@@ -111,4 +111,82 @@ var _ = Describe("Users", func() {
 			errIsNil: true,
 		}),
 	)
+
+	DescribeTable("Confirm",
+		func(e expectation) {
+			server.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("POST", "/user/confirm"),
+					ghttp.VerifyHeader(http.Header{
+						"Accept":       {"application/vnd.rise.v0+json"},
+						"Content-Type": {"application/x-www-form-urlencoded"},
+						"User-Agent":   {"RiseCLI"},
+					}),
+					ghttp.RespondWith(e.resCode, e.resBody),
+				),
+			)
+
+			appErr := users.Confirm("foo@example.com", "123456")
+			Expect(server.ReceivedRequests()).To(HaveLen(1))
+
+			if e.errIsNil {
+				Expect(appErr).To(BeNil())
+			} else {
+				Expect(appErr.Code).To(Equal(e.errCode))
+				Expect(appErr.Description).To(ContainSubstring(e.errDesc))
+				Expect(appErr.IsFatal).To(Equal(e.errIsFatal))
+			}
+		},
+
+		Entry("unexpected response code", expectation{
+			resCode:    http.StatusInternalServerError,
+			resBody:    "",
+			errIsNil:   false,
+			errCode:    users.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("malformed json", expectation{
+			resCode:    http.StatusOK,
+			resBody:    `{"foo": }`,
+			errIsNil:   false,
+			errCode:    users.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("422 with invalid code error", expectation{
+			resCode:    422,
+			resBody:    `{"error": "invalid_params", "error_description": "invalid email or confirmation_code", "confirmed": false}`,
+			errIsNil:   false,
+			errCode:    users.ErrCodeValidationFailed,
+			errDesc:    "incorrect confirmation code",
+			errIsFatal: false,
+		}),
+
+		Entry("422 with unexpected error", expectation{
+			resCode:    422,
+			resBody:    `{"error": "something_weng_wrong"}`,
+			errIsNil:   false,
+			errCode:    users.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("status is OK, but somehow confirmed is false", expectation{
+			resCode:    http.StatusOK,
+			resBody:    `{"confirmed": false}`,
+			errIsNil:   false,
+			errCode:    users.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("successful confirmation", expectation{
+			resCode:  http.StatusOK,
+			resBody:  `{"confirmed": true}`,
+			errIsNil: true,
+		}),
+	)
 })

@@ -57,7 +57,9 @@ func Confirm(email, confirmationCode string) *apperror.Error {
 	res, err := goreq.Request{
 		Method:      "POST",
 		Uri:         config.Host + "/user/confirm",
+		Accept:      "application/vnd.rise.v0+json",
 		ContentType: "application/x-www-form-urlencoded",
+		UserAgent:   "RiseCLI",
 
 		Body: url.Values{
 			"email":             {email},
@@ -73,17 +75,20 @@ func Confirm(email, confirmationCode string) *apperror.Error {
 		return apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
 
-	if res.StatusCode == 422 {
-		resText, err := res.Body.ToString()
-		if err != nil {
-			return apperror.New(ErrCodeUnexpectedError, err, "", true)
-		}
+	var j map[string]interface{}
+	if err := res.Body.FromJsonTo(&j); err != nil {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
 
-		if strings.Contains(resText, "invalid email or confirmation_code") {
+	if res.StatusCode == 422 {
+		if j["error"] == "invalid_params" && j["error_description"] == "invalid email or confirmation_code" {
 			return apperror.New(ErrCodeValidationFailed, nil, "You've entered an incorrect confirmation code. Please try again.", false)
-		} else {
-			return apperror.New(ErrCodeUnexpectedError, err, resText, true)
 		}
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	if v, ok := j["confirmed"].(bool); !v || !ok {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
 
 	return nil
