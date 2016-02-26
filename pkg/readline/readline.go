@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	Input  = os.Stdin
-	Output = os.Stdout
+	Input  io.Reader = os.Stdin
+	Output io.Writer = os.Stdout
 )
 
 func Read(prompt string, retry bool) (string, error) {
@@ -21,10 +21,11 @@ func Read(prompt string, retry bool) (string, error) {
 		err error
 	)
 
+	in := bufio.NewReader(Input)
+
 	for {
 		fmt.Fprint(Output, prompt)
 
-		in := bufio.NewReader(Input)
 		s, err = in.ReadString('\n')
 		if err != nil {
 			return "", err
@@ -41,20 +42,30 @@ func Read(prompt string, retry bool) (string, error) {
 }
 
 func ReadSecurely(prompt string, retry bool) (string, error) {
-	s, err := doReadSecurely(prompt)
-	fmt.Fprintln(Output)
-	if err != nil {
-		return "", err
+	var (
+		s   string
+		err error
+	)
+
+	in := bufio.NewReader(Input)
+
+	for {
+		fmt.Fprint(Output, prompt)
+
+		s, err = doReadSecurely(prompt, in)
+		if err != nil {
+			return "", err
+		}
+
+		if s != "" || !retry {
+			break
+		}
 	}
 
-	if s == "" && retry {
-		return ReadSecurely(prompt, true)
-	}
-
-	return s, err
+	return s, nil
 }
 
-func doReadSecurely(prompt string) (string, error) {
+func doReadSecurely(prompt string, in *bufio.Reader) (string, error) {
 	useAnsi := false // if true, use ansi to conceal password
 
 	if Input == os.Stdin {
@@ -75,13 +86,9 @@ func doReadSecurely(prompt string) (string, error) {
 		}
 	}
 
-	fmt.Fprint(Output, prompt)
-
 	if useAnsi {
 		fmt.Fprint(Output, "\033[8m")
 	}
-
-	in := bufio.NewReader(Input)
 
 	s := []byte{}
 	for {
@@ -92,9 +99,11 @@ func doReadSecurely(prompt string) (string, error) {
 		if b == 10 /* LF */ || b == 13 /* CR */ {
 			break
 		}
+
 		if b == 3 /* ^C */ || b == 4 /* ^D */ {
 			return "", io.EOF
 		}
+
 		if b == 8 /* BS */ || b == 127 /* DEL */ {
 			if len(s) > 0 {
 				s = s[:len(s)-1]
