@@ -1,0 +1,16 @@
+{
+	"ImportPath": "github.com/nitrous-io/rise-cli-go",
+	"GoVersion": "go1.6",
+	"Packages": [
+		"github.com/nitrous-io/rise-cli-go",
+		"github.com/nitrous-io/rise-cli-go/config",
+		"github.com/nitrous-io/rise-cli-go/util"
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/codegangsta/cli",
+			"Comment": "1.2.0-217-g5db7419",
+			"Rev": "5db74198dee1cfe60cf06a611d03a420361baad6"
+		}
+	]
+}

@@ -1,0 +1,6 @@
+#!/bin/bash
+
+export RISE_CLI_ENV=${RISE_ENV:-"development"}
+echo "RISE_CLI_ENV is \"$RISE_ENV\""
+
+$(eval echo "$@")
