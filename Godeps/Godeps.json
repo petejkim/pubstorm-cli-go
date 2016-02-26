@@ -4,13 +4,28 @@
 	"Packages": [
 		"github.com/nitrous-io/rise-cli-go",
 		"github.com/nitrous-io/rise-cli-go/config",
+		"github.com/nitrous-io/rise-cli-go/pkg/term",
+		"github.com/nitrous-io/rise-cli-go/pkg/term/windows",
 		"github.com/nitrous-io/rise-cli-go/util"
 	],
 	"Deps": [
 		{
+			"ImportPath": "github.com/Azure/go-ansiterm",
+			"Rev": "70b2c90b260171e829f1ebd7c17f600c11858dbe"
+		},
+		{
+			"ImportPath": "github.com/Sirupsen/logrus",
+			"Comment": "v0.9.0-15-g219c8cb",
+			"Rev": "219c8cb75c258c552e999735be6df753ffc7afdc"
+		},
+		{
 			"ImportPath": "github.com/codegangsta/cli",
 			"Comment": "1.2.0-217-g5db7419",
 			"Rev": "5db74198dee1cfe60cf06a611d03a420361baad6"
+		},
+		{
+			"ImportPath": "golang.org/x/sys/unix",
+			"Rev": "5eaf0df67e70d6997a9fe0ed24383fa1b01638d3"
 		}
 	]
 }
