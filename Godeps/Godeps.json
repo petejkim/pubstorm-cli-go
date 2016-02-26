@@ -3,7 +3,9 @@
 	"GoVersion": "go1.6",
 	"Packages": [
 		"github.com/nitrous-io/rise-cli-go",
-		"github.com/nitrous-io/rise-cli-go/auth",
+		"github.com/nitrous-io/rise-cli-go/apperror",
+		"github.com/nitrous-io/rise-cli-go/client/users",
+		"github.com/nitrous-io/rise-cli-go/commands/signup",
 		"github.com/nitrous-io/rise-cli-go/config",
 		"github.com/nitrous-io/rise-cli-go/pkg/readline",
 		"github.com/nitrous-io/rise-cli-go/pkg/term",

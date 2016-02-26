@@ -15,27 +15,42 @@ var (
 	Output = os.Stdout
 )
 
-func Read(prompt string) (string, error) {
-	fmt.Fprint(Output, prompt)
+func Read(prompt string, retry bool) (string, error) {
+	var (
+		s   string
+		err error
+	)
 
-	in := bufio.NewReader(Input)
-	s, err := in.ReadString('\n')
-	if err != nil {
-		return "", err
+	for {
+		fmt.Fprint(Output, prompt)
+
+		in := bufio.NewReader(Input)
+		s, err = in.ReadString('\n')
+		if err != nil {
+			return "", err
+		}
+
+		s = strings.TrimRight(s, "\r\n")
+
+		if s != "" || !retry {
+			break
+		}
 	}
 
-	return strings.TrimRight(s, "\r\n"), nil
+	return s, nil
 }
 
-func ReadSecurely(prompt string) (string, error) {
+func ReadSecurely(prompt string, retry bool) (string, error) {
 	s, err := doReadSecurely(prompt)
 	fmt.Fprintln(Output)
 	if err != nil {
 		return "", err
 	}
-	if s == "" {
-		return ReadSecurely(prompt)
+
+	if s == "" && retry {
+		return ReadSecurely(prompt, true)
 	}
+
 	return s, err
 }
 
