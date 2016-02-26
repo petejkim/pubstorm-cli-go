@@ -1,10 +1,8 @@
 package users
 
 import (
-	"fmt"
 	"net/http"
 	"net/url"
-	"strings"
 
 	"github.com/franela/goreq"
 	"github.com/nitrous-io/rise-cli-go/apperror"
@@ -22,7 +20,9 @@ func Create(email, password string) *apperror.Error {
 	res, err := goreq.Request{
 		Method:      "POST",
 		Uri:         config.Host + "/users",
+		Accept:      "application/vnd.rise.v0+json",
 		ContentType: "application/x-www-form-urlencoded",
+		UserAgent:   "RiseCLI",
 
 		Body: url.Values{
 			"email":    {email},
@@ -45,11 +45,9 @@ func Create(email, password string) *apperror.Error {
 
 	if res.StatusCode == 422 {
 		if j["error"] == "invalid_params" {
-			fmt.Println("There were errors in your input. Please try again")
 			return apperror.New(ErrCodeValidationFailed, nil, util.ValidationErrorsToString(j), false)
-		} else {
-			return apperror.New(ErrCodeUnexpectedError, err, "", true)
 		}
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
 
 	return nil

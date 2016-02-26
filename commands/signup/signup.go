@@ -41,6 +41,7 @@ func Signup(c *cli.Context) {
 			break
 		}
 		appErr.Handle()
+		fmt.Println("There were errors in your input. Please try again.")
 	}
 
 	fmt.Println("Your account has been created. You will receive your confirmation code shortly.")
