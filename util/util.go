@@ -18,6 +18,9 @@ func ExitIfError(err error) {
 }
 
 func ValidationErrorsToString(j map[string]interface{}) string {
+	if j == nil {
+		return ""
+	}
 	msgs := []string{}
 	if errs, ok := j["errors"].(map[string]interface{}); ok {
 		for k, v := range errs {
