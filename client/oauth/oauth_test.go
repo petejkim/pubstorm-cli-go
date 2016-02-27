@@ -2,6 +2,7 @@ package oauth_test
 
 import (
 	"net/http"
+	"net/url"
 	"testing"
 
 	"github.com/nitrous-io/rise-cli-go/client/oauth"
@@ -54,6 +55,11 @@ var _ = Describe("OAuth", func() {
 						"Accept":       {"application/vnd.rise.v0+json"},
 						"Content-Type": {"application/x-www-form-urlencoded"},
 						"User-Agent":   {"RiseCLI"},
+					}),
+					ghttp.VerifyForm(url.Values{
+						"grant_type": {"password"},
+						"username":   {"foo@example.com"},
+						"password":   {"p@55w0rd"},
 					}),
 					ghttp.RespondWith(e.resCode, e.resBody),
 				),

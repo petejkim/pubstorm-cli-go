@@ -27,8 +27,9 @@ func FetchToken(email, password string) (token string, appErr *apperror.Error) {
 		BasicAuthPassword: config.ClientSecret,
 
 		Body: url.Values{
-			"email":    {email},
-			"password": {password},
+			"grant_type": {"password"},
+			"username":   {email},
+			"password":   {password},
 		}.Encode(),
 	}.Do()
 

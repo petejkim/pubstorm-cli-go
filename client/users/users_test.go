@@ -2,6 +2,7 @@ package users_test
 
 import (
 	"net/http"
+	"net/url"
 	"testing"
 
 	"github.com/nitrous-io/rise-cli-go/client/users"
@@ -52,6 +53,10 @@ var _ = Describe("Users", func() {
 						"Accept":       {"application/vnd.rise.v0+json"},
 						"Content-Type": {"application/x-www-form-urlencoded"},
 						"User-Agent":   {"RiseCLI"},
+					}),
+					ghttp.VerifyForm(url.Values{
+						"email":    {"foo@example.com"},
+						"password": {"p@55w0rd"},
 					}),
 					ghttp.RespondWith(e.resCode, e.resBody),
 				),
@@ -122,6 +127,10 @@ var _ = Describe("Users", func() {
 						"Accept":       {"application/vnd.rise.v0+json"},
 						"Content-Type": {"application/x-www-form-urlencoded"},
 						"User-Agent":   {"RiseCLI"},
+					}),
+					ghttp.VerifyForm(url.Values{
+						"email":             {"foo@example.com"},
+						"confirmation_code": {"123456"},
 					}),
 					ghttp.RespondWith(e.resCode, e.resBody),
 				),
