@@ -10,9 +10,10 @@ import (
 )
 
 var (
-	ErrCodeRequestFailed   = "request_failed"
-	ErrCodeUnexpectedError = "unexpected_error"
-	ErrCodeInvalidGrant    = "invalid_grant"
+	ErrCodeRequestFailed    = "request_failed"
+	ErrCodeUnexpectedError  = "unexpected_error"
+	ErrCodeInvalidGrant     = "invalid_grant"
+	ErrCodeUnconfirmedEmail = "unconfirmed_email"
 )
 
 func FetchToken(email, password string) (token string, appErr *apperror.Error) {
@@ -52,7 +53,7 @@ func FetchToken(email, password string) (token string, appErr *apperror.Error) {
 			case "user credentials are invalid":
 				return "", apperror.New(ErrCodeInvalidGrant, nil, "invalid email or password", false)
 			case "user has not confirmed email address":
-				return "", apperror.New(ErrCodeInvalidGrant, nil, "user has not confirmed email address", false)
+				return "", apperror.New(ErrCodeUnconfirmedEmail, nil, "user has not confirmed email address", false)
 			}
 		}
 		return "", apperror.New(ErrCodeUnexpectedError, err, "", true)

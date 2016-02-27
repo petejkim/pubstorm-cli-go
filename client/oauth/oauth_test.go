@@ -111,7 +111,7 @@ var _ = Describe("OAuth", func() {
 			resCode:    http.StatusBadRequest,
 			resBody:    `{"error": "invalid_grant", "error_description": "user has not confirmed email address"}`,
 			errIsNil:   false,
-			errCode:    oauth.ErrCodeInvalidGrant,
+			errCode:    oauth.ErrCodeUnconfirmedEmail,
 			errDesc:    "user has not confirmed email address",
 			errIsFatal: false,
 		}),

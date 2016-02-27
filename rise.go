@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/codegangsta/cli"
+	"github.com/nitrous-io/rise-cli-go/commands/login"
 	"github.com/nitrous-io/rise-cli-go/commands/signup"
 )
 
@@ -17,6 +18,11 @@ func main() {
 			Name:   "signup",
 			Usage:  "Create a new Rise account",
 			Action: signup.Signup,
+		},
+		{
+			Name:   "login",
+			Usage:  "Log in to a Rise account",
+			Action: login.Login,
 		},
 	}
 

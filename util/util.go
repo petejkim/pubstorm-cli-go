@@ -17,6 +17,10 @@ func ExitIfError(err error) {
 	}
 }
 
+func ExitSomethingWentWrong() {
+	log.Fatalln("Error: Something went wrong. Please try again.")
+}
+
 func ValidationErrorsToString(j map[string]interface{}) string {
 	if j == nil {
 		return ""
