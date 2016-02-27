@@ -57,6 +57,8 @@ func ReadSecurely(prompt string, retry bool) (string, error) {
 			return "", err
 		}
 
+		fmt.Fprintln(Output) // print endline
+
 		if s != "" || !retry {
 			break
 		}
