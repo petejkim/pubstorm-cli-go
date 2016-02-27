@@ -34,7 +34,7 @@ func Create(email, password string) *apperror.Error {
 		return apperror.New(ErrCodeRequestFailed, err, "", true)
 	}
 
-	if res.StatusCode != 422 && res.StatusCode != 201 {
+	if res.StatusCode != 422 && res.StatusCode != http.StatusCreated {
 		return apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
 

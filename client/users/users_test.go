@@ -63,6 +63,7 @@ var _ = Describe("Users", func() {
 			if e.errIsNil {
 				Expect(appErr).To(BeNil())
 			} else {
+				Expect(appErr).NotTo(BeNil())
 				Expect(appErr.Code).To(Equal(e.errCode))
 				Expect(appErr.Description).To(ContainSubstring(e.errDesc))
 				Expect(appErr.IsFatal).To(Equal(e.errIsFatal))
@@ -132,6 +133,7 @@ var _ = Describe("Users", func() {
 			if e.errIsNil {
 				Expect(appErr).To(BeNil())
 			} else {
+				Expect(appErr).NotTo(BeNil())
 				Expect(appErr.Code).To(Equal(e.errCode))
 				Expect(appErr.Description).To(ContainSubstring(e.errDesc))
 				Expect(appErr.IsFatal).To(Equal(e.errIsFatal))
