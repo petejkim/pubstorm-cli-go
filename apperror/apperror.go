@@ -50,7 +50,7 @@ func (e *Error) Print() {
 
 func (e *Error) Handle() {
 	if e.IsFatal {
-		log.Fatal(e.Error())
+		log.Fatalln(e.Error())
 	} else {
 		e.Print()
 	}

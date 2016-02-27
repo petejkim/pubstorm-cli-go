@@ -11,7 +11,7 @@ import (
 func ExitIfError(err error) {
 	if err != nil {
 		if err != io.EOF {
-			log.Fatal(err)
+			log.Fatalln(err)
 		}
 		os.Exit(1)
 	}
