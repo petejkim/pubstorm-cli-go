@@ -2,17 +2,21 @@ package signup
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/codegangsta/cli"
+	"github.com/nitrous-io/rise-cli-go/client/oauth"
 	"github.com/nitrous-io/rise-cli-go/client/users"
+	"github.com/nitrous-io/rise-cli-go/config"
 	"github.com/nitrous-io/rise-cli-go/pkg/readline"
 	"github.com/nitrous-io/rise-cli-go/util"
 )
 
 func Signup(c *cli.Context) {
 	var (
-		err   error
-		email string
+		err      error
+		email    string
+		password string
 	)
 
 	fmt.Println("Create a Rise account")
@@ -20,7 +24,7 @@ func Signup(c *cli.Context) {
 		email, err = readline.Read("Enter Email: ", true)
 		util.ExitIfError(err)
 
-		var password, passwordConf string
+		var passwordConf string
 
 		readPw := func() {
 			password, err = readline.ReadSecurely("Enter Password: ", true)
@@ -58,4 +62,17 @@ func Signup(c *cli.Context) {
 	}
 
 	fmt.Println("Thanks for confirming your email address! Your account is now active!")
+
+	token, appErr := oauth.FetchToken(email, password)
+	if token == "" {
+		fmt.Println("Error: Could not login to Rise. Use `rise login` command to try again.")
+
+		if appErr != nil {
+			log.Fatalln(appErr.Error())
+		}
+	}
+
+	config.AccessToken = token
+	config.Save()
+	fmt.Println("You are logged in as", email)
 }
