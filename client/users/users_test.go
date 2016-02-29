@@ -93,6 +93,15 @@ var _ = Describe("Users", func() {
 			errIsFatal: true,
 		}),
 
+		Entry("422 with email is taken error)", expectation{
+			resCode:    422,
+			resBody:    `{"error": "invalid_params", "errors": {"email": "is taken"}}`,
+			errIsNil:   false,
+			errCode:    users.ErrCodeValidationFailed,
+			errDesc:    "email is taken",
+			errIsFatal: false,
+		}),
+
 		Entry("422 with validation errors", expectation{
 			resCode:    422,
 			resBody:    `{"error": "invalid_params", "errors": {"password": "is invalid"}}`,
