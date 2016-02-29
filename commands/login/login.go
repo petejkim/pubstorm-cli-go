@@ -36,14 +36,32 @@ func Login(c *cli.Context) {
 
 		if appErr != nil && appErr.Code == oauth.ErrCodeUnconfirmedEmail {
 			fmt.Println("You have to confirm your email address to continue. Please check your inbox for the confirmation code.")
+
+			resendUsed := false
 			for {
-				confirmationCode, err := readline.Read("Enter Confirmation Code: ", true)
+				var prompt string
+				if resendUsed {
+					prompt = "Enter Confirmation Code (check your inbox): "
+				} else {
+					prompt = `Enter Confirmation Code (or enter "resend" if you need it sent again): `
+				}
+				confirmationCode, err := readline.Read(prompt, true)
 				util.ExitIfError(err)
 
-				appErr := users.Confirm(email, confirmationCode)
-				if appErr == nil {
-					break
+				if confirmationCode == "resend" && !resendUsed {
+					appErr = users.ResendConfirmationCode(email)
+					if appErr == nil {
+						resendUsed = true
+						fmt.Println("Confirmation code has been resent. You will receive your confirmation code shortly.")
+						continue
+					}
+				} else {
+					appErr = users.Confirm(email, confirmationCode)
+					if appErr == nil {
+						break
+					}
 				}
+
 				appErr.Handle()
 			}
 

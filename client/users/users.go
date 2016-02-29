@@ -93,3 +93,43 @@ func Confirm(email, confirmationCode string) *apperror.Error {
 
 	return nil
 }
+
+func ResendConfirmationCode(email string) *apperror.Error {
+	res, err := goreq.Request{
+		Method:      "POST",
+		Uri:         config.Host + "/user/confirm/resend",
+		Accept:      "application/vnd.rise.v0+json",
+		ContentType: "application/x-www-form-urlencoded",
+		UserAgent:   "RiseCLI",
+
+		Body: url.Values{
+			"email": {email},
+		}.Encode(),
+	}.Do()
+
+	if err != nil {
+		return apperror.New(ErrCodeRequestFailed, err, "", true)
+	}
+
+	if res.StatusCode != 422 && res.StatusCode != http.StatusOK {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	var j map[string]interface{}
+	if err := res.Body.FromJsonTo(&j); err != nil {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	if res.StatusCode == 422 {
+		if j["error"] == "invalid_params" && j["error_description"] == "email is not found or already confirmed" {
+			return apperror.New(ErrCodeValidationFailed, nil, "Could not request confirmation code to be resent. (Is it already confirmed?)", true)
+		}
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	if v, ok := j["sent"].(bool); !v || !ok {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	return nil
+}
