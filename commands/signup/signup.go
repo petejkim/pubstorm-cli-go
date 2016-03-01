@@ -22,16 +22,16 @@ func Signup(c *cli.Context) {
 	fmt.Println("Create a Rise account")
 	for {
 		email, err = readline.Read("Enter Email: ", true, "")
-		util.ExitIfError(err)
+		util.ExitIfErrorOrEOF(err)
 
 		var passwordConf string
 
 		readPw := func() {
 			password, err = readline.ReadSecurely("Enter Password: ", true, "")
-			util.ExitIfError(err)
+			util.ExitIfErrorOrEOF(err)
 
 			passwordConf, err = readline.ReadSecurely("Confirm Password: ", true, "")
-			util.ExitIfError(err)
+			util.ExitIfErrorOrEOF(err)
 		}
 
 		readPw()
@@ -52,7 +52,7 @@ func Signup(c *cli.Context) {
 
 	for {
 		confirmationCode, err := readline.Read("Enter Confirmation Code (check your inbox): ", true, "")
-		util.ExitIfError(err)
+		util.ExitIfErrorOrEOF(err)
 
 		appErr := users.Confirm(email, confirmationCode)
 		if appErr == nil {

@@ -2,6 +2,7 @@ package deploy
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/codegangsta/cli"
@@ -11,69 +12,78 @@ import (
 )
 
 func Deploy(c *cli.Context) {
-	fmt.Println("Set up your Rise project")
-
 	var (
 		err  error
-		proj = &project.Project{}
+		proj *project.Project
 	)
 
-	for {
-		proj.Name, err = readline.Read("Enter Project Name: ", true, "")
+	proj, err = project.Load()
+	if err != nil && !os.IsNotExist(err) {
 		util.ExitIfError(err)
-
-		if err := proj.ValidateName(); err != nil {
-			fmt.Println(err.Error())
-			continue
-		}
-
-		break
 	}
 
-	for {
-		proj.Path, err = readline.Read("Enter Project Path: [.] ", true, ".")
-		util.ExitIfError(err)
+	if proj == nil {
+		proj = &project.Project{}
 
-		if err := proj.ValidatePath(); err != nil {
-			fmt.Println(err.Error())
-			continue
+		fmt.Println("Set up your Rise project")
+
+		for {
+			proj.Name, err = readline.Read("Enter Project Name: ", true, "")
+			util.ExitIfErrorOrEOF(err)
+
+			if err := proj.ValidateName(); err != nil {
+				fmt.Println(err.Error())
+				continue
+			}
+
+			break
 		}
 
-		break
-	}
+		for {
+			proj.Path, err = readline.Read("Enter Project Path: [.] ", true, ".")
+			util.ExitIfErrorOrEOF(err)
 
-	for {
-		enableStats, err := readline.Read("Enable Basic Stats? [Y/n] ", true, "y")
-		util.ExitIfError(err)
+			if err := proj.ValidatePath(); err != nil {
+				fmt.Println(err.Error())
+				continue
+			}
 
-		switch strings.ToLower(enableStats) {
-		case "y", "yes":
-			proj.EnableStats = true
-		case "n", "no":
-			proj.EnableStats = false
-		default:
-			continue
+			break
 		}
 
-		break
-	}
+		for {
+			enableStats, err := readline.Read("Enable Basic Stats? [Y/n] ", true, "y")
+			util.ExitIfErrorOrEOF(err)
 
-	for {
-		forceHTTPS, err := readline.Read("Force HTTPS? [y/N] ", true, "n")
-		util.ExitIfError(err)
+			switch strings.ToLower(enableStats) {
+			case "y", "yes":
+				proj.EnableStats = true
+			case "n", "no":
+				proj.EnableStats = false
+			default:
+				continue
+			}
 
-		switch strings.ToLower(forceHTTPS) {
-		case "y", "yes":
-			proj.ForceHTTPS = true
-		case "n", "no":
-			proj.ForceHTTPS = false
-		default:
-			continue
+			break
 		}
 
-		break
-	}
+		for {
+			forceHTTPS, err := readline.Read("Force HTTPS? [y/N] ", true, "n")
+			util.ExitIfErrorOrEOF(err)
 
-	err = proj.Save()
-	util.ExitIfError(err)
+			switch strings.ToLower(forceHTTPS) {
+			case "y", "yes":
+				proj.ForceHTTPS = true
+			case "n", "no":
+				proj.ForceHTTPS = false
+			default:
+				continue
+			}
+
+			break
+		}
+
+		err = proj.Save()
+		util.ExitIfError(err)
+	}
 }

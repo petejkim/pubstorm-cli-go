@@ -27,10 +27,10 @@ func Login(c *cli.Context) {
 		)
 
 		email, err = readline.Read("Enter Email: ", true, "")
-		util.ExitIfError(err)
+		util.ExitIfErrorOrEOF(err)
 
 		password, err = readline.ReadSecurely("Enter Password: ", true, "")
-		util.ExitIfError(err)
+		util.ExitIfErrorOrEOF(err)
 
 		token, appErr = oauth.FetchToken(email, password)
 
@@ -46,7 +46,7 @@ func Login(c *cli.Context) {
 					prompt = `Enter Confirmation Code (or enter "resend" if you need it sent again): `
 				}
 				confirmationCode, err := readline.Read(prompt, true, "")
-				util.ExitIfError(err)
+				util.ExitIfErrorOrEOF(err)
 
 				if confirmationCode == "resend" && !resendUsed {
 					appErr = users.ResendConfirmationCode(email)

@@ -8,7 +8,15 @@ import (
 	"strings"
 )
 
+// Prints and exits if err is not nil
 func ExitIfError(err error) {
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
+
+// Exits if err is not nil. If err is not an EOF error, prints error message
+func ExitIfErrorOrEOF(err error) {
 	if err != nil {
 		if err != io.EOF {
 			log.Fatalln(err)

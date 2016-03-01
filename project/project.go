@@ -78,3 +78,30 @@ func (p *Project) Save() error {
 		"force_https":  p.ForceHTTPS,
 	})
 }
+
+func Load() (*Project, error) {
+	f, err := os.Open(riseJSON)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	var j struct {
+		Name        string `json:"name"`
+		Path        string `json:"path"`
+		EnableStats bool   `json:"enable_stats"`
+		ForceHTTPS  bool   `json:"force_https"`
+	}
+
+	err = json.NewDecoder(f).Decode(&j)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Project{
+		Name:        j.Name,
+		Path:        j.Path,
+		EnableStats: j.EnableStats,
+		ForceHTTPS:  j.ForceHTTPS,
+	}, nil
+}

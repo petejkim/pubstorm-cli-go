@@ -131,5 +131,41 @@ var _ = Describe("Project", func() {
 				Expect(j["force_https"]).To(BeFalse())
 			})
 		})
+
+		Describe("Load()", func() {
+			Context("when rise.json does not exist", func() {
+				It("returns error", func() {
+					proj, err := project.Load()
+					Expect(err).NotTo(BeNil())
+					Expect(os.IsNotExist(err)).To(BeTrue())
+					Expect(proj).To(BeNil())
+				})
+			})
+
+			Context("when rise.json exists", func() {
+				BeforeEach(func() {
+					err = ioutil.WriteFile("rise.json", []byte(`
+						{
+							"name": "good-beer-company",
+							"path": "./output",
+							"enable_stats": false,
+							"force_https": true
+						}
+					`), 0600)
+					Expect(err).To(BeNil())
+				})
+
+				It("loads rise.json and returns a project", func() {
+					proj, err := project.Load()
+					Expect(err).To(BeNil())
+
+					Expect(proj).NotTo(BeNil())
+					Expect(proj.Name).To(Equal("good-beer-company"))
+					Expect(proj.Path).To(Equal("./output"))
+					Expect(proj.EnableStats).To(BeFalse())
+					Expect(proj.ForceHTTPS).To(BeTrue())
+				})
+			})
+		})
 	})
 })
