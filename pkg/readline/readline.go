@@ -15,7 +15,7 @@ var (
 	Output io.Writer = os.Stdout
 )
 
-func Read(prompt string, retry bool) (string, error) {
+func Read(prompt string, retry bool, def string) (string, error) {
 	var (
 		s   string
 		err error
@@ -33,6 +33,10 @@ func Read(prompt string, retry bool) (string, error) {
 
 		s = strings.TrimRight(s, "\r\n")
 
+		if s == "" && def != "" {
+			s = def
+		}
+
 		if s != "" || !retry {
 			break
 		}
@@ -41,7 +45,7 @@ func Read(prompt string, retry bool) (string, error) {
 	return s, nil
 }
 
-func ReadSecurely(prompt string, retry bool) (string, error) {
+func ReadSecurely(prompt string, retry bool, def string) (string, error) {
 	var (
 		s   string
 		err error
@@ -58,6 +62,10 @@ func ReadSecurely(prompt string, retry bool) (string, error) {
 		}
 
 		fmt.Fprintln(Output) // print endline
+
+		if s == "" && def != "" {
+			s = def
+		}
 
 		if s != "" || !retry {
 			break
