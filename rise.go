@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/codegangsta/cli"
+	"github.com/nitrous-io/rise-cli-go/commands/deploy"
 	"github.com/nitrous-io/rise-cli-go/commands/login"
 	"github.com/nitrous-io/rise-cli-go/commands/signup"
 )
@@ -23,6 +24,11 @@ func main() {
 			Name:   "login",
 			Usage:  "Log in to a Rise account",
 			Action: login.Login,
+		},
+		{
+			Name:   "deploy",
+			Usage:  "Deploy your project",
+			Action: deploy.Deploy,
 		},
 	}
 

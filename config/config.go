@@ -20,6 +20,10 @@ var (
 	AccessToken string
 )
 
+const (
+	configJSON = "config.json"
+)
+
 func init() {
 	if envHost := os.Getenv("RISE_HOST"); envHost != "" {
 		Host = envHost
@@ -38,7 +42,7 @@ func init() {
 
 // Saves config to a json file
 func Save() {
-	configPath := filepath.Join(DotRisePath, "config.json")
+	configPath := filepath.Join(DotRisePath, configJSON)
 	f, err := os.OpenFile(configPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		log.Fatalf("Fatal Error: Could not write to %s!\n", configPath)
