@@ -1,6 +1,9 @@
 package bundle_test
 
 import (
+	"archive/tar"
+	"compress/gzip"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -10,7 +13,6 @@ import (
 
 	"github.com/nitrous-io/rise-cli-go/bundle"
 	. "github.com/onsi/ginkgo"
-	// . "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 )
 
@@ -110,6 +112,78 @@ var _ = Describe("Bundle", func() {
 			Expect(size).To(Equal(int64(30)))
 
 			Expect(b.FileList()).To(ConsistOf(expectedFiles))
+		})
+	})
+
+	Describe("Pack", func() {
+		var (
+			files     map[string][]byte
+			fileNames []string
+		)
+
+		BeforeEach(func() {
+			files = map[string][]byte{
+				"foo/foo.rb": []byte(`puts "hello"`),
+				"bar.sql":    []byte(`SELECT * FROM hello;`),
+				"baz/baz.js": []byte(`console.log("hello");`),
+				"qux.php":    []byte(`<?php echo("hello") ?>`),
+			}
+
+			fileNames = make([]string, 0, len(files))
+
+			for fileName, fileContent := range files {
+				fileNames = append(fileNames, fileName)
+
+				if strings.Contains(fileName, "/") {
+					dir := filepath.Dir(fileName)
+					err = os.MkdirAll(dir, 0700)
+					Expect(err).To(BeNil())
+				}
+				err = ioutil.WriteFile(fileName, []byte(fileContent), 0600)
+				Expect(err).To(BeNil())
+			}
+		})
+
+		It("creates a compressed tarball", func() {
+			b := bundle.New(".")
+			_, _, err := b.Assemble(nil, false)
+			Expect(err).To(BeNil())
+
+			tarballPath := filepath.Join(tempDir, "bundle.tar.gz")
+			err = b.Pack(tarballPath, false)
+			Expect(err).To(BeNil())
+
+			_, err = os.Stat(tarballPath)
+			Expect(err).To(BeNil())
+
+			f, err := os.Open(tarballPath)
+			Expect(err).To(BeNil())
+			defer f.Close()
+
+			gr, err := gzip.NewReader(f)
+			Expect(err).To(BeNil())
+			defer gr.Close()
+
+			tr := tar.NewReader(gr)
+
+			filesRead := []string{}
+
+			for i := 0; i < 4; i++ {
+				hdr, err := tr.Next()
+				Expect(err).To(BeNil())
+				fileName := hdr.Name
+				Expect(files).To(HaveKey(fileName))
+
+				data, err := ioutil.ReadAll(tr)
+				Expect(err).To(BeNil())
+				Expect(data).To(Equal(files[fileName]))
+
+				filesRead = append(filesRead, fileName)
+			}
+
+			_, err = tr.Next()
+			Expect(err).To(Equal(io.EOF))
+			Expect(fileNames).To(ConsistOf(filesRead))
 		})
 	})
 })
