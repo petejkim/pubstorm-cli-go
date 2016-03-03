@@ -29,7 +29,7 @@ func New(path string) *Bundle {
 func (b *Bundle) Assemble(ignoreList []string, verbose bool) (count int, size int64, err error) {
 	b.fileList = []string{}
 
-	absPath, err := filepath.Abs(b.path)
+	basePath, err := filepath.Abs(b.path)
 	if err != nil {
 		return 0, 0, err
 	}
@@ -40,7 +40,7 @@ func (b *Bundle) Assemble(ignoreList []string, verbose bool) (count int, size in
 			return nil
 		}
 
-		incl, fileSize, err := shouldInclude(path, ignoreList, fi, verbose)
+		incl, fileSize, err := shouldInclude(path, basePath, ignoreList, fi, verbose)
 		if err != nil {
 			// SkipDir error should fall through
 			if err == filepath.SkipDir {
@@ -50,7 +50,7 @@ func (b *Bundle) Assemble(ignoreList []string, verbose bool) (count int, size in
 		}
 
 		if incl {
-			relPath, err := filepath.Rel(absPath, path)
+			relPath, err := filepath.Rel(basePath, path)
 			if err != nil {
 				return err
 			}
@@ -61,7 +61,7 @@ func (b *Bundle) Assemble(ignoreList []string, verbose bool) (count int, size in
 		return nil
 	}
 
-	if err := filepath.Walk(absPath, walkFn); err != nil {
+	if err := filepath.Walk(basePath, walkFn); err != nil {
 		b.fileList = []string{}
 		return 0, 0, err
 	}
@@ -69,7 +69,7 @@ func (b *Bundle) Assemble(ignoreList []string, verbose bool) (count int, size in
 	return len(b.fileList), size, nil
 }
 
-func shouldInclude(path string, ignoreList []string, fi os.FileInfo, verbose bool) (incl bool, fileSize int64, err error) {
+func shouldInclude(path, basePath string, ignoreList []string, fi os.FileInfo, verbose bool) (incl bool, fileSize int64, err error) {
 	var (
 		isDir = fi.IsDir()
 		mode  = fi.Mode()
@@ -84,9 +84,13 @@ func shouldInclude(path string, ignoreList []string, fi os.FileInfo, verbose boo
 		return false, 0, nil
 	}
 
-	log := func(m string) {
+	logWarn := func(m string) {
 		if verbose {
-			fmt.Printf("Warning: Ignoring \"%s\", %s\n", path, m)
+			relPath, _ := filepath.Rel(basePath, path)
+			if relPath == "" {
+				relPath = path
+			}
+			fmt.Printf("Warning: Ignoring \"%s\", %s\n", relPath, m)
 		}
 	}
 
@@ -96,48 +100,48 @@ func shouldInclude(path string, ignoreList []string, fi os.FileInfo, verbose boo
 		fi, err = os.Stat(path)
 		// if there is an error following the symlink, skip
 		if err != nil {
-			log("could not follow symlink")
+			logWarn("could not follow symlink")
 			return skip()
 		}
 
 		// if symlink points to a directory, skip
 		if fi.IsDir() {
-			log("symlink points to a directory")
+			logWarn("symlink points to a directory")
 			return skip()
 		}
 
 		// if symlink points to a non-regular file, skip
 		if !fi.Mode().IsRegular() {
-			log("file has special mode bits set")
+			logWarn("file has special mode bits set")
 			return skip()
 		}
 	}
 
 	// if file name starts with ".", "#" or ends with "~", skip
 	if base[0] == '.' {
-		log(`name begins with "."`)
+		logWarn(`name begins with "."`)
 		return skip()
 	}
 
 	if base[0] == '#' {
-		log(`name begins with "#"`)
+		logWarn(`name begins with "#"`)
 		return skip()
 	}
 
 	if base[len(base)-1] == '~' {
-		log(`name ends with "~"`)
+		logWarn(`name ends with "~"`)
 		return skip()
 	}
 
 	// if file is in the ignore list, skip
 	if ignoreList != nil && pathmatch.PathMatchAny(path, ignoreList...) {
-		log("name is in ignore list")
+		logWarn("name is in ignore list")
 		return skip()
 	}
 
 	// if file is not a regular file or symlink to a regular file (tested earlier), skip
 	if mode&os.ModeSymlink != os.ModeSymlink && !isDir && !mode.IsRegular() {
-		log("file has special mode bits set")
+		logWarn("file has special mode bits set")
 		return skip()
 	}
 
@@ -149,7 +153,7 @@ func shouldInclude(path string, ignoreList []string, fi os.FileInfo, verbose boo
 	// if the file can't be read, skip
 	f, err := os.Open(path)
 	if err != nil {
-		log("file can't be read")
+		logWarn("file can't be read")
 		return false, 0, nil
 	}
 	f.Close()
@@ -162,9 +166,9 @@ func (b *Bundle) FileList() []string {
 }
 
 func (b *Bundle) Pack(tarballPath string, verbose bool) error {
-	log := func(m string) {
+	logErr := func(m string) {
 		if verbose {
-			fmt.Printf("Error: %s\n", m)
+			fmt.Fprintf(os.Stderr, "Error: %s\n", m)
 		}
 	}
 
@@ -189,25 +193,25 @@ func (b *Bundle) Pack(tarballPath string, verbose bool) error {
 	for _, path := range b.fileList {
 		fi, err := os.Stat(path)
 		if err != nil {
-			log(fmt.Sprintf("Could not get file info for \"%s\", aborting!", path))
+			logErr(fmt.Sprintf("Could not get file info for \"%s\", aborting!", path))
 			return err
 		}
 
 		hdr, err := tar.FileInfoHeader(fi, path)
 		hdr.Name = path
 		if err != nil {
-			log(fmt.Sprintf("Could not get file info for \"%s\", aborting!", path))
+			logErr(fmt.Sprintf("Could not get file info for \"%s\", aborting!", path))
 			return err
 		}
 
 		if err := tw.WriteHeader(hdr); err != nil {
-			log(fmt.Sprintf("Failed to write to \"%s\", aborting!", tarballPath))
+			logErr(fmt.Sprintf("Failed to write to \"%s\", aborting!", tarballPath))
 			return err
 		}
 
 		ff, err := os.Open(path)
 		if err != nil {
-			log(fmt.Sprintf("Failed to write to \"%s\", aborting!", tarballPath))
+			logErr(fmt.Sprintf("Failed to write to \"%s\", aborting!", tarballPath))
 			return err
 		}
 
@@ -215,12 +219,12 @@ func (b *Bundle) Pack(tarballPath string, verbose bool) error {
 		ff.Close()
 
 		if err != nil {
-			log(fmt.Sprintf("Failed to write to \"%s\", aborting!", tarballPath))
+			logErr(fmt.Sprintf("Failed to write to \"%s\", aborting!", tarballPath))
 			return err
 		}
 
 		if n != hdr.Size {
-			log(fmt.Sprintf("File size of \"%s\" changed while packing, aborting!", tarballPath))
+			logErr(fmt.Sprintf("File size of \"%s\" changed while packing, aborting!", tarballPath))
 			return ErrFileChanged
 		}
 	}
