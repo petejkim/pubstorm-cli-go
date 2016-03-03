@@ -10,10 +10,11 @@ import (
 )
 
 var (
-	ErrCodeRequestFailed    = "request_failed"
-	ErrCodeUnexpectedError  = "unexpected_error"
-	ErrCodeInvalidGrant     = "invalid_grant"
-	ErrCodeUnconfirmedEmail = "unconfirmed_email"
+	ErrCodeRequestFailed        = "request_failed"
+	ErrCodeUnexpectedError      = "unexpected_error"
+	ErrCodeInvalidGrant         = "invalid_grant"
+	ErrCodeUnconfirmedEmail     = "unconfirmed_email"
+	ErrCodeInvalidAuthorization = "invalid_authorization"
 )
 
 func FetchToken(email, password string) (token string, appErr *apperror.Error) {
@@ -65,4 +66,46 @@ func FetchToken(email, password string) (token string, appErr *apperror.Error) {
 	}
 
 	return token, nil
+}
+
+func InvalidateToken(token string) (appErr *apperror.Error) {
+	req := goreq.Request{
+		Method:      "DELETE",
+		Uri:         config.Host + "/oauth/token",
+		Accept:      "application/vnd.rise.v0+json",
+		ContentType: "application/x-www-form-urlencoded",
+		UserAgent:   "RiseCLI",
+	}
+
+	req.AddHeader("Authorization", "Bearer "+token)
+	res, err := req.Do()
+
+	if err != nil {
+		return apperror.New(ErrCodeRequestFailed, err, "", true)
+	}
+
+	if res.StatusCode != http.StatusUnauthorized && res.StatusCode != http.StatusOK {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	var j map[string]interface{}
+	if err := res.Body.FromJsonTo(&j); err != nil {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	if res.StatusCode == http.StatusUnauthorized {
+		if j["error"] == "invalid_token" {
+			switch j["error_description"] {
+			case "access token is invalid":
+				return apperror.New(ErrCodeInvalidAuthorization, nil, "invalid access token", false)
+			}
+		}
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	if v, ok := j["invalidated"].(bool); !v || !ok {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	return nil
 }

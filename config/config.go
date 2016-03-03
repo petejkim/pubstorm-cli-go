@@ -25,8 +25,8 @@ const (
 )
 
 func init() {
-	if envHost := os.Getenv("RISE_HOST"); envHost != "" {
-		Host = envHost
+	if envRiseHost := os.Getenv("RISE_HOST"); envRiseHost != "" {
+		Host = envRiseHost
 	}
 
 	if runtime.GOOS == "windows" {
@@ -36,20 +36,49 @@ func init() {
 	}
 
 	if err := os.MkdirAll(DotRisePath, 0700); err != nil {
-		log.Fatalln("Fatal Error: Could not make data directory!")
+		log.Fatalln("Fatal Error: Failed to make data directory!")
+	}
+
+	if err := Load(); err != nil {
+		if !os.IsNotExist(err) {
+			log.Fatalln("Fatal Error: Failed to load rise config file!")
+		}
 	}
 }
 
 // Saves config to a json file
-func Save() {
+func Save() error {
 	configPath := filepath.Join(DotRisePath, configJSON)
 	f, err := os.OpenFile(configPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
-		log.Fatalf("Fatal Error: Could not write to %s!\n", configPath)
+		return err
 	}
 	defer f.Close()
 
-	err = json.NewEncoder(f).Encode(map[string]interface{}{
+	return json.NewEncoder(f).Encode(map[string]interface{}{
 		"access_token": AccessToken,
 	})
+}
+
+// Load config from .rise/config.json
+func Load() error {
+	configPath := filepath.Join(DotRisePath, configJSON)
+
+	f, err := os.Open(configPath)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	var j struct {
+		AccessToken string `json:"access_token"`
+	}
+
+	if err = json.NewDecoder(f).Decode(&j); err != nil {
+		return err
+	}
+
+	AccessToken = j.AccessToken
+
+	return nil
 }

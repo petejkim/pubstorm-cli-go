@@ -150,4 +150,84 @@ var _ = Describe("OAuth", func() {
 			tokenRecvd: "myawes0met0ken",
 		}),
 	)
+
+	DescribeTable("InvalidateToken",
+		func(e expectation) {
+			server.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("DELETE", "/oauth/token"),
+					ghttp.VerifyHeader(http.Header{
+						"Authorization": {"Bearer t0k3n"},
+						"Accept":        {"application/vnd.rise.v0+json"},
+						"Content-Type":  {"application/x-www-form-urlencoded"},
+						"User-Agent":    {"RiseCLI"},
+					}),
+					ghttp.RespondWith(e.resCode, e.resBody),
+				),
+			)
+
+			appErr := oauth.InvalidateToken("t0k3n")
+			Expect(server.ReceivedRequests()).To(HaveLen(1))
+
+			if e.errIsNil {
+				Expect(appErr).To(BeNil())
+			} else {
+				Expect(appErr).NotTo(BeNil())
+				Expect(appErr.Code).To(Equal(e.errCode))
+				Expect(appErr.Description).To(ContainSubstring(e.errDesc))
+				Expect(appErr.IsFatal).To(Equal(e.errIsFatal))
+			}
+		},
+
+		Entry("unexpected response code", expectation{
+			resCode:    http.StatusInternalServerError,
+			resBody:    "",
+			errIsNil:   false,
+			errCode:    oauth.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("malformed json", expectation{
+			resCode:    http.StatusOK,
+			resBody:    `{"invalidated": }`,
+			errIsNil:   false,
+			errCode:    oauth.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("401 with token required", expectation{
+			resCode:    http.StatusUnauthorized,
+			resBody:    `{"invalidated": false, "error": "invalid_token", "error_description": "access token is required"}`,
+			errIsNil:   false,
+			errCode:    oauth.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("401 with token invalid", expectation{
+			resCode:    http.StatusUnauthorized,
+			resBody:    `{"invalidated": false, "error": "invalid_token", "error_description": "access token is invalid"}`,
+			errIsNil:   false,
+			errCode:    oauth.ErrCodeInvalidAuthorization,
+			errDesc:    "invalid access token",
+			errIsFatal: false,
+		}),
+
+		Entry("status is ok but token is not invalidated", expectation{
+			resCode:    http.StatusOK,
+			resBody:    `{"invalidated": false}`,
+			errIsNil:   false,
+			errCode:    oauth.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("token invalidated", expectation{
+			resCode:  http.StatusOK,
+			resBody:  `{"invalidated": true}`,
+			errIsNil: true,
+		}),
+	)
 })

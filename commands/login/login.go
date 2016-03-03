@@ -2,6 +2,7 @@ package login
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/codegangsta/cli"
 	"github.com/nitrous-io/rise-cli-go/apperror"
@@ -82,6 +83,8 @@ func Login(c *cli.Context) {
 	}
 
 	config.AccessToken = token
-	config.Save()
+	if err := config.Save(); err != nil {
+		log.Fatalln("Fatal Error: Could not save rise config file!")
+	}
 	fmt.Println("You are logged in as", email)
 }

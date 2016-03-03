@@ -93,8 +93,7 @@ func Load() (*Project, error) {
 		ForceHTTPS  bool   `json:"force_https"`
 	}
 
-	err = json.NewDecoder(f).Decode(&j)
-	if err != nil {
+	if err = json.NewDecoder(f).Decode(&j); err != nil {
 		return nil, err
 	}
 
