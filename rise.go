@@ -4,10 +4,10 @@ import (
 	"os"
 
 	"github.com/codegangsta/cli"
-	"github.com/nitrous-io/rise-cli-go/commands/deploy"
-	"github.com/nitrous-io/rise-cli-go/commands/login"
-	"github.com/nitrous-io/rise-cli-go/commands/logout"
-	"github.com/nitrous-io/rise-cli-go/commands/signup"
+	"github.com/nitrous-io/rise-cli-go/cli/deploy"
+	"github.com/nitrous-io/rise-cli-go/cli/login"
+	"github.com/nitrous-io/rise-cli-go/cli/logout"
+	"github.com/nitrous-io/rise-cli-go/cli/signup"
 )
 
 func main() {
