@@ -10,12 +10,15 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/dustin/go-humanize"
 	"github.com/nitrous-io/rise-cli-go/bundle"
+	"github.com/nitrous-io/rise-cli-go/cli/common"
 	"github.com/nitrous-io/rise-cli-go/pkg/readline"
 	"github.com/nitrous-io/rise-cli-go/project"
 	"github.com/nitrous-io/rise-cli-go/util"
 )
 
 func Deploy(c *cli.Context) {
+	common.RequireAccessToken()
+
 	var (
 		err  error
 		proj *project.Project

@@ -2,20 +2,16 @@ package logout
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/codegangsta/cli"
+	"github.com/nitrous-io/rise-cli-go/cli/common"
 	"github.com/nitrous-io/rise-cli-go/client/oauth"
 	"github.com/nitrous-io/rise-cli-go/config"
 	"github.com/nitrous-io/rise-cli-go/util"
 )
 
 func Logout(c *cli.Context) {
-	token := config.AccessToken
-	if token == "" {
-		fmt.Fprintln(os.Stderr, "Access token not found!")
-		os.Exit(1)
-	}
+	token := common.RequireAccessToken()
 
 	if appErr := oauth.InvalidateToken(token); appErr != nil {
 		appErr.Handle()
