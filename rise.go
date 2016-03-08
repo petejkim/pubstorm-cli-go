@@ -5,6 +5,7 @@ import (
 
 	"github.com/codegangsta/cli"
 	"github.com/nitrous-io/rise-cli-go/cli/deploy"
+	"github.com/nitrous-io/rise-cli-go/cli/initcmd"
 	"github.com/nitrous-io/rise-cli-go/cli/login"
 	"github.com/nitrous-io/rise-cli-go/cli/logout"
 	"github.com/nitrous-io/rise-cli-go/cli/signup"
@@ -32,8 +33,13 @@ func main() {
 			Action: logout.Logout,
 		},
 		{
+			Name:   "init",
+			Usage:  "Create a new Rise project",
+			Action: initcmd.Init,
+		},
+		{
 			Name:   "deploy",
-			Usage:  "Deploy your project",
+			Usage:  "Deploy a Rise project",
 			Action: deploy.Deploy,
 		},
 	}

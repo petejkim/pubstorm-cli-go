@@ -23,7 +23,7 @@ var _ = Describe("Util", func() {
 			if expected == nil {
 				Expect(actual).To(Equal(""))
 			} else {
-				actualStrs := strings.Split(actual, "\n")
+				actualStrs := strings.Split(actual, ", ")
 				Expect(actualStrs).To(ConsistOf(expected))
 			}
 		},
@@ -40,7 +40,7 @@ var _ = Describe("Util", func() {
 				"foo": "is not bar",
 			},
 		}, []string{
-			"* foo is not bar",
+			"Foo is not bar",
 		}),
 
 		Entry("map with many items", map[string]interface{}{
@@ -50,9 +50,21 @@ var _ = Describe("Util", func() {
 				"baz": "is not qux",
 			},
 		}, []string{
-			"* foo is not bar",
-			"* bar is not foo",
-			"* baz is not qux",
+			"Foo is not bar",
+			"Bar is not foo",
+			"Baz is not qux",
 		}),
+	)
+
+	DescribeTable("Capitalize",
+		func(str, expected string) {
+			Expect(util.Capitalize(str)).To(Equal(expected))
+		},
+
+		Entry("empty string", "", ""),
+		Entry("capitalize one word", "hello", "Hello"),
+		Entry("capitalize only the first word", "hello world", "Hello world"),
+		Entry("capitalize the first word, not touching the rest", "foo Bar baz", "Foo Bar baz"),
+		Entry("unicode shouldn't break", "유니코드", "유니코드"),
 	)
 })

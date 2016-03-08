@@ -199,7 +199,7 @@ var _ = Describe("OAuth", func() {
 
 		Entry("401 with token required", expectation{
 			resCode:    http.StatusUnauthorized,
-			resBody:    `{"invalidated": false, "error": "invalid_token", "error_description": "access token is required"}`,
+			resBody:    `{"error": "invalid_token", "error_description": "access token is required"}`,
 			errIsNil:   false,
 			errCode:    oauth.ErrCodeUnexpectedError,
 			errDesc:    "",
@@ -208,7 +208,7 @@ var _ = Describe("OAuth", func() {
 
 		Entry("401 with token invalid", expectation{
 			resCode:    http.StatusUnauthorized,
-			resBody:    `{"invalidated": false, "error": "invalid_token", "error_description": "access token is invalid"}`,
+			resBody:    `{"error": "invalid_token", "error_description": "access token is invalid"}`,
 			errIsNil:   false,
 			errCode:    oauth.ErrCodeInvalidAuthorization,
 			errDesc:    "invalid access token",

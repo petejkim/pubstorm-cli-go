@@ -36,8 +36,16 @@ func ValidationErrorsToString(j map[string]interface{}) string {
 	msgs := []string{}
 	if errs, ok := j["errors"].(map[string]interface{}); ok {
 		for k, v := range errs {
-			msgs = append(msgs, fmt.Sprintf("* %s %s", k, v))
+			msgs = append(msgs, fmt.Sprintf("%s %s", Capitalize(k), v))
 		}
 	}
-	return strings.Join(msgs, "\n")
+	return strings.Join(msgs, ", ")
+}
+
+func Capitalize(s string) string {
+	if len(s) <= 1 {
+		return strings.ToUpper(s)
+	}
+	r := []rune(s)
+	return strings.ToUpper(string(r[0])) + string(r[1:])
 }

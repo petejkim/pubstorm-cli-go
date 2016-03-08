@@ -5,6 +5,8 @@ import (
 	"os"
 
 	"github.com/nitrous-io/rise-cli-go/config"
+	"github.com/nitrous-io/rise-cli-go/project"
+	"github.com/nitrous-io/rise-cli-go/util"
 )
 
 func RequireAccessToken() string {
@@ -14,4 +16,14 @@ func RequireAccessToken() string {
 		os.Exit(1)
 	}
 	return token
+}
+
+func RequireProject() *project.Project {
+	proj, err := project.Load()
+	if os.IsNotExist(err) {
+		fmt.Fprintln(os.Stderr, "Error: Could not find a Rise project in current path. Run `rise init` to create a Rise project.")
+		os.Exit(1)
+	}
+	util.ExitIfError(err)
+	return proj
 }

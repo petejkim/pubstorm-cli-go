@@ -19,12 +19,10 @@ func New(code string, err error, description string, isFatal bool) *Error {
 }
 
 func (e *Error) Error() string {
-	var m []string
+	m := []string{}
 
 	if e.IsFatal {
-		m = []string{"Fatal Error:"}
-	} else {
-		m = []string{"Error:"}
+		m = append(m, "Fatal Error:")
 	}
 
 	if e.Description != "" {

@@ -3,6 +3,7 @@ package users_test
 import (
 	"net/http"
 	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/nitrous-io/rise-cli-go/client/users"
@@ -70,7 +71,7 @@ var _ = Describe("Users", func() {
 			} else {
 				Expect(appErr).NotTo(BeNil())
 				Expect(appErr.Code).To(Equal(e.errCode))
-				Expect(appErr.Description).To(ContainSubstring(e.errDesc))
+				Expect(strings.ToLower(appErr.Description)).To(ContainSubstring(e.errDesc))
 				Expect(appErr.IsFatal).To(Equal(e.errIsFatal))
 			}
 		},
@@ -178,7 +179,7 @@ var _ = Describe("Users", func() {
 
 		Entry("422 with invalid code error", expectation{
 			resCode:    422,
-			resBody:    `{"error": "invalid_params", "error_description": "invalid email or confirmation_code", "confirmed": false}`,
+			resBody:    `{"error": "invalid_params", "error_description": "invalid email or confirmation_code"}`,
 			errIsNil:   false,
 			errCode:    users.ErrCodeValidationFailed,
 			errDesc:    "incorrect confirmation code",

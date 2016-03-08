@@ -9,7 +9,7 @@ import (
 	"github.com/nitrous-io/rise-cli-go/config"
 )
 
-var (
+const (
 	ErrCodeRequestFailed        = "request_failed"
 	ErrCodeUnexpectedError      = "unexpected_error"
 	ErrCodeInvalidGrant         = "invalid_grant"
