@@ -1,0 +1,191 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"path": "github.com/Azure/go-ansiterm",
+			"revision": "70b2c90b260171e829f1ebd7c17f600c11858dbe",
+			"revisionTime": "2015-08-06T20:25:15-07:00"
+		},
+		{
+			"path": "github.com/Azure/go-ansiterm/winterm",
+			"revision": "70b2c90b260171e829f1ebd7c17f600c11858dbe",
+			"revisionTime": "2015-08-06T20:25:15-07:00"
+		},
+		{
+			"path": "github.com/Sirupsen/logrus",
+			"revision": "219c8cb75c258c552e999735be6df753ffc7afdc",
+			"revisionTime": "2016-02-24T16:10:30-05:00"
+		},
+		{
+			"path": "github.com/codegangsta/cli",
+			"revision": "5db74198dee1cfe60cf06a611d03a420361baad6",
+			"revisionTime": "2016-02-17T19:24:44-08:00"
+		},
+		{
+			"path": "github.com/dustin/go-humanize",
+			"revision": "8929fe90cee4b2cb9deb468b51fb34eba64d1bf0",
+			"revisionTime": "2015-11-25T16:46:33-05:00"
+		},
+		{
+			"path": "github.com/franela/goreq",
+			"revision": "3ddeded65be21dacb5a2e2d0b95af9ff6862a2b5",
+			"revisionTime": "2016-01-21T11:51:05-03:00"
+		},
+		{
+			"path": "github.com/golang/protobuf/proto",
+			"revision": "b982704f8bb716bb608144408cff30e15fbde841",
+			"revisionTime": "2016-02-02T18:33:00+11:00"
+		},
+		{
+			"path": "github.com/onsi/ginkgo",
+			"revision": "07d85e6b10c4289c7d612f9b13f45ba36f66d55b",
+			"revisionTime": "2016-01-31T07:41:39-08:00"
+		},
+		{
+			"path": "github.com/onsi/ginkgo/config",
+			"revision": "07d85e6b10c4289c7d612f9b13f45ba36f66d55b",
+			"revisionTime": "2016-01-31T07:41:39-08:00"
+		},
+		{
+			"path": "github.com/onsi/ginkgo/extensions/table",
+			"revision": "07d85e6b10c4289c7d612f9b13f45ba36f66d55b",
+			"revisionTime": "2016-01-31T07:41:39-08:00"
+		},
+		{
+			"path": "github.com/onsi/ginkgo/internal/codelocation",
+			"revision": "07d85e6b10c4289c7d612f9b13f45ba36f66d55b",
+			"revisionTime": "2016-01-31T07:41:39-08:00"
+		},
+		{
+			"path": "github.com/onsi/ginkgo/internal/containernode",
+			"revision": "07d85e6b10c4289c7d612f9b13f45ba36f66d55b",
+			"revisionTime": "2016-01-31T07:41:39-08:00"
+		},
+		{
+			"path": "github.com/onsi/ginkgo/internal/failer",
+			"revision": "07d85e6b10c4289c7d612f9b13f45ba36f66d55b",
+			"revisionTime": "2016-01-31T07:41:39-08:00"
+		},
+		{
+			"path": "github.com/onsi/ginkgo/internal/leafnodes",
+			"revision": "07d85e6b10c4289c7d612f9b13f45ba36f66d55b",
+			"revisionTime": "2016-01-31T07:41:39-08:00"
+		},
+		{
+			"path": "github.com/onsi/ginkgo/internal/remote",
+			"revision": "07d85e6b10c4289c7d612f9b13f45ba36f66d55b",
+			"revisionTime": "2016-01-31T07:41:39-08:00"
+		},
+		{
+			"path": "github.com/onsi/ginkgo/internal/spec",
+			"revision": "07d85e6b10c4289c7d612f9b13f45ba36f66d55b",
+			"revisionTime": "2016-01-31T07:41:39-08:00"
+		},
+		{
+			"path": "github.com/onsi/ginkgo/internal/specrunner",
+			"revision": "07d85e6b10c4289c7d612f9b13f45ba36f66d55b",
+			"revisionTime": "2016-01-31T07:41:39-08:00"
+		},
+		{
+			"path": "github.com/onsi/ginkgo/internal/suite",
+			"revision": "07d85e6b10c4289c7d612f9b13f45ba36f66d55b",
+			"revisionTime": "2016-01-31T07:41:39-08:00"
+		},
+		{
+			"path": "github.com/onsi/ginkgo/internal/testingtproxy",
+			"revision": "07d85e6b10c4289c7d612f9b13f45ba36f66d55b",
+			"revisionTime": "2016-01-31T07:41:39-08:00"
+		},
+		{
+			"path": "github.com/onsi/ginkgo/internal/writer",
+			"revision": "07d85e6b10c4289c7d612f9b13f45ba36f66d55b",
+			"revisionTime": "2016-01-31T07:41:39-08:00"
+		},
+		{
+			"path": "github.com/onsi/ginkgo/reporters",
+			"revision": "07d85e6b10c4289c7d612f9b13f45ba36f66d55b",
+			"revisionTime": "2016-01-31T07:41:39-08:00"
+		},
+		{
+			"path": "github.com/onsi/ginkgo/reporters/stenographer",
+			"revision": "07d85e6b10c4289c7d612f9b13f45ba36f66d55b",
+			"revisionTime": "2016-01-31T07:41:39-08:00"
+		},
+		{
+			"path": "github.com/onsi/ginkgo/types",
+			"revision": "07d85e6b10c4289c7d612f9b13f45ba36f66d55b",
+			"revisionTime": "2016-01-31T07:41:39-08:00"
+		},
+		{
+			"path": "github.com/onsi/gomega",
+			"revision": "c72df929b80ef4930aaa75d5e486887ff2f3e06a",
+			"revisionTime": "2016-02-07T13:07:00-08:00"
+		},
+		{
+			"path": "github.com/onsi/gomega/format",
+			"revision": "c72df929b80ef4930aaa75d5e486887ff2f3e06a",
+			"revisionTime": "2016-02-07T13:07:00-08:00"
+		},
+		{
+			"path": "github.com/onsi/gomega/ghttp",
+			"revision": "c72df929b80ef4930aaa75d5e486887ff2f3e06a",
+			"revisionTime": "2016-02-07T13:07:00-08:00"
+		},
+		{
+			"path": "github.com/onsi/gomega/internal/assertion",
+			"revision": "c72df929b80ef4930aaa75d5e486887ff2f3e06a",
+			"revisionTime": "2016-02-07T13:07:00-08:00"
+		},
+		{
+			"path": "github.com/onsi/gomega/internal/asyncassertion",
+			"revision": "c72df929b80ef4930aaa75d5e486887ff2f3e06a",
+			"revisionTime": "2016-02-07T13:07:00-08:00"
+		},
+		{
+			"path": "github.com/onsi/gomega/internal/oraclematcher",
+			"revision": "c72df929b80ef4930aaa75d5e486887ff2f3e06a",
+			"revisionTime": "2016-02-07T13:07:00-08:00"
+		},
+		{
+			"path": "github.com/onsi/gomega/internal/testingtsupport",
+			"revision": "c72df929b80ef4930aaa75d5e486887ff2f3e06a",
+			"revisionTime": "2016-02-07T13:07:00-08:00"
+		},
+		{
+			"path": "github.com/onsi/gomega/matchers",
+			"revision": "c72df929b80ef4930aaa75d5e486887ff2f3e06a",
+			"revisionTime": "2016-02-07T13:07:00-08:00"
+		},
+		{
+			"path": "github.com/onsi/gomega/matchers/support/goraph/bipartitegraph",
+			"revision": "c72df929b80ef4930aaa75d5e486887ff2f3e06a",
+			"revisionTime": "2016-02-07T13:07:00-08:00"
+		},
+		{
+			"path": "github.com/onsi/gomega/matchers/support/goraph/edge",
+			"revision": "c72df929b80ef4930aaa75d5e486887ff2f3e06a",
+			"revisionTime": "2016-02-07T13:07:00-08:00"
+		},
+		{
+			"path": "github.com/onsi/gomega/matchers/support/goraph/node",
+			"revision": "c72df929b80ef4930aaa75d5e486887ff2f3e06a",
+			"revisionTime": "2016-02-07T13:07:00-08:00"
+		},
+		{
+			"path": "github.com/onsi/gomega/matchers/support/goraph/util",
+			"revision": "c72df929b80ef4930aaa75d5e486887ff2f3e06a",
+			"revisionTime": "2016-02-07T13:07:00-08:00"
+		},
+		{
+			"path": "github.com/onsi/gomega/types",
+			"revision": "c72df929b80ef4930aaa75d5e486887ff2f3e06a",
+			"revisionTime": "2016-02-07T13:07:00-08:00"
+		},
+		{
+			"path": "golang.org/x/sys/unix",
+			"revision": "5eaf0df67e70d6997a9fe0ed24383fa1b01638d3",
+			"revisionTime": "2016-02-22T17:57:57+01:00"
+		}
+	]
+}
