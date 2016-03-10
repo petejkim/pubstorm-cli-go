@@ -18,6 +18,8 @@ var (
 	DotRisePath string
 
 	AccessToken string
+
+	MaxProjectSize = int64(1024 * 1024 * 1000) // 1 GiB
 )
 
 const (
