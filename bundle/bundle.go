@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 
 	"github.com/nitrous-io/rise-cli-go/pkg/pathmatch"
+	"github.com/nitrous-io/rise-cli-go/pkg/progressbar"
 )
 
 var (
@@ -190,6 +191,8 @@ func (b *Bundle) Pack(tarballPath string, verbose bool) error {
 		tw.Close()
 	}()
 
+	pb := progressbar.NewCounter(os.Stdout, len(b.fileList))
+
 	for _, path := range b.fileList {
 		fi, err := os.Stat(path)
 		if err != nil {
@@ -226,6 +229,10 @@ func (b *Bundle) Pack(tarballPath string, verbose bool) error {
 		if n != hdr.Size {
 			logErr(fmt.Sprintf("File size of \"%s\" changed while packing, aborting!", tarballPath))
 			return ErrFileChanged
+		}
+
+		if verbose {
+			pb.Next()
 		}
 	}
 
