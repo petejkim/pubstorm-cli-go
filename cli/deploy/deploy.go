@@ -55,7 +55,7 @@ func Deploy(c *cli.Context) {
 
 	fmt.Printf("Uploading bundle \"%s\"...\n", proj.Name)
 
-	appErr := deployments.Create(config.AccessToken, proj.Name, bunPath)
+	appErr := deployments.Create(config.AccessToken, proj.Name, bunPath, true)
 	if appErr != nil {
 		appErr.Handle()
 	}
