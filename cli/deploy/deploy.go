@@ -25,7 +25,7 @@ func Deploy(c *cli.Context) {
 	fmt.Printf("Scanning \"%s\"...\n", absPath)
 
 	bun := bundle.New(proj.Path)
-	count, size, err := bun.Assemble(nil, false)
+	count, size, err := bun.Assemble([]string{"rise.json", "Thumbs.db", "desktop.ini"}, false)
 
 	fmt.Printf("Bundling %s files (%s)...\n", humanize.Comma(int64(count)), humanize.Bytes(uint64(size)))
 

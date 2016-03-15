@@ -63,6 +63,7 @@ var _ = Describe("Bundle", func() {
 				"vendor/assets/javascripts/jquery/jquery-2.0.js",
 				"vendor/assets/javascripts/underscore.js",
 				"README.rdoc",
+				"rise.json",
 			}
 
 			for _, f := range files {
@@ -92,7 +93,7 @@ var _ = Describe("Bundle", func() {
 
 		It("return all files", func() {
 			b := bundle.New(".")
-			count, size, err := b.Assemble([]string{"log", "development.rb", "vendor/assets"}, false)
+			count, size, err := b.Assemble([]string{"log", "development.rb", "vendor/assets", "rise.json"}, false)
 			Expect(err).To(BeNil())
 
 			expectedFiles := []string{
