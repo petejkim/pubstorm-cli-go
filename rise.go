@@ -48,6 +48,11 @@ func main() {
 			Usage:  "List all domains for a Rise project",
 			Action: domains.List,
 		},
+		{
+			Name:   "domains.add",
+			Usage:  "Add a new domain to a Rise project",
+			Action: domains.Add,
+		},
 	}
 
 	app.Run(os.Args)
