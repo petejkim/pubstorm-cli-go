@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/codegangsta/cli"
 	"github.com/dustin/go-humanize"
@@ -12,6 +13,7 @@ import (
 	"github.com/nitrous-io/rise-cli-go/cli/common"
 	"github.com/nitrous-io/rise-cli-go/client/deployments"
 	"github.com/nitrous-io/rise-cli-go/config"
+	"github.com/nitrous-io/rise-cli-go/pkg/spinner"
 	"github.com/nitrous-io/rise-cli-go/util"
 )
 
@@ -53,10 +55,26 @@ func Deploy(c *cli.Context) {
 		os.Exit(1)
 	}
 
-	fmt.Printf("Uploading bundle \"%s\"...\n", proj.Name)
+	fmt.Printf("Uploading bundle \"%s\" to Rise Cloud...\n", proj.Name)
 
-	appErr := deployments.Create(config.AccessToken, proj.Name, bunPath, true)
+	deployment, appErr := deployments.Create(config.AccessToken, proj.Name, bunPath, true)
 	if appErr != nil {
 		appErr.Handle()
 	}
+
+	spin := spinner.New()
+	fmt.Printf("\nLaunching...%s", string(spin.Next()))
+
+	for deployment.State != deployments.DeploymentStateDeployed {
+		time.Sleep(500 * time.Millisecond)
+
+		fmt.Printf("\b%s", string(spin.Next()))
+
+		deployment, appErr = deployments.Get(config.AccessToken, proj.Name, deployment.ID)
+		if appErr != nil {
+			appErr.Handle()
+		}
+	}
+
+	fmt.Printf("\b \b\n\nhttps://%s.%s/ deployed to Rise\n", proj.Name, config.DefaultDomain)
 }

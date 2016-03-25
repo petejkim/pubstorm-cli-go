@@ -30,10 +30,10 @@ func Create(token, name string) *apperror.Error {
 	}
 	req.AddHeader("Authorization", "Bearer "+token)
 	res, err := req.Do()
-
 	if err != nil {
 		return apperror.New(ErrCodeRequestFailed, err, "", true)
 	}
+	defer res.Body.Close()
 
 	if res.StatusCode != 422 && res.StatusCode != http.StatusCreated {
 		return apperror.New(ErrCodeUnexpectedError, err, "", true)

@@ -9,14 +9,14 @@ import (
 )
 
 var (
-	Host = "https://api.rise.sh"
+	Host          = "https://api.rise.sh"
+	DefaultDomain = "rise.cloud"
 
 	// these do not have to be secured
 	ClientID     = "73c24fbc2eb24bbf1d3fc3749fc8ac35"
 	ClientSecret = "0f3295e1b531191c0ce8ccf331421644d4c4fbab9eb179778e5172977bf0238cdbf4b3afe1ead11b9892ce8806e87cc1acc10263dfdade879a05b931809690a1"
 
 	DotRisePath string
-
 	AccessToken string
 
 	MaxProjectSize = int64(1024 * 1024 * 1000) // 1 GiB

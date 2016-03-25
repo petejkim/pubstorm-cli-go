@@ -79,10 +79,10 @@ func InvalidateToken(token string) (appErr *apperror.Error) {
 
 	req.AddHeader("Authorization", "Bearer "+token)
 	res, err := req.Do()
-
 	if err != nil {
 		return apperror.New(ErrCodeRequestFailed, err, "", true)
 	}
+	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusUnauthorized && res.StatusCode != http.StatusOK {
 		return apperror.New(ErrCodeUnexpectedError, err, "", true)
