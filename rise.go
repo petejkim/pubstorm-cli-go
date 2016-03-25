@@ -5,6 +5,7 @@ import (
 
 	"github.com/codegangsta/cli"
 	"github.com/nitrous-io/rise-cli-go/cli/deploy"
+	"github.com/nitrous-io/rise-cli-go/cli/domains"
 	"github.com/nitrous-io/rise-cli-go/cli/initcmd"
 	"github.com/nitrous-io/rise-cli-go/cli/login"
 	"github.com/nitrous-io/rise-cli-go/cli/logout"
@@ -41,6 +42,11 @@ func main() {
 			Name:   "deploy",
 			Usage:  "Deploy a Rise project",
 			Action: deploy.Deploy,
+		},
+		{
+			Name:   "domains",
+			Usage:  "List all domains for a Rise project",
+			Action: domains.List,
 		},
 	}
 
