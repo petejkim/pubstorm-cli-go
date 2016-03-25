@@ -34,7 +34,7 @@ func Create(email, password string) *apperror.Error {
 		return apperror.New(ErrCodeRequestFailed, err, "", true)
 	}
 
-	if res.StatusCode != 422 && res.StatusCode != http.StatusCreated {
+	if !util.ContainsInt([]int{http.StatusCreated, 422}, res.StatusCode) {
 		return apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
 
@@ -71,7 +71,7 @@ func Confirm(email, confirmationCode string) *apperror.Error {
 		return apperror.New(ErrCodeRequestFailed, err, "", true)
 	}
 
-	if res.StatusCode != 422 && res.StatusCode != http.StatusOK {
+	if !util.ContainsInt([]int{http.StatusOK, 422}, res.StatusCode) {
 		return apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
 
@@ -111,7 +111,7 @@ func ResendConfirmationCode(email string) *apperror.Error {
 		return apperror.New(ErrCodeRequestFailed, err, "", true)
 	}
 
-	if res.StatusCode != 422 && res.StatusCode != http.StatusOK {
+	if !util.ContainsInt([]int{http.StatusOK, 422}, res.StatusCode) {
 		return apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
 

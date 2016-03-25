@@ -6,6 +6,7 @@ import (
 	"github.com/franela/goreq"
 	"github.com/nitrous-io/rise-cli-go/apperror"
 	"github.com/nitrous-io/rise-cli-go/config"
+	"github.com/nitrous-io/rise-cli-go/util"
 )
 
 const (
@@ -28,7 +29,7 @@ func Index(token, projectName string) (domainNames []string, appErr *apperror.Er
 		return nil, apperror.New(ErrCodeRequestFailed, err, "", true)
 	}
 
-	if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusNotFound {
+	if !util.ContainsInt([]int{http.StatusOK, http.StatusNotFound}, res.StatusCode) {
 		return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
 

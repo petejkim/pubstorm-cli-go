@@ -49,3 +49,16 @@ func Capitalize(s string) string {
 	r := []rune(s)
 	return strings.ToUpper(string(r[0])) + string(r[1:])
 }
+
+func FindInt(list []int, what int) int {
+	for i, v := range list {
+		if v == what {
+			return i
+		}
+	}
+	return -1
+}
+
+func ContainsInt(list []int, what int) bool {
+	return FindInt(list, what) != -1
+}

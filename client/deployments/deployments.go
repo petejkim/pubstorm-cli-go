@@ -13,6 +13,7 @@ import (
 	"github.com/nitrous-io/rise-cli-go/apperror"
 	"github.com/nitrous-io/rise-cli-go/config"
 	"github.com/nitrous-io/rise-cli-go/pkg/progressbar"
+	"github.com/nitrous-io/rise-cli-go/util"
 )
 
 const (
@@ -80,7 +81,7 @@ func Create(token, name, bunPath string, verbose bool) (depl *Deployment, appErr
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusBadRequest && res.StatusCode != http.StatusAccepted {
+	if !util.ContainsInt([]int{http.StatusAccepted, http.StatusBadRequest}, res.StatusCode) {
 		return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
 
@@ -127,7 +128,7 @@ func Get(token, projectName string, deploymentID uint) (depl *Deployment, appErr
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusNotFound && res.StatusCode != http.StatusOK {
+	if !util.ContainsInt([]int{http.StatusOK, http.StatusNotFound}, res.StatusCode) {
 		return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
 

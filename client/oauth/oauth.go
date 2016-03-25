@@ -7,6 +7,7 @@ import (
 	"github.com/franela/goreq"
 	"github.com/nitrous-io/rise-cli-go/apperror"
 	"github.com/nitrous-io/rise-cli-go/config"
+	"github.com/nitrous-io/rise-cli-go/util"
 )
 
 const (
@@ -39,7 +40,7 @@ func FetchToken(email, password string) (token string, appErr *apperror.Error) {
 		return "", apperror.New(ErrCodeRequestFailed, err, "", true)
 	}
 
-	if res.StatusCode != http.StatusBadRequest && res.StatusCode != http.StatusOK {
+	if !util.ContainsInt([]int{http.StatusOK, http.StatusBadRequest}, res.StatusCode) {
 		return "", apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
 
@@ -84,7 +85,7 @@ func InvalidateToken(token string) (appErr *apperror.Error) {
 	}
 	defer res.Body.Close()
 
-	if res.StatusCode != http.StatusUnauthorized && res.StatusCode != http.StatusOK {
+	if !util.ContainsInt([]int{http.StatusOK, http.StatusUnauthorized}, res.StatusCode) {
 		return apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
 
