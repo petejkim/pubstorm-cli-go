@@ -200,4 +200,75 @@ var _ = Describe("Domains", func() {
 			errIsNil: true,
 		}),
 	)
+
+	DescribeTable("Delete",
+		func(e expectation) {
+			server.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("DELETE", "/projects/foo-bar-express/domains/foo-bar-express.com"),
+					ghttp.VerifyHeader(http.Header{
+						"Authorization": {"Bearer t0k3n"},
+						"Accept":        {"application/vnd.rise.v0+json"},
+						"Content-Type":  {"application/x-www-form-urlencoded"},
+						"User-Agent":    {"RiseCLI"},
+					}),
+					ghttp.RespondWith(e.resCode, e.resBody),
+				),
+			)
+
+			appErr := domains.Delete("t0k3n", "foo-bar-express", "foo-bar-express.com")
+			Expect(server.ReceivedRequests()).To(HaveLen(1))
+
+			if e.errIsNil {
+				Expect(appErr).To(BeNil())
+			} else {
+				Expect(appErr).NotTo(BeNil())
+				Expect(appErr.Code).To(Equal(e.errCode))
+				Expect(strings.ToLower(appErr.Description)).To(ContainSubstring(e.errDesc))
+				Expect(appErr.IsFatal).To(Equal(e.errIsFatal))
+			}
+		},
+
+		Entry("unexpected response code", expectation{
+			resCode:    http.StatusInternalServerError,
+			resBody:    "",
+			errIsNil:   false,
+			errCode:    domains.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("malformed json", expectation{
+			resCode:    http.StatusCreated,
+			resBody:    `{"foo": }`,
+			errIsNil:   false,
+			errCode:    domains.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("404 with project not found", expectation{
+			resCode:    http.StatusNotFound,
+			resBody:    `{"error": "not_found", "error_description": "project could not be found"}`,
+			errIsNil:   false,
+			errCode:    domains.ErrCodeNotFound,
+			errDesc:    "project could not be found",
+			errIsFatal: true,
+		}),
+
+		Entry("404 with domain not found", expectation{
+			resCode:    http.StatusNotFound,
+			resBody:    `{"error": "not_found", "error_description": "domain could not be found"}`,
+			errIsNil:   false,
+			errCode:    domains.ErrCodeNotFound,
+			errDesc:    "domain could not be found",
+			errIsFatal: true,
+		}),
+
+		Entry("successfully deleted", expectation{
+			resCode:  http.StatusOK,
+			resBody:  `{"deleted": true}`,
+			errIsNil: true,
+		}),
+	)
 })

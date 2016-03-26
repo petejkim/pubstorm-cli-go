@@ -65,3 +65,49 @@ func Add(c *cli.Context) {
 
 	fmt.Printf("Successfully added \"%s\" to project \"%s\"\n", domainName, proj.Name)
 }
+
+func Remove(c *cli.Context) {
+	common.RequireAccessToken()
+	proj := common.RequireProject()
+
+	domainName := c.Args().First()
+
+	var err error
+	interactive := domainName == ""
+
+	for {
+		if interactive {
+			domainName, err = readline.Read("Enter Domain Name to Remove: ", true, "")
+			util.ExitIfErrorOrEOF(err)
+		}
+
+		if domainName == proj.Name+"."+config.DefaultDomain {
+			fmt.Printf("Domain \"%s\" cannot be deleted\n", domainName)
+			if interactive {
+				continue
+			} else {
+				os.Exit(1)
+			}
+		}
+
+		appErr := domains.Delete(config.AccessToken, proj.Name, domainName)
+		if appErr != nil {
+			if appErr.Code == domains.ErrCodeNotFound {
+				fmt.Printf("Domain \"%s\" is not found\n", domainName)
+				if interactive {
+					continue
+				} else {
+					os.Exit(1)
+				}
+			}
+
+			appErr.Handle()
+		}
+
+		if appErr == nil || !interactive {
+			break
+		}
+	}
+
+	fmt.Printf("Successfully removed \"%s\" from project \"%s\"\n", domainName, proj.Name)
+}

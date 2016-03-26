@@ -37,7 +37,16 @@ func Index(token, projectName string) (domainNames []string, appErr *apperror.Er
 	}
 
 	if res.StatusCode == http.StatusNotFound {
-		return nil, apperror.New(ErrCodeNotFound, nil, "project could not be found", true)
+		var j map[string]interface{}
+		if err := res.Body.FromJsonTo(&j); err != nil {
+			return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
+		}
+
+		if errDesc, ok := j["error_description"].(string); ok {
+			return nil, apperror.New(ErrCodeNotFound, nil, errDesc, true)
+		} else {
+			return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
+		}
 	}
 
 	var j map[string][]string
@@ -96,6 +105,38 @@ func Create(token, projectName, name string) (appErr *apperror.Error) {
 			}
 		}
 		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	return nil
+}
+
+func Delete(token, projectName, name string) (appErr *apperror.Error) {
+	req := goreq.Request{
+		Method:      "DELETE",
+		Uri:         config.Host + "/projects/" + projectName + "/domains/" + name,
+		Accept:      "application/vnd.rise.v0+json",
+		ContentType: "application/x-www-form-urlencoded",
+		UserAgent:   "RiseCLI",
+	}
+
+	req.AddHeader("Authorization", "Bearer "+token)
+	res, err := req.Do()
+
+	if err != nil {
+		return apperror.New(ErrCodeRequestFailed, err, "", true)
+	}
+
+	if res.StatusCode != http.StatusNotFound && res.StatusCode != http.StatusOK {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	var j map[string]interface{}
+	if err := res.Body.FromJsonTo(&j); err != nil {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	if res.StatusCode == http.StatusNotFound {
+		return apperror.New(ErrCodeNotFound, nil, j["error_description"].(string), true)
 	}
 
 	return nil
