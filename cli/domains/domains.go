@@ -43,6 +43,8 @@ func Add(c *cli.Context) {
 			util.ExitIfErrorOrEOF(err)
 		}
 
+		domainName = util.SanitizeDomain(domainName)
+
 		appErr := domains.Create(config.AccessToken, proj.Name, domainName)
 		if appErr != nil {
 			if appErr.Code == domains.ErrCodeValidationFailed {
@@ -80,6 +82,8 @@ func Remove(c *cli.Context) {
 			domainName, err = readline.Read("Enter Domain Name to Remove: ", true, "")
 			util.ExitIfErrorOrEOF(err)
 		}
+
+		domainName = util.SanitizeDomain(domainName)
 
 		if domainName == proj.Name+"."+config.DefaultDomain {
 			fmt.Printf("Domain \"%s\" cannot be deleted\n", domainName)

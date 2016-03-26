@@ -62,3 +62,12 @@ func FindInt(list []int, what int) int {
 func ContainsInt(list []int, what int) bool {
 	return FindInt(list, what) != -1
 }
+
+func SanitizeDomain(domain string) string {
+	domain = strings.TrimSpace(domain)
+	labels := strings.Split(domain, ".")
+	if len(labels) == 2 {
+		domain = "www." + domain
+	}
+	return domain
+}
