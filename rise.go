@@ -10,9 +10,18 @@ import (
 	"github.com/nitrous-io/rise-cli-go/cli/login"
 	"github.com/nitrous-io/rise-cli-go/cli/logout"
 	"github.com/nitrous-io/rise-cli-go/cli/signup"
+	"github.com/nitrous-io/rise-cli-go/pkg/readline"
+	"github.com/nitrous-io/rise-cli-go/tui"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 func main() {
+	log.SetFormatter(&tui.Formatter{})
+	log.SetOutput(tui.Out)
+	log.SetLevel(log.InfoLevel)
+	readline.Output = tui.Out
+
 	app := cli.NewApp()
 	app.Name = "rise"
 	app.Usage = "Command line interface for Rise.sh"

@@ -2,9 +2,9 @@ package apperror
 
 import (
 	"fmt"
-	"log"
-	"os"
 	"strings"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 type Error struct {
@@ -43,12 +43,12 @@ func (e *Error) Error() string {
 }
 
 func (e *Error) Print() {
-	fmt.Fprintln(os.Stderr, e)
+	log.Error(e)
 }
 
 func (e *Error) Handle() {
 	if e.IsFatal {
-		log.Fatalln(e.Error())
+		log.Fatal(e.Error())
 	} else {
 		e.Print()
 	}
