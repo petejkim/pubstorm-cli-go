@@ -38,6 +38,16 @@
 			"revisionTime": "2016-02-02T18:33:00+11:00"
 		},
 		{
+			"path": "github.com/mattn/go-colorable",
+			"revision": "9fdad7c47650b7d2e1da50644c1f4ba7f172f252",
+			"revisionTime": "2016-02-10T09:18:57+09:00"
+		},
+		{
+			"path": "github.com/mattn/go-isatty",
+			"revision": "56b76bdf51f7708750eac80fa38b952bb9f32639",
+			"revisionTime": "2015-12-11T09:06:21+09:00"
+		},
+		{
 			"path": "github.com/onsi/ginkgo",
 			"revision": "07d85e6b10c4289c7d612f9b13f45ba36f66d55b",
 			"revisionTime": "2016-01-31T07:41:39-08:00"
