@@ -11,6 +11,7 @@ import (
 	"github.com/nitrous-io/rise-cli-go/cli/logout"
 	"github.com/nitrous-io/rise-cli-go/cli/signup"
 	"github.com/nitrous-io/rise-cli-go/pkg/readline"
+	"github.com/nitrous-io/rise-cli-go/tr"
 	"github.com/nitrous-io/rise-cli-go/tui"
 
 	log "github.com/Sirupsen/logrus"
@@ -24,47 +25,47 @@ func main() {
 
 	app := cli.NewApp()
 	app.Name = "rise"
-	app.Usage = "Command line interface for Rise.sh"
+	app.Usage = tr.T("rise_cli_desc")
 
 	app.Commands = []cli.Command{
 		{
 			Name:   "signup",
-			Usage:  "Create a new Rise account",
+			Usage:  tr.T("signup_desc"),
 			Action: signup.Signup,
 		},
 		{
 			Name:   "login",
-			Usage:  "Log in to a Rise account",
+			Usage:  tr.T("login_desc"),
 			Action: login.Login,
 		},
 		{
 			Name:   "logout",
-			Usage:  "Log out from current session",
+			Usage:  tr.T("logout_desc"),
 			Action: logout.Logout,
 		},
 		{
 			Name:   "init",
-			Usage:  "Create a new Rise project",
+			Usage:  tr.T("init_desc"),
 			Action: initcmd.Init,
 		},
 		{
-			Name:   "deploy",
-			Usage:  "Deploy a Rise project",
+			Name:   "publish, deploy",
+			Usage:  tr.T("deploy_desc"),
 			Action: deploy.Deploy,
 		},
 		{
 			Name:   "domains",
-			Usage:  "List all domains for a Rise project",
+			Usage:  tr.T("domains_desc"),
 			Action: domains.List,
 		},
 		{
 			Name:   "domains.add",
-			Usage:  "Add a new domain to a Rise project",
+			Usage:  tr.T("domains_add_desc"),
 			Action: domains.Add,
 		},
 		{
 			Name:   "domains.rm",
-			Usage:  "Remove a domain from a Rise project",
+			Usage:  tr.T("domains_rm_desc"),
 			Action: domains.Remove,
 		},
 	}
