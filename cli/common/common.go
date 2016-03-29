@@ -6,6 +6,7 @@ import (
 
 	"github.com/nitrous-io/rise-cli-go/config"
 	"github.com/nitrous-io/rise-cli-go/project"
+	"github.com/nitrous-io/rise-cli-go/tui"
 	"github.com/nitrous-io/rise-cli-go/util"
 )
 
@@ -26,4 +27,15 @@ func RequireProject() *project.Project {
 	}
 	util.ExitIfError(err)
 	return proj
+}
+
+func PrintLogo() {
+	fmt.Printf(
+		"%s\n%s\n%s\n%s\n%s\n\n",
+		tui.Ylo(`        _`),
+		tui.Ylo(`  _ __ (_) ___   ___`),
+		tui.Red(` | '__|| |/ __| / _ \`),
+		tui.Mag(` | |   | |\__ \|  __/`),
+		tui.Blu(` |_|   |_||___/ \___|`),
+	)
 }

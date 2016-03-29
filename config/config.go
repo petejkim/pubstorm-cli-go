@@ -11,6 +11,7 @@ import (
 var (
 	Host          = "https://api.rise.sh"
 	DefaultDomain = "rise.cloud"
+	WebsiteHost   = "https://www.rise.sh"
 
 	// these do not have to be secured
 	ClientID     = "73c24fbc2eb24bbf1d3fc3749fc8ac35"
