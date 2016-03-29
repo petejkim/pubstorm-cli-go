@@ -12,7 +12,7 @@ var strs = map[string]map[string]string{
 		"domains_add_desc": "Add a new domain to a Rise project",
 		"domains_rm_desc":  "Remove a domain from a Rise project",
 
-		"join_rise":           "Join Rise, the easiest way to publish your HTML5 websites and apps.",
+		"join_rise":           "Join Rise, the easiest way to publish your HTML5 websites and apps!",
 		"signup_disclaimer":   "By creating an account, you agree to the following:-",
 		"rise_tos":            "Rise Terms of Service",
 		"rise_privacy_policy": "Rise Privacy Policy",
@@ -26,6 +26,14 @@ var strs = map[string]map[string]string{
 		"confirmation_sucess": "Thanks for confirming your email address! Your account is now active!",
 		"login_fail":          "Login failed. Please try again by running `rise login` command.",
 		"login_success":       "You are logged in as %s.",
+
+		"login_rise":                "Welcome back to Rise, the easiest way to publish your HTML5 websites and apps!",
+		"enter_credentials":         "Enter your Rise credentials",
+		"confirmation_required":     "You have to confirm your email address to continue. Please check your inbox for the confirmation code.",
+		"enter_confirmation_resend": "Enter Confirmation Code (Or enter \"resend\" if you need it sent again)",
+		"confirmation_resent":       "Confirmation code has been resent. You will receive your confirmation code shortly via email.",
+
+		"rise_config_write_failed": "Could not save rise config file!",
 	},
 }
 

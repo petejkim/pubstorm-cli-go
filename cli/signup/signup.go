@@ -44,7 +44,6 @@ func Signup(c *cli.Context) {
 		readPw()
 		for password != passwordConf {
 			log.Error(tr.T("password_no_match"))
-			tui.Println()
 			readPw()
 		}
 
@@ -53,7 +52,7 @@ func Signup(c *cli.Context) {
 			break
 		}
 		appErr.Handle()
-		tui.Println(tr.T("error_in_input") + "\n")
+		tui.Println(tr.T("error_in_input"))
 	}
 
 	log.Info(tr.T("account_created"))

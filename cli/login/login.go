@@ -1,16 +1,18 @@
 package login
 
 import (
-	"fmt"
-	"log"
-
 	"github.com/codegangsta/cli"
 	"github.com/nitrous-io/rise-cli-go/apperror"
+	"github.com/nitrous-io/rise-cli-go/cli/common"
 	"github.com/nitrous-io/rise-cli-go/client/oauth"
 	"github.com/nitrous-io/rise-cli-go/client/users"
 	"github.com/nitrous-io/rise-cli-go/config"
 	"github.com/nitrous-io/rise-cli-go/pkg/readline"
+	"github.com/nitrous-io/rise-cli-go/tr"
+	"github.com/nitrous-io/rise-cli-go/tui"
 	"github.com/nitrous-io/rise-cli-go/util"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 func Login(c *cli.Context) {
@@ -19,41 +21,45 @@ func Login(c *cli.Context) {
 		token string
 	)
 
-	fmt.Println("Enter your Rise credentials")
+	common.PrintLogo()
+	tui.Println(tui.Bold(tr.T("login_rise")) + "\n")
+	tui.Println(tr.T("enter_credentials"))
 	for {
+		tui.Println()
 		var (
 			err      error
 			password string
 			appErr   *apperror.Error
 		)
 
-		email, err = readline.Read("Enter Email: ", true, "")
+		email, err = readline.Read(tui.Bold(tr.T("enter_email")+": "), true, "")
 		util.ExitIfErrorOrEOF(err)
 
-		password, err = readline.ReadSecurely("Enter Password: ", true, "")
+		password, err = readline.ReadSecurely(tui.Bold(tr.T("enter_password")+": "), true, "")
 		util.ExitIfErrorOrEOF(err)
 
 		token, appErr = oauth.FetchToken(email, password)
 
 		if appErr != nil && appErr.Code == oauth.ErrCodeUnconfirmedEmail {
-			fmt.Println("You have to confirm your email address to continue. Please check your inbox for the confirmation code.")
+			log.Info(tr.T("confirmation_required"))
 
 			resendUsed := false
 			for {
+				tui.Println()
 				var prompt string
 				if resendUsed {
-					prompt = "Enter Confirmation Code (check your inbox): "
+					prompt = tr.T("enter_confirmation")
 				} else {
-					prompt = `Enter Confirmation Code (or enter "resend" if you need it sent again): `
+					prompt = tr.T("enter_confirmation_resend")
 				}
-				confirmationCode, err := readline.Read(prompt, true, "")
+				confirmationCode, err := readline.Read(tui.Bold(prompt+": "), true, "")
 				util.ExitIfErrorOrEOF(err)
 
 				if confirmationCode == "resend" && !resendUsed {
 					appErr = users.ResendConfirmationCode(email)
 					if appErr == nil {
 						resendUsed = true
-						fmt.Println("Confirmation code has been resent. You will receive your confirmation code shortly.")
+						log.Info(tr.T("confirmation_resent"))
 						continue
 					}
 				} else {
@@ -65,8 +71,8 @@ func Login(c *cli.Context) {
 
 				appErr.Handle()
 			}
-
-			fmt.Println("Thanks for confirming your email address! Your account is now active!")
+			log.Info(tr.T("confirmation_sucess"))
+			tui.Println()
 
 			token, appErr = oauth.FetchToken(email, password)
 		}
@@ -84,7 +90,7 @@ func Login(c *cli.Context) {
 
 	config.AccessToken = token
 	if err := config.Save(); err != nil {
-		log.Fatalln("Fatal Error: Could not save rise config file!")
+		log.Fatalln(tr.T("rise_config_write_failed"))
 	}
-	fmt.Println("You are logged in as", email)
+	log.Infof(tr.T("login_success"), email)
 }

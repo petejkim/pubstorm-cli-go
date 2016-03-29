@@ -3,15 +3,16 @@ package util
 import (
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"strings"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 // Prints and exits if err is not nil
 func ExitIfError(err error) {
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
 }
 
@@ -19,14 +20,14 @@ func ExitIfError(err error) {
 func ExitIfErrorOrEOF(err error) {
 	if err != nil {
 		if err != io.EOF {
-			log.Fatalln(err)
+			log.Fatal(err)
 		}
 		os.Exit(1)
 	}
 }
 
 func ExitSomethingWentWrong() {
-	log.Fatalln("Error: Something went wrong. Please try again.")
+	log.Fatal("Something went wrong. Please try again.")
 }
 
 func ValidationErrorsToString(j map[string]interface{}) string {
