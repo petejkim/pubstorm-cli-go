@@ -1,16 +1,16 @@
 package domains
 
 import (
-	"fmt"
-	"log"
-	"os"
-
 	"github.com/codegangsta/cli"
 	"github.com/nitrous-io/rise-cli-go/cli/common"
 	"github.com/nitrous-io/rise-cli-go/client/domains"
 	"github.com/nitrous-io/rise-cli-go/config"
 	"github.com/nitrous-io/rise-cli-go/pkg/readline"
+	"github.com/nitrous-io/rise-cli-go/tr"
+	"github.com/nitrous-io/rise-cli-go/tui"
 	"github.com/nitrous-io/rise-cli-go/util"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 func List(c *cli.Context) {
@@ -22,9 +22,9 @@ func List(c *cli.Context) {
 		appErr.Handle()
 	}
 
-	fmt.Printf("Domains for \"%s\"\n", proj.Name)
+	tui.Printf(tui.Undl(tui.Bold(tr.T("domains_for")))+"\n", proj.Name)
 	for _, domainName := range domainNames {
-		fmt.Println(domainName)
+		tui.Println(domainName)
 	}
 }
 
@@ -39,7 +39,7 @@ func Add(c *cli.Context) {
 
 	for {
 		if interactive {
-			domainName, err = readline.Read("Enter Domain Name to Add: ", true, "")
+			domainName, err = readline.Read(tui.Bold(tr.T("enter_domain_name_to_add")+": "), true, "")
 			util.ExitIfErrorOrEOF(err)
 		}
 
@@ -48,14 +48,14 @@ func Add(c *cli.Context) {
 		appErr := domains.Create(config.AccessToken, proj.Name, domainName)
 		if appErr != nil {
 			if appErr.Code == domains.ErrCodeValidationFailed {
-				fmt.Println(appErr.Description)
 				if interactive {
+					log.Error(appErr.Description)
 					continue
 				} else {
-					os.Exit(1)
+					log.Fatal(appErr.Description)
 				}
 			} else if appErr.Code == domains.ErrCodeLimitReached {
-				log.Fatalf("You cannot add any more domains to project \"%s\"!", proj.Name)
+				log.Fatalf(tr.T("domain_limit_reached"), proj.Name)
 			}
 			appErr.Handle()
 		}
@@ -65,7 +65,7 @@ func Add(c *cli.Context) {
 		}
 	}
 
-	fmt.Printf("Successfully added \"%s\" to project \"%s\"\n", domainName, proj.Name)
+	log.Infof(tr.T("domain_added"), domainName, proj.Name)
 }
 
 func Remove(c *cli.Context) {
@@ -79,29 +79,29 @@ func Remove(c *cli.Context) {
 
 	for {
 		if interactive {
-			domainName, err = readline.Read("Enter Domain Name to Remove: ", true, "")
+			domainName, err = readline.Read(tui.Bold(tr.T("enter_domain_name_to_remove")+": "), true, "")
 			util.ExitIfErrorOrEOF(err)
 		}
 
 		domainName = util.SanitizeDomain(domainName)
 
 		if domainName == proj.Name+"."+config.DefaultDomain {
-			fmt.Printf("Domain \"%s\" cannot be deleted\n", domainName)
 			if interactive {
+				log.Errorf(tr.T("domain_cannot_be_deleted"), domainName)
 				continue
 			} else {
-				os.Exit(1)
+				log.Fatalf(tr.T("domain_cannot_be_deleted"), domainName)
 			}
 		}
 
 		appErr := domains.Delete(config.AccessToken, proj.Name, domainName)
 		if appErr != nil {
 			if appErr.Code == domains.ErrCodeNotFound {
-				fmt.Printf("Domain \"%s\" is not found\n", domainName)
 				if interactive {
+					log.Errorf(tr.T("domain_not_found"), domainName)
 					continue
 				} else {
-					os.Exit(1)
+					log.Fatalf(tr.T("domain_not_found"), domainName)
 				}
 			}
 
@@ -113,5 +113,5 @@ func Remove(c *cli.Context) {
 		}
 	}
 
-	fmt.Printf("Successfully removed \"%s\" from project \"%s\"\n", domainName, proj.Name)
+	log.Infof(tr.T("domain_removed"), domainName, proj.Name)
 }

@@ -75,6 +75,15 @@ var strs = map[string]map[string]string{
 		"stat_failed":       "Could not get file info for \"%s\"; aborting.",
 		"write_failed":      "Failed to write to \"%s\"; aborting.",
 		"file_size_changed": "File size of \"%s\" changed while packing; aborting.",
+
+		"domains_for":                 "Domains for \"%s\"",
+		"enter_domain_name_to_add":    "Enter Domain Name to Add",
+		"domain_limit_reached":        "You cannot add any more domains to project \"%s\".",
+		"domain_added":                "Successfully added \"%s\" to project \"%s\".",
+		"enter_domain_name_to_remove": "Enter Domain Name to Remove",
+		"domain_cannot_be_deleted":    "Domain \"%s\" cannot be deleted.",
+		"domain_not_found":            "Domain \"%s\" is not found",
+		"domain_removed":              "Successfully removed \"%s\" to project \"%s\".",
 	},
 }
 
