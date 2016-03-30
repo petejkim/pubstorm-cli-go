@@ -5,6 +5,8 @@ import (
 	"io"
 	"math"
 	"strings"
+
+	"github.com/nitrous-io/rise-cli-go/tui"
 )
 
 func draw(w io.Writer, i, total float64) {
@@ -12,5 +14,5 @@ func draw(w io.Writer, i, total float64) {
 	percentage := i / total
 	progress := int(math.Floor(percentage * float64(barWidth)))
 
-	fmt.Fprintf(w, "\r[%s%s] %.1f%%", strings.Repeat("=", progress), strings.Repeat(" ", barWidth-progress), percentage*100.0)
+	fmt.Fprintf(w, "\r["+tui.Blu("%s")+"%s] "+tui.Cyn("%.1f%%"), strings.Repeat("=", progress), strings.Repeat(" ", barWidth-progress), percentage*100.0)
 }

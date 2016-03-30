@@ -12,7 +12,7 @@ import (
 	"github.com/franela/goreq"
 	"github.com/nitrous-io/rise-cli-go/apperror"
 	"github.com/nitrous-io/rise-cli-go/config"
-	"github.com/nitrous-io/rise-cli-go/pkg/progressbar"
+	"github.com/nitrous-io/rise-cli-go/progressbar"
 	"github.com/nitrous-io/rise-cli-go/util"
 )
 

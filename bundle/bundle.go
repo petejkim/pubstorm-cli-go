@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 
 	"github.com/nitrous-io/rise-cli-go/pkg/pathmatch"
-	"github.com/nitrous-io/rise-cli-go/pkg/progressbar"
+	"github.com/nitrous-io/rise-cli-go/progressbar"
 )
 
 var (

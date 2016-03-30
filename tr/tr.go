@@ -52,6 +52,15 @@ var strs = map[string]map[string]string{
 		"enter_project_name":  "Enter Project Name",
 		"project_initialized": "Successfully created project \"%s\".",
 		"rise_json_saved":     "Saved project settings to \"rise.json\". This file should not be deleted.",
+
+		"scanning_path":            "Scanning \"%s\"...",
+		"bundling_file_count_size": "Bundling %s files (%s)...",
+		"project_size_exceeded":    "Your project size cannot exceed %s!",
+		"packing_bundle":           "Packing bundle \"%s\"...",
+		"bundle_size_exceeded":     "Your bundle size cannot exceed %s!",
+		"uploading_bundle":         "Uploading bundle \"%s\" to Rise Cloud...",
+		"launching":                "Launching...",
+		"published":                "%s published on Rise Cloud.",
 	},
 }
 
