@@ -44,26 +44,27 @@ var _ = Describe("Bundle", func() {
 	Describe("Assemble()", func() {
 		BeforeEach(func() {
 			files := []string{
-				".gitignore",
-				"Rakefile",
-				"app/assets/javascripts/application.js",
-				"app/controllers/home/home_controller.rb",
-				"app/controllers/posts/posts_controller.rb",
-				"app/models/.gitkeep",
-				"app/models/post.rb",
-				"app/models/#post.rb",
-				"app/views/home/home.erb",
-				"app/views/home/home.erb~",
-				"config/environments/production.rb",
-				"config/environments/development.rb",
-				"log/development.log",
-				"log/production.log",
-				"public/index.html",
-				"tmp/appendonly.txt",
-				"vendor/assets/javascripts/jquery/jquery-2.0.js",
-				"vendor/assets/javascripts/underscore.js",
-				"README.rdoc",
+				"public/.gitignore",
+				"public/Rakefile",
+				"public/app/assets/javascripts/application.js",
+				"public/app/controllers/home/home_controller.rb",
+				"public/app/controllers/posts/posts_controller.rb",
+				"public/app/models/.gitkeep",
+				"public/app/models/post.rb",
+				"public/app/models/#post.rb",
+				"public/app/views/home/home.erb",
+				"public/app/views/home/home.erb~",
+				"public/config/environments/production.rb",
+				"public/config/environments/development.rb",
+				"public/log/development.log",
+				"public/log/production.log",
+				"public/public/index.html",
+				"public/tmp/appendonly.txt",
+				"public/vendor/assets/javascripts/jquery/jquery-2.0.js",
+				"public/vendor/assets/javascripts/underscore.js",
+				"public/README.rdoc",
 				"rise.json",
+				"extra_file.txt",
 			}
 
 			for _, f := range files {
@@ -77,22 +78,22 @@ var _ = Describe("Bundle", func() {
 			}
 
 			// symlink to a file
-			err = os.Symlink(filepath.Join(tempDir, "vendor/assets/javascripts/underscore.js"), filepath.Join(tempDir, "app/assets/javascripts/underscore.js"))
+			err = os.Symlink(filepath.Join(tempDir, "public/vendor/assets/javascripts/underscore.js"), filepath.Join(tempDir, "public/app/assets/javascripts/underscore.js"))
 			Expect(err).To(BeNil())
 
 			// symlink to a dir
-			err = os.Symlink(filepath.Join(tempDir, "vendor/assets/javascripts/jquery"), filepath.Join(tempDir, "app/assets/javascripts/jquery"))
+			err = os.Symlink(filepath.Join(tempDir, "public/vendor/assets/javascripts/jquery"), filepath.Join(tempDir, "public/app/assets/javascripts/jquery"))
 			Expect(err).To(BeNil())
 
 			// unreadable file
-			err = os.Chmod("tmp/appendonly.txt", 0200)
+			err = os.Chmod("public/tmp/appendonly.txt", 0200)
 			Expect(err).To(BeNil())
 
 			time.Sleep(100 * time.Millisecond)
 		})
 
 		It("return all files", func() {
-			b := bundle.New(".")
+			b := bundle.New("public")
 			count, size, err := b.Assemble([]string{"log", "development.rb", "vendor/assets", "rise.json"}, false)
 			Expect(err).To(BeNil())
 
@@ -124,16 +125,16 @@ var _ = Describe("Bundle", func() {
 
 		BeforeEach(func() {
 			files = map[string][]byte{
-				"foo/foo.rb": []byte(`puts "hello"`),
-				"bar.sql":    []byte(`SELECT * FROM hello;`),
-				"baz/baz.js": []byte(`console.log("hello");`),
-				"qux.php":    []byte(`<?php echo("hello") ?>`),
+				"public/foo/foo.rb": []byte(`puts "hello"`),
+				"public/bar.sql":    []byte(`SELECT * FROM hello;`),
+				"public/baz/baz.js": []byte(`console.log("hello");`),
+				"public/qux.php":    []byte(`<?php echo("hello") ?>`),
 			}
 
 			fileNames = make([]string, 0, len(files))
 
 			for fileName, fileContent := range files {
-				fileNames = append(fileNames, fileName)
+				fileNames = append(fileNames, fileName[len("public/"):])
 
 				if strings.Contains(fileName, "/") {
 					dir := filepath.Dir(fileName)
@@ -146,7 +147,7 @@ var _ = Describe("Bundle", func() {
 		})
 
 		It("creates a compressed tarball", func() {
-			b := bundle.New(".")
+			b := bundle.New("public")
 			_, _, err := b.Assemble(nil, false)
 			Expect(err).To(BeNil())
 
@@ -173,11 +174,11 @@ var _ = Describe("Bundle", func() {
 				hdr, err := tr.Next()
 				Expect(err).To(BeNil())
 				fileName := hdr.Name
-				Expect(files).To(HaveKey(fileName))
+				Expect(fileNames).To(ContainElement(fileName))
 
 				data, err := ioutil.ReadAll(tr)
 				Expect(err).To(BeNil())
-				Expect(data).To(Equal(files[fileName]))
+				Expect(data).To(Equal(files["public/"+fileName]))
 
 				filesRead = append(filesRead, fileName)
 			}

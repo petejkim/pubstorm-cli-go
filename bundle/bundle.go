@@ -194,19 +194,26 @@ func (b *Bundle) Pack(tarballPath string, showError, showProgress bool) error {
 		tw.Close()
 	}()
 
+	basePath, err := filepath.Abs(b.path)
+	if err != nil {
+		return err
+	}
+
 	pb := progressbar.NewCounter(os.Stdout, len(b.fileList))
 
 	for _, path := range b.fileList {
-		fi, err := os.Stat(path)
+		absPath := filepath.Join(basePath, path)
+
+		fi, err := os.Stat(absPath)
 		if err != nil {
-			logErr(fmt.Sprintf(tr.T("stat_failed"), path))
+			logErr(fmt.Sprintf(tr.T("stat_failed"), absPath))
 			return err
 		}
 
 		hdr, err := tar.FileInfoHeader(fi, path)
 		hdr.Name = path
 		if err != nil {
-			logErr(fmt.Sprintf(tr.T("stat_failed"), path))
+			logErr(fmt.Sprintf(tr.T("stat_failed"), absPath))
 			return err
 		}
 
@@ -215,7 +222,7 @@ func (b *Bundle) Pack(tarballPath string, showError, showProgress bool) error {
 			return err
 		}
 
-		ff, err := os.Open(path)
+		ff, err := os.Open(absPath)
 		if err != nil {
 			logErr(fmt.Sprintf(tr.T("write_failed"), tarballPath))
 			return err
