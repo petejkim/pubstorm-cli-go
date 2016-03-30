@@ -90,7 +90,7 @@ func Login(c *cli.Context) {
 
 	config.AccessToken = token
 	if err := config.Save(); err != nil {
-		log.Fatalln(tr.T("rise_config_write_failed"))
+		log.Fatal(tr.T("rise_config_write_failed"))
 	}
 	log.Infof(tr.T("login_success"), email)
 }

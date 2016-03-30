@@ -21,7 +21,7 @@ func Logout(c *cli.Context) {
 
 	config.AccessToken = ""
 	if err := config.Save(); err != nil {
-		log.Fatalln(tr.T("rise_config_write_failed"))
+		log.Fatal(tr.T("rise_config_write_failed"))
 	}
 	log.Info(tr.T("access_token_cleared"))
 }

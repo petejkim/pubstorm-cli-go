@@ -77,7 +77,7 @@ func Signup(c *cli.Context) {
 		log.Error(tr.T("login_fail"))
 
 		if appErr != nil {
-			log.Fatalln(appErr.Error())
+			log.Fatal(appErr.Error())
 		}
 	}
 
