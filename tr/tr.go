@@ -43,7 +43,7 @@ var strs = map[string]map[string]string{
 
 		"something_wrong": "Something went wrong. Please try again.",
 
-		"existing_rise_project": "A Rise project already exists in the current working directory, aborting.",
+		"existing_rise_project": "A Rise project already exists in the current working directory; aborting.",
 
 		"init_rise_project":   "Set up your Rise project",
 		"enter_project_path":  "Enter Project Path",
@@ -61,6 +61,20 @@ var strs = map[string]map[string]string{
 		"uploading_bundle":         "Uploading bundle \"%s\" to Rise Cloud...",
 		"launching":                "Launching...",
 		"published":                "%s published on Rise Cloud.",
+
+		"ignore_file_reason":    "Ignoring \"%s\", %s...",
+		"symlink_error":         "could not follow symlink",
+		"symlink_to_dir":        "symlink points to a directory",
+		"special_mode_bits":     "file has special mode bits set",
+		"name_has_dot_prefix":   "name begins with \".\"",
+		"name_has_hash_prefix":  "name begins with \"#\"",
+		"name_has_tilde_suffix": "name ends with \"~\"",
+		"name_in_ignore_list":   "name is in ignore list",
+		"file_unreadable":       "file is not readable",
+
+		"stat_failed":       "Could not get file info for \"%s\"; aborting.",
+		"write_failed":      "Failed to write to \"%s\"; aborting.",
+		"file_size_changed": "File size of \"%s\" changed while packing; aborting.",
 	},
 }
 

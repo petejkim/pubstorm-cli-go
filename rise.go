@@ -53,6 +53,12 @@ func main() {
 			Aliases: []string{"deploy"},
 			Usage:   tr.T("deploy_desc"),
 			Action:  deploy.Deploy,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "verbose, v",
+					Usage: "Show additional information",
+				},
+			},
 		},
 		{
 			Name:   "domains",

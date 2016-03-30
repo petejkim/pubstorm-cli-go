@@ -22,6 +22,8 @@ import (
 )
 
 func Deploy(c *cli.Context) {
+	verbose := c.Bool("verbose")
+
 	common.RequireAccessToken()
 	proj := common.RequireProject()
 
@@ -31,7 +33,7 @@ func Deploy(c *cli.Context) {
 	tui.Printf(tr.T("scanning_path")+"\n", absPath)
 
 	bun := bundle.New(proj.Path)
-	count, size, err := bun.Assemble([]string{"rise.json", "Thumbs.db", "desktop.ini"}, false)
+	count, size, err := bun.Assemble([]string{"rise.json", "Thumbs.db", "desktop.ini"}, verbose)
 
 	log.Infof(tr.T("bundling_file_count_size"), humanize.Comma(int64(count)), humanize.Bytes(uint64(size)))
 
@@ -47,7 +49,7 @@ func Deploy(c *cli.Context) {
 
 	tui.Printf("\n"+tr.T("packing_bundle")+"\n", proj.Name)
 
-	err = bun.Pack(bunPath, true)
+	err = bun.Pack(bunPath, verbose)
 	util.ExitIfError(err)
 
 	fi, err := os.Stat(bunPath)
@@ -59,7 +61,7 @@ func Deploy(c *cli.Context) {
 
 	tui.Printf("\n"+tr.T("uploading_bundle")+"\n", proj.Name)
 
-	deployment, appErr := deployments.Create(config.AccessToken, proj.Name, bunPath, true)
+	deployment, appErr := deployments.Create(config.AccessToken, proj.Name, bunPath)
 	if appErr != nil {
 		appErr.Handle()
 	}

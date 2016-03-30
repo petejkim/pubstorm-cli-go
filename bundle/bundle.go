@@ -11,6 +11,9 @@ import (
 
 	"github.com/nitrous-io/rise-cli-go/pkg/pathmatch"
 	"github.com/nitrous-io/rise-cli-go/progressbar"
+	"github.com/nitrous-io/rise-cli-go/tr"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 var (
@@ -91,7 +94,7 @@ func shouldInclude(path, basePath string, ignoreList []string, fi os.FileInfo, v
 			if relPath == "" {
 				relPath = path
 			}
-			fmt.Printf("Warning: Ignoring \"%s\", %s\n", relPath, m)
+			log.Warnf(tr.T("ignore_file_reason"), relPath, m)
 		}
 	}
 
@@ -101,48 +104,48 @@ func shouldInclude(path, basePath string, ignoreList []string, fi os.FileInfo, v
 		fi, err = os.Stat(path)
 		// if there is an error following the symlink, skip
 		if err != nil {
-			logWarn("could not follow symlink")
+			logWarn(tr.T("symlink_error"))
 			return skip()
 		}
 
 		// if symlink points to a directory, skip
 		if fi.IsDir() {
-			logWarn("symlink points to a directory")
+			logWarn(tr.T("symlink_to_dir"))
 			return skip()
 		}
 
 		// if symlink points to a non-regular file, skip
 		if !fi.Mode().IsRegular() {
-			logWarn("file has special mode bits set")
+			logWarn(tr.T("special_mode_bits"))
 			return skip()
 		}
 	}
 
 	// if file name starts with ".", "#" or ends with "~", skip
 	if base[0] == '.' {
-		logWarn(`name begins with "."`)
+		logWarn(tr.T("name_has_dot_prefix"))
 		return skip()
 	}
 
 	if base[0] == '#' {
-		logWarn(`name begins with "#"`)
+		logWarn(tr.T("name_has_hash_prefix"))
 		return skip()
 	}
 
 	if base[len(base)-1] == '~' {
-		logWarn(`name ends with "~"`)
+		logWarn(tr.T("name_has_tilde_suffix"))
 		return skip()
 	}
 
 	// if file is in the ignore list, skip
 	if ignoreList != nil && pathmatch.PathMatchAny(path, ignoreList...) {
-		logWarn("name is in ignore list")
+		logWarn(tr.T("name_in_ignore_list"))
 		return skip()
 	}
 
 	// if file is not a regular file or symlink to a regular file (tested earlier), skip
 	if mode&os.ModeSymlink != os.ModeSymlink && !isDir && !mode.IsRegular() {
-		logWarn("file has special mode bits set")
+		logWarn(tr.T("special_mode_bits"))
 		return skip()
 	}
 
@@ -154,7 +157,7 @@ func shouldInclude(path, basePath string, ignoreList []string, fi os.FileInfo, v
 	// if the file can't be read, skip
 	f, err := os.Open(path)
 	if err != nil {
-		logWarn("file can't be read")
+		logWarn(tr.T("file_unreadable"))
 		return false, 0, nil
 	}
 	f.Close()
@@ -169,7 +172,7 @@ func (b *Bundle) FileList() []string {
 func (b *Bundle) Pack(tarballPath string, verbose bool) error {
 	logErr := func(m string) {
 		if verbose {
-			fmt.Fprintf(os.Stderr, "Error: %s\n", m)
+			log.Error(m)
 		}
 	}
 
@@ -196,25 +199,25 @@ func (b *Bundle) Pack(tarballPath string, verbose bool) error {
 	for _, path := range b.fileList {
 		fi, err := os.Stat(path)
 		if err != nil {
-			logErr(fmt.Sprintf("Could not get file info for \"%s\", aborting!", path))
+			logErr(fmt.Sprintf(tr.T("stat_failed"), path))
 			return err
 		}
 
 		hdr, err := tar.FileInfoHeader(fi, path)
 		hdr.Name = path
 		if err != nil {
-			logErr(fmt.Sprintf("Could not get file info for \"%s\", aborting!", path))
+			logErr(fmt.Sprintf(tr.T("stat_failed"), path))
 			return err
 		}
 
 		if err := tw.WriteHeader(hdr); err != nil {
-			logErr(fmt.Sprintf("Failed to write to \"%s\", aborting!", tarballPath))
+			logErr(fmt.Sprintf(tr.T("write_failed"), tarballPath))
 			return err
 		}
 
 		ff, err := os.Open(path)
 		if err != nil {
-			logErr(fmt.Sprintf("Failed to write to \"%s\", aborting!", tarballPath))
+			logErr(fmt.Sprintf(tr.T("write_failed"), tarballPath))
 			return err
 		}
 
@@ -222,18 +225,16 @@ func (b *Bundle) Pack(tarballPath string, verbose bool) error {
 		ff.Close()
 
 		if err != nil {
-			logErr(fmt.Sprintf("Failed to write to \"%s\", aborting!", tarballPath))
+			logErr(fmt.Sprintf(tr.T("write_failed"), tarballPath))
 			return err
 		}
 
 		if n != hdr.Size {
-			logErr(fmt.Sprintf("File size of \"%s\" changed while packing, aborting!", tarballPath))
+			logErr(fmt.Sprintf(tr.T("file_size_changed"), tarballPath))
 			return ErrFileChanged
 		}
 
-		if verbose {
-			pb.Next()
-		}
+		pb.Next()
 	}
 
 	return nil
