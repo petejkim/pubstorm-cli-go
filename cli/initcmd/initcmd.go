@@ -1,9 +1,7 @@
 package initcmd
 
 import (
-	"fmt"
 	"os"
-	"strings"
 
 	"github.com/codegangsta/cli"
 	"github.com/nitrous-io/rise-cli-go/cli/common"
@@ -11,7 +9,11 @@ import (
 	"github.com/nitrous-io/rise-cli-go/config"
 	"github.com/nitrous-io/rise-cli-go/pkg/readline"
 	"github.com/nitrous-io/rise-cli-go/project"
+	"github.com/nitrous-io/rise-cli-go/tr"
+	"github.com/nitrous-io/rise-cli-go/tui"
 	"github.com/nitrous-io/rise-cli-go/util"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 func Init(c *cli.Context) {
@@ -23,27 +25,26 @@ func Init(c *cli.Context) {
 	}
 
 	if proj != nil {
-		fmt.Println("Error: A Rise project already exists in current path, aborting.")
-		os.Exit(1)
+		log.Fatal(tr.T("existing_rise_project"))
 	} else {
 		proj = &project.Project{}
 
-		fmt.Println("Set up your Rise project")
+		tui.Println(tr.T("init_rise_project"))
 
 		for {
-			proj.Path, err = readline.Read("Enter Project Path: [.] ", true, ".")
+			proj.Path, err = readline.Read(tui.Bold(tr.T("enter_project_path")+": [.] "), true, ".")
 			util.ExitIfErrorOrEOF(err)
 
 			if err := proj.ValidatePath(); err != nil {
-				fmt.Println(err.Error())
+				log.Error(err.Error())
 				continue
 			}
 
 			break
 		}
 
-		for {
-			enableStats, err := readline.Read("Enable Basic Stats? [Y/n] ", true, "y")
+		/*for {
+			enableStats, err := readline.Read(tui.Bold(tr.T("enable_basic_stats")+"? [Y/n] "), true, "y")
 			util.ExitIfErrorOrEOF(err)
 
 			switch strings.ToLower(enableStats) {
@@ -59,7 +60,7 @@ func Init(c *cli.Context) {
 		}
 
 		for {
-			forceHTTPS, err := readline.Read("Force HTTPS? [y/N] ", true, "n")
+			forceHTTPS, err := readline.Read(tui.Bold(tr.T("force_https")+"? [y/N] "), true, "n")
 			util.ExitIfErrorOrEOF(err)
 
 			switch strings.ToLower(forceHTTPS) {
@@ -72,14 +73,16 @@ func Init(c *cli.Context) {
 			}
 
 			break
-		}
+		}*/
+		proj.EnableStats = true
+		proj.ForceHTTPS = false
 
 		for {
-			proj.Name, err = readline.Read("Enter Project Name: ", true, "")
+			proj.Name, err = readline.Read(tui.Bold(tr.T("enter_project_name")+": "), true, "")
 			util.ExitIfErrorOrEOF(err)
 
 			if err := proj.ValidateName(); err != nil {
-				fmt.Println(err.Error())
+				log.Error(err.Error())
 				continue
 			}
 
@@ -92,7 +95,10 @@ func Init(c *cli.Context) {
 			break
 		}
 
-		err = proj.Save()
-		util.ExitIfError(err)
+		log.Infof(tr.T("project_initialized"), proj.Name)
+		if err = proj.Save(); err != nil {
+			log.Fatal(err.Error())
+		}
+		log.Info(tr.T("rise_json_saved"))
 	}
 }

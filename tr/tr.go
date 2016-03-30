@@ -42,6 +42,16 @@ var strs = map[string]map[string]string{
 		"no_rise_project": "Could not find a Rise project in current working directory. To initialize a new Rise project here, run `rise init`.",
 
 		"something_wrong": "Something went wrong. Please try again.",
+
+		"existing_rise_project": "A Rise project already exists in the current working directory, aborting.",
+
+		"init_rise_project":   "Set up your Rise project",
+		"enter_project_path":  "Enter Project Path",
+		"enable_basic_stats":  "Enable Basic Stats",
+		"force_https":         "Redirect \"http\" to \"https\" URL",
+		"enter_project_name":  "Enter Project Name",
+		"project_initialized": "Successfully created project \"%s\".",
+		"rise_json_saved":     "Saved project settings to \"rise.json\". This file should not be deleted.",
 	},
 }
 
