@@ -18,7 +18,7 @@ func init() {
 }
 
 func Print(a ...interface{}) (n int, err error) {
-	return fmt.Fprint(os.Stdout, a...)
+	return fmt.Fprint(Out, a...)
 }
 
 func Printf(format string, a ...interface{}) (n int, err error) {

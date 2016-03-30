@@ -1,7 +1,6 @@
 package common
 
 import (
-	"fmt"
 	"os"
 
 	log "github.com/Sirupsen/logrus"
@@ -30,7 +29,7 @@ func RequireProject() *project.Project {
 }
 
 func PrintLogo() {
-	fmt.Printf(
+	tui.Printf(
 		"%s\n%s\n%s\n%s\n%s\n\n",
 		tui.Ylo(`        _                     _                    _`),
 		tui.Ylo(`  _ __ (_) ___   ___     ___ | |  ___   _   _   __| |`),
