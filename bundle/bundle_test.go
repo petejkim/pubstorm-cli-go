@@ -151,7 +151,7 @@ var _ = Describe("Bundle", func() {
 			Expect(err).To(BeNil())
 
 			tarballPath := filepath.Join(tempDir, "bundle.tar.gz")
-			err = b.Pack(tarballPath, false)
+			err = b.Pack(tarballPath, false, false)
 			Expect(err).To(BeNil())
 
 			_, err = os.Stat(tarballPath)

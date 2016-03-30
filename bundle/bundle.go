@@ -30,7 +30,7 @@ func New(path string) *Bundle {
 }
 
 // Walks the path and forms a list of files that should be included in the bundle
-func (b *Bundle) Assemble(ignoreList []string, verbose bool) (count int, size int64, err error) {
+func (b *Bundle) Assemble(ignoreList []string, showWarnings bool) (count int, size int64, err error) {
 	b.fileList = []string{}
 
 	basePath, err := filepath.Abs(b.path)
@@ -44,7 +44,7 @@ func (b *Bundle) Assemble(ignoreList []string, verbose bool) (count int, size in
 			return nil
 		}
 
-		incl, fileSize, err := shouldInclude(path, basePath, ignoreList, fi, verbose)
+		incl, fileSize, err := shouldInclude(path, basePath, ignoreList, fi, showWarnings)
 		if err != nil {
 			// SkipDir error should fall through
 			if err == filepath.SkipDir {
@@ -73,7 +73,7 @@ func (b *Bundle) Assemble(ignoreList []string, verbose bool) (count int, size in
 	return len(b.fileList), size, nil
 }
 
-func shouldInclude(path, basePath string, ignoreList []string, fi os.FileInfo, verbose bool) (incl bool, fileSize int64, err error) {
+func shouldInclude(path, basePath string, ignoreList []string, fi os.FileInfo, showWarnings bool) (incl bool, fileSize int64, err error) {
 	var (
 		isDir = fi.IsDir()
 		mode  = fi.Mode()
@@ -89,7 +89,7 @@ func shouldInclude(path, basePath string, ignoreList []string, fi os.FileInfo, v
 	}
 
 	logWarn := func(m string) {
-		if verbose {
+		if showWarnings {
 			relPath, _ := filepath.Rel(basePath, path)
 			if relPath == "" {
 				relPath = path
@@ -169,9 +169,9 @@ func (b *Bundle) FileList() []string {
 	return b.fileList
 }
 
-func (b *Bundle) Pack(tarballPath string, verbose bool) error {
+func (b *Bundle) Pack(tarballPath string, showError, showProgress bool) error {
 	logErr := func(m string) {
-		if verbose {
+		if showError {
 			log.Error(m)
 		}
 	}
@@ -234,7 +234,9 @@ func (b *Bundle) Pack(tarballPath string, verbose bool) error {
 			return ErrFileChanged
 		}
 
-		pb.Next()
+		if showProgress {
+			pb.Next()
+		}
 	}
 
 	return nil

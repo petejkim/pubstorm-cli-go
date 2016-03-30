@@ -49,7 +49,7 @@ func Deploy(c *cli.Context) {
 
 	tui.Printf("\n"+tr.T("packing_bundle")+"\n", proj.Name)
 
-	err = bun.Pack(bunPath, verbose)
+	err = bun.Pack(bunPath, true, true)
 	util.ExitIfError(err)
 
 	fi, err := os.Stat(bunPath)
@@ -61,7 +61,7 @@ func Deploy(c *cli.Context) {
 
 	tui.Printf("\n"+tr.T("uploading_bundle")+"\n", proj.Name)
 
-	deployment, appErr := deployments.Create(config.AccessToken, proj.Name, bunPath)
+	deployment, appErr := deployments.Create(config.AccessToken, proj.Name, bunPath, false)
 	if appErr != nil {
 		appErr.Handle()
 	}

@@ -97,7 +97,7 @@ var _ = Describe("Deployments", func() {
 				os.Remove(bunPath)
 			}()
 
-			deployment, appErr := deployments.Create("t0k3n", "foo-bar-express", bunPath, false)
+			deployment, appErr := deployments.Create("t0k3n", "foo-bar-express", bunPath, true)
 			Expect(server.ReceivedRequests()).To(HaveLen(1))
 
 			if e.errIsNil {

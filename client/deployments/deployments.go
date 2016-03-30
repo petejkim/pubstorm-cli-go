@@ -30,7 +30,7 @@ type Deployment struct {
 	State string `json:"state"`
 }
 
-func Create(token, name, bunPath string) (depl *Deployment, appErr *apperror.Error) {
+func Create(token, name, bunPath string, quiet bool) (depl *Deployment, appErr *apperror.Error) {
 	req := goreq.Request{
 		Method:    "POST",
 		Uri:       config.Host + "/projects/" + name + "/deployments",
@@ -64,8 +64,12 @@ func Create(token, name, bunPath string) (depl *Deployment, appErr *apperror.Err
 	req.AddHeader("Content-Type", writer.FormDataContentType())
 	bodyLen := int64(body.Len())
 
-	pb := progressbar.NewReader(body, os.Stdout, bodyLen)
-	req.Body = pb
+	if quiet {
+		req.Body = body
+	} else {
+		pb := progressbar.NewReader(body, os.Stdout, bodyLen)
+		req.Body = pb
+	}
 
 	req.OnBeforeRequest = func(goreq *goreq.Request, httpreq *http.Request) {
 		httpreq.ContentLength = bodyLen
