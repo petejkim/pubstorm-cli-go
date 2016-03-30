@@ -24,7 +24,7 @@ var strs = map[string]map[string]string{
 		"account_created":     "Your account has been created. You will receive your confirmation code shortly via email.",
 		"enter_confirmation":  "Enter Confirmation Code (Check your inbox!)",
 		"confirmation_sucess": "Thanks for confirming your email address! Your account is now active!",
-		"login_fail":          "Login failed. Please try again by running `rise login` command.",
+		"login_fail":          "Login failed. Please try again by running `rise login`.",
 		"login_success":       "You are logged in as %s.",
 
 		"login_rise":                "Welcome back to Rise, the easiest way to publish your HTML5 websites and apps!",
@@ -37,6 +37,11 @@ var strs = map[string]map[string]string{
 
 		"logout_success":       "You are now logged out.",
 		"access_token_cleared": "Access token cleared.",
+
+		"not_logged_in":   "You are not logged in. Please login by running `rise login` or create a new account by running `rise signup`.",
+		"no_rise_project": "Could not find a Rise project in current working directory. To initialize a new Rise project here, run `rise init`.",
+
+		"something_wrong": "Something went wrong. Please try again.",
 	},
 }
 

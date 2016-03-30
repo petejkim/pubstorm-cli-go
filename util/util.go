@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/nitrous-io/rise-cli-go/tr"
 )
 
 // Prints and exits if err is not nil
@@ -27,7 +28,7 @@ func ExitIfErrorOrEOF(err error) {
 }
 
 func ExitSomethingWentWrong() {
-	log.Fatal("Something went wrong. Please try again.")
+	log.Fatal(tr.T("something_wrong"))
 }
 
 func ValidationErrorsToString(j map[string]interface{}) string {
