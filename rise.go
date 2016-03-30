@@ -49,9 +49,10 @@ func main() {
 			Action: initcmd.Init,
 		},
 		{
-			Name:   "publish, deploy",
-			Usage:  tr.T("deploy_desc"),
-			Action: deploy.Deploy,
+			Name:    "publish",
+			Aliases: []string{"deploy"},
+			Usage:   tr.T("deploy_desc"),
+			Action:  deploy.Deploy,
 		},
 		{
 			Name:   "domains",
