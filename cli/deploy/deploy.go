@@ -12,6 +12,7 @@ import (
 	"github.com/nitrous-io/rise-cli-go/bundle"
 	"github.com/nitrous-io/rise-cli-go/cli/common"
 	"github.com/nitrous-io/rise-cli-go/client/deployments"
+	"github.com/nitrous-io/rise-cli-go/client/projects"
 	"github.com/nitrous-io/rise-cli-go/config"
 	"github.com/nitrous-io/rise-cli-go/pkg/spinner"
 	"github.com/nitrous-io/rise-cli-go/tr"
@@ -26,6 +27,14 @@ func Deploy(c *cli.Context) {
 
 	common.RequireAccessToken()
 	proj := common.RequireProject()
+
+	appErr := projects.Get(config.AccessToken, proj.Name)
+	if appErr != nil {
+		if appErr.Code == projects.ErrCodeNotFound {
+			log.Fatalf(tr.T("project_not_found"), proj.Name)
+		}
+		appErr.Handle()
+	}
 
 	absPath, err := filepath.Abs(proj.Path)
 	util.ExitIfError(err)
@@ -63,6 +72,9 @@ func Deploy(c *cli.Context) {
 
 	deployment, appErr := deployments.Create(config.AccessToken, proj.Name, bunPath, false)
 	if appErr != nil {
+		if appErr.Code == projects.ErrCodeNotFound {
+			log.Fatalf(tr.T("project_not_found"), proj.Name)
+		}
 		appErr.Handle()
 	}
 

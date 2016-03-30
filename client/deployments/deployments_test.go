@@ -139,6 +139,15 @@ var _ = Describe("Deployments", func() {
 			errIsFatal: true,
 		}),
 
+		Entry("404 with not found", expectation{
+			resCode:    http.StatusNotFound,
+			resBody:    `{"error": "not_found", "error_description": "project could not be found"}`,
+			errIsNil:   false,
+			errCode:    deployments.ErrCodeNotFound,
+			errDesc:    "project could not be found",
+			errIsFatal: true,
+		}),
+
 		Entry("successful deployment", expectation{
 			resCode:  http.StatusAccepted,
 			resBody:  `{"deployment": {"id": 10, "state": "uploaded" }}`,

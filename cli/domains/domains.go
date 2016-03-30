@@ -1,9 +1,12 @@
 package domains
 
 import (
+	"strings"
+
 	"github.com/codegangsta/cli"
 	"github.com/nitrous-io/rise-cli-go/cli/common"
 	"github.com/nitrous-io/rise-cli-go/client/domains"
+	"github.com/nitrous-io/rise-cli-go/client/projects"
 	"github.com/nitrous-io/rise-cli-go/config"
 	"github.com/nitrous-io/rise-cli-go/pkg/readline"
 	"github.com/nitrous-io/rise-cli-go/tr"
@@ -19,6 +22,9 @@ func List(c *cli.Context) {
 
 	domainNames, appErr := domains.Index(config.AccessToken, proj.Name)
 	if appErr != nil {
+		if appErr.Code == projects.ErrCodeNotFound {
+			log.Fatalf(tr.T("project_not_found"), proj.Name)
+		}
 		appErr.Handle()
 	}
 
@@ -56,6 +62,8 @@ func Add(c *cli.Context) {
 				}
 			} else if appErr.Code == domains.ErrCodeLimitReached {
 				log.Fatalf(tr.T("domain_limit_reached"), proj.Name)
+			} else if appErr.Code == domains.ErrCodeNotFound {
+				log.Fatalf(tr.T("project_not_found"), proj.Name)
 			}
 			appErr.Handle()
 		}
@@ -97,6 +105,9 @@ func Remove(c *cli.Context) {
 		appErr := domains.Delete(config.AccessToken, proj.Name, domainName)
 		if appErr != nil {
 			if appErr.Code == domains.ErrCodeNotFound {
+				if strings.Contains(appErr.Description, "project") {
+					log.Fatalf(tr.T("project_not_found"), proj.Name)
+				}
 				if interactive {
 					log.Errorf(tr.T("domain_not_found"), domainName)
 					continue

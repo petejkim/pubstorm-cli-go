@@ -1,6 +1,7 @@
 package projects
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 
@@ -14,6 +15,7 @@ const (
 	ErrCodeRequestFailed    = "request_failed"
 	ErrCodeUnexpectedError  = "unexpected_error"
 	ErrCodeValidationFailed = "validation_failed"
+	ErrCodeNotFound         = "not_found"
 )
 
 func Create(token, name string) *apperror.Error {
@@ -52,4 +54,33 @@ func Create(token, name string) *apperror.Error {
 	}
 
 	return nil
+}
+
+func Get(token, name string) *apperror.Error {
+	uri := fmt.Sprintf("%s/projects/%s", config.Host, name)
+	req := goreq.Request{
+		Method:    "GET",
+		Uri:       uri,
+		Accept:    "application/vnd.rise.v0+json",
+		UserAgent: "RiseCLI",
+	}
+	req.AddHeader("Authorization", "Bearer "+token)
+
+	res, err := req.Do()
+	if err != nil {
+		return apperror.New(ErrCodeRequestFailed, err, "", true)
+	}
+	defer res.Body.Close()
+
+	if !util.ContainsInt([]int{http.StatusOK, http.StatusNotFound}, res.StatusCode) {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	if res.StatusCode == http.StatusOK {
+		return nil
+	} else if res.StatusCode == http.StatusNotFound {
+		return apperror.New(ErrCodeNotFound, nil, "project could not be found", true)
+	}
+
+	return apperror.New(ErrCodeUnexpectedError, err, "", true)
 }

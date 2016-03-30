@@ -84,6 +84,8 @@ var strs = map[string]map[string]string{
 		"domain_cannot_be_deleted":    "Domain \"%s\" cannot be deleted.",
 		"domain_not_found":            "Domain \"%s\" is not found",
 		"domain_removed":              "Successfully removed \"%s\" to project \"%s\".",
+
+		"project_not_found": "Could not find a project \"%s\" that belongs to you.",
 	},
 }
 
