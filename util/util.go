@@ -73,3 +73,15 @@ func SanitizeDomain(domain string) string {
 	}
 	return domain
 }
+
+func SplitDomain(name string) (subdomain string, domain string) {
+	name = strings.TrimSpace(name)
+	labels := strings.Split(name, ".")
+	llen := len(labels)
+	if llen >= 2 {
+		subdomain = strings.Join(labels[:llen-2], ".")
+		domain = strings.Join(labels[llen-2:], ".")
+		return subdomain, domain
+	}
+	return "", domain
+}

@@ -80,6 +80,8 @@ var strs = map[string]map[string]string{
 		"enter_domain_name_to_add":    "Enter Domain Name to Add",
 		"domain_limit_reached":        "You cannot add any more domains to project \"%s\".",
 		"domain_added":                "Successfully added \"%s\" to project \"%s\".",
+		"dns_instructions":            "Please add the following records to the DNS configuration for the domain \"%s\":-",
+		"dns_more_info":               "For more information on DNS configuration, please visit %s",
 		"enter_domain_name_to_remove": "Enter Domain Name to Remove",
 		"domain_cannot_be_deleted":    "Domain \"%s\" cannot be deleted.",
 		"domain_not_found":            "Domain \"%s\" is not found",

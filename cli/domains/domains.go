@@ -1,6 +1,7 @@
 package domains
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/codegangsta/cli"
@@ -30,7 +31,7 @@ func List(c *cli.Context) {
 
 	tui.Printf(tui.Undl(tui.Bold(tr.T("domains_for")))+"\n", proj.Name)
 	for _, domainName := range domainNames {
-		tui.Println(domainName)
+		tui.Println("- " + domainName)
 	}
 }
 
@@ -74,6 +75,19 @@ func Add(c *cli.Context) {
 	}
 
 	log.Infof(tr.T("domain_added"), domainName, proj.Name)
+	tui.Println()
+
+	subDn, Dn := util.SplitDomain(domainName)
+	riseDn := fmt.Sprintf("%s.%s", proj.Name, config.DefaultDomain)
+
+	dns_inst := fmt.Sprintf(tr.T("dns_instructions"), Dn) + "\n\n"
+	dns_inst += fmt.Sprintf("  * %s: %s ---> %s", tui.Bold("CNAME (Alias)"), tui.Undl(subDn), tui.Undl(riseDn))
+	if subDn == "www" {
+		dns_inst += fmt.Sprintf("\n  * %s: %s ---> %s", tui.Bold("A (Host)"), tui.Undl("@"), tui.Undl(config.RedirectorIP))
+	}
+	log.Info(dns_inst)
+	tui.Println()
+	log.Infof(tr.T("dns_more_info"), tui.Undl(tui.Blu(config.DNSHelpURL)))
 }
 
 func Remove(c *cli.Context) {
