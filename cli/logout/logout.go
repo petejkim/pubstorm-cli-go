@@ -1,13 +1,13 @@
 package logout
 
 import (
-	"fmt"
-
 	"github.com/codegangsta/cli"
 	"github.com/nitrous-io/rise-cli-go/cli/common"
 	"github.com/nitrous-io/rise-cli-go/client/oauth"
 	"github.com/nitrous-io/rise-cli-go/config"
-	"github.com/nitrous-io/rise-cli-go/util"
+	"github.com/nitrous-io/rise-cli-go/tr"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 func Logout(c *cli.Context) {
@@ -16,12 +16,12 @@ func Logout(c *cli.Context) {
 	if appErr := oauth.InvalidateToken(token); appErr != nil {
 		appErr.Handle()
 	} else {
-		fmt.Println("You have successfully logged out.")
+		log.Info(tr.T("logout_success"))
 	}
 
 	config.AccessToken = ""
-	err := config.Save()
-	util.ExitIfError(err)
-
-	fmt.Println("Access token cleared.")
+	if err := config.Save(); err != nil {
+		log.Fatalln(tr.T("rise_config_write_failed"))
+	}
+	log.Info(tr.T("access_token_cleared"))
 }

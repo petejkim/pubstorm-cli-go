@@ -34,6 +34,9 @@ var strs = map[string]map[string]string{
 		"confirmation_resent":       "Confirmation code has been resent. You will receive your confirmation code shortly via email.",
 
 		"rise_config_write_failed": "Could not save rise config file!",
+
+		"logout_success":       "You are now logged out.",
+		"access_token_cleared": "Access token cleared.",
 	},
 }
 
