@@ -9,11 +9,13 @@ import (
 )
 
 var (
-	Host          = "https://api.rise.sh"
-	DefaultDomain = "rise.cloud"
+	Version = "0.0.0"
+
+	Host          = "http://localhost:3000"
+	DefaultDomain = "risecloud.dev"
 	WebsiteHost   = "https://www.rise.sh"
 
-	RedirectorIP = "52.38.113.95"
+	RedirectorIP = "52.38.113.95" // don't ever change this
 	DNSHelpURL   = "https://help.rise.sh/custom-domains"
 
 	// these do not have to be secured

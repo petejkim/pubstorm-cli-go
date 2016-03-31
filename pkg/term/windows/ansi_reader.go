@@ -55,7 +55,7 @@ func (ar *ansiReader) Read(p []byte) (int, error) {
 
 	// Previously read bytes exist, read as much as we can and return
 	if len(ar.buffer) > 0 {
-		logger.Debugf("Reading previously cached bytes")
+		//logger.Debugf("Reading previously cached bytes")
 
 		originalLength := len(ar.buffer)
 		copiedLength := copy(p, ar.buffer)
@@ -66,7 +66,7 @@ func (ar *ansiReader) Read(p []byte) (int, error) {
 			ar.buffer = ar.buffer[copiedLength:]
 		}
 
-		logger.Debugf("Read from cache p[%d]: % x", copiedLength, p)
+		//logger.Debugf("Read from cache p[%d]: % x", copiedLength, p)
 		return copiedLength, nil
 	}
 
@@ -75,7 +75,7 @@ func (ar *ansiReader) Read(p []byte) (int, error) {
 	if err != nil {
 		return 0, err
 	} else if len(events) == 0 {
-		logger.Debug("No input events detected")
+		//logger.Debug("No input events detected")
 		return 0, nil
 	}
 
@@ -83,11 +83,11 @@ func (ar *ansiReader) Read(p []byte) (int, error) {
 
 	// Save excess bytes and right-size keyBytes
 	if len(keyBytes) > len(p) {
-		logger.Debugf("Received %d keyBytes, only room for %d bytes", len(keyBytes), len(p))
+		//logger.Debugf("Received %d keyBytes, only room for %d bytes", len(keyBytes), len(p))
 		ar.buffer = keyBytes[len(p):]
 		keyBytes = keyBytes[:len(p)]
 	} else if len(keyBytes) == 0 {
-		logger.Debug("No key bytes returned from the translator")
+		//logger.Debug("No key bytes returned from the translator")
 		return 0, nil
 	}
 
@@ -96,8 +96,8 @@ func (ar *ansiReader) Read(p []byte) (int, error) {
 		return 0, errors.New("Unexpected copy length encountered.")
 	}
 
-	logger.Debugf("Read        p[%d]: % x", copiedLength, p)
-	logger.Debugf("Read keyBytes[%d]: % x", copiedLength, keyBytes)
+	//logger.Debugf("Read        p[%d]: % x", copiedLength, p)
+	//logger.Debugf("Read keyBytes[%d]: % x", copiedLength, keyBytes)
 	return copiedLength, nil
 }
 
@@ -112,7 +112,7 @@ func readInputEvents(fd uintptr, maxBytes int) ([]winterm.INPUT_RECORD, error) {
 	if countRecords > ansiterm.MAX_INPUT_EVENTS {
 		countRecords = ansiterm.MAX_INPUT_EVENTS
 	}
-	logger.Debugf("[windows] readInputEvents: Reading %v records (buffer size %v, record size %v)", countRecords, maxBytes, recordSize)
+	//logger.Debugf("[windows] readInputEvents: Reading %v records (buffer size %v, record size %v)", countRecords, maxBytes, recordSize)
 
 	// Wait for and read input events
 	events := make([]winterm.INPUT_RECORD, countRecords)
@@ -130,7 +130,7 @@ func readInputEvents(fd uintptr, maxBytes int) ([]winterm.INPUT_RECORD, error) {
 	}
 
 	// Return a slice restricted to the number of returned records
-	logger.Debugf("[windows] readInputEvents: Read %v events", nEvents)
+	//logger.Debugf("[windows] readInputEvents: Read %v events", nEvents)
 	return events[:nEvents], nil
 }
 

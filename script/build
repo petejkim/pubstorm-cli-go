@@ -1,0 +1,67 @@
+#!/bin/bash
+set -e
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd $DIR/..
+
+export RISE_CLI_ENV=${RISE_CLI_ENV:-"development"}
+echo "RISE_CLI_ENV is \"$RISE_CLI_ENV\""
+
+noColor="\x1b[0m"
+okColor="\x1b[32;01m"
+errorColor="\x1b[31;01m"
+warnColor="\x1b[33;01m"
+
+riseCmd=${RISE_CMD:-"rise"}
+riseVersion=${RISE_VERSION:-"`cat VERSION`-`git rev-parse --short HEAD`"}
+
+case $RISE_CLI_ENV in
+  "staging")
+    riseHost=${RISE_HOST:-"https://api.risestaging.com"}
+    riseDefaultDomain=${RISE_DEFAULT_DOMAIN:-"risestaging.cloud"}
+    riseWebsiteHost=${RISE_WEBSITE_HOST:-"https://www.risestaging.com"}
+    riseClientID=${RISE_CLIENT_ID:-"6614ee34ecc460a1b960c660cdd71e02"}
+    riseClientSecret=${RISE_CLIENT_SECRET:-"a840567b6f0ed9f7f7d406601645d8821407da581a54b996b2d0428d2f3c5643a5124dc28b08d7c2409752de51ce6961da773341780f3c4fc683476b4a275e22"}
+    ;;
+  "production")
+    riseHost=${RISE_HOST:-"https://api.rise.sh"}
+    riseDefaultDomain=${RISE_DEFAULT_DOMAIN:-"rise.cloud"}
+    riseWebsiteHost=${RISE_WEBSITE_HOST:-"https://www.rise.sh"}
+    riseClientID=${RISE_CLIENT_ID:-"FIXME"}
+    riseClientSecret=${RISE_CLIENT_SECRET:-"FIXME"}
+    ;;
+  *)
+    riseHost=${RISE_HOST:-"http://localhost:3000"}
+    riseDefaultDomain=${RISE_DEFAULT_DOMAIN:-"risecloud.dev"}
+    riseWebsiteHost=${RISE_WEBSITE_HOST:-"https://www.rise.sh"}
+    riseClientID=${RISE_CLIENT_ID:-"73c24fbc2eb24bbf1d3fc3749fc8ac35"}
+    riseClientSecret=${RISE_CLIENT_SECRET:-"0f3295e1b531191c0ce8ccf331421644d4c4fbab9eb179778e5172977bf0238cdbf4b3afe1ead11b9892ce8806e87cc1acc10263dfdade879a05b931809690a1"}
+    ;;
+esac
+
+configPkg="github.com/nitrous-io/rise-cli-go/config"
+riseLdFlags="-X $configPkg.Version=$riseVersion -X $configPkg.Host=$riseHost -X $configPkg.DefaultDomain=$riseDefaultDomain -X $configPkg.WebsiteHost=$riseWebsiteHost -X $configPkg.ClientID=$riseClientID -X $configPkg.ClientSecret=$riseClientSecret"
+
+echo $riseLdFlags
+
+build() {
+  mkdir -p dist/"$2-$1"
+  echo -e "$okColor--> Compiling for $2 ($1)...$noColor"
+  cmd="$riseCmd"
+  if [ "$2" == "windows" ]; then
+    cmd="$cmd.exe"
+  fi
+  GO15VENDOREXPERIMENT=1 GOARCH=$1 GOOS=$2 go build -v -ldflags "$riseLdFlags" -o "dist/$2-$1/$cmd"
+}
+
+build 386 linux
+build amd64 linux
+build arm linux
+
+build 386 windows
+build amd64 windows
+
+build 386 darwin
+build amd64 darwin
+
+echo -e "$okColor--> I'm done.$noColor"

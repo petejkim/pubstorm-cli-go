@@ -10,6 +10,7 @@ import (
 	"github.com/nitrous-io/rise-cli-go/cli/login"
 	"github.com/nitrous-io/rise-cli-go/cli/logout"
 	"github.com/nitrous-io/rise-cli-go/cli/signup"
+	"github.com/nitrous-io/rise-cli-go/config"
 	"github.com/nitrous-io/rise-cli-go/pkg/readline"
 	"github.com/nitrous-io/rise-cli-go/tr"
 	"github.com/nitrous-io/rise-cli-go/tui"
@@ -25,6 +26,7 @@ func main() {
 
 	app := cli.NewApp()
 	app.Name = "rise"
+	app.Version = config.Version
 	app.Usage = tr.T("rise_cli_desc")
 
 	app.Commands = []cli.Command{
