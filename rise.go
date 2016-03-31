@@ -64,6 +64,18 @@ func main() {
 			Name:   "domains",
 			Usage:  tr.T("domains_desc"),
 			Action: domains.List,
+			Subcommands: []cli.Command{
+				{
+					Name:   "add",
+					Usage:  tr.T("domains_add_desc"),
+					Action: domains.Add,
+				},
+				{
+					Name:   "rm",
+					Usage:  tr.T("domains_rm_desc"),
+					Action: domains.Remove,
+				},
+			},
 		},
 		{
 			Name:   "domains.add",
