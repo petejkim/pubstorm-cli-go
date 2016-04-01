@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	AppName  = "pubstorm"
+	AppName  = "PubStorm"
 	Version  = "0.0.0"
 	BuildEnv = "development"
 
