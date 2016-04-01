@@ -1,6 +1,10 @@
 package tui
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+	"runtime"
+)
 
 const (
 	bold      = 1
@@ -20,6 +24,9 @@ const (
 	DisableColors = false
 )
 
+// detect if this is running in cmd.exe window
+var isWindowsCmd = runtime.GOOS == "windows" && os.Getenv("TERM") == ""
+
 func modeText(color int, s string) string {
 	if DisableColors {
 		return s
@@ -31,7 +38,14 @@ func Blk(s string) string { return modeText(30+black, s) }
 func Red(s string) string { return modeText(30+red, s) }
 func Grn(s string) string { return modeText(30+green, s) }
 func Ylo(s string) string { return modeText(30+yellow, s) }
-func Blu(s string) string { return modeText(30+blue, s) }
+func Blu(s string) string {
+	// on windows, blue (color 1) is barely visible. use hi-blue (color 9) instead.
+	if isWindowsCmd {
+		return modeText(90+blue, s)
+	} else {
+		return modeText(30+blue, s)
+	}
+}
 func Mag(s string) string { return modeText(30+magenta, s) }
 func Cyn(s string) string { return modeText(30+cyan, s) }
 func Wht(s string) string { return modeText(30+white, s) }
