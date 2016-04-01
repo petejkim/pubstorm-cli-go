@@ -13,6 +13,7 @@ import (
 	"github.com/nitrous-io/rise-cli-go/apperror"
 	"github.com/nitrous-io/rise-cli-go/config"
 	"github.com/nitrous-io/rise-cli-go/progressbar"
+	"github.com/nitrous-io/rise-cli-go/tui"
 	"github.com/nitrous-io/rise-cli-go/util"
 )
 
@@ -67,7 +68,7 @@ func Create(token, name, bunPath string, quiet bool) (depl *Deployment, appErr *
 	if quiet {
 		req.Body = body
 	} else {
-		pb := progressbar.NewReader(body, os.Stdout, bodyLen)
+		pb := progressbar.NewReader(body, tui.Out, bodyLen)
 		req.Body = pb
 	}
 

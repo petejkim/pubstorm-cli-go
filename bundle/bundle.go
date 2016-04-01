@@ -12,6 +12,7 @@ import (
 	"github.com/nitrous-io/rise-cli-go/pkg/pathmatch"
 	"github.com/nitrous-io/rise-cli-go/progressbar"
 	"github.com/nitrous-io/rise-cli-go/tr"
+	"github.com/nitrous-io/rise-cli-go/tui"
 
 	log "github.com/Sirupsen/logrus"
 )
@@ -199,7 +200,7 @@ func (b *Bundle) Pack(tarballPath string, showError, showProgress bool) error {
 		return err
 	}
 
-	pb := progressbar.NewCounter(os.Stdout, len(b.fileList))
+	pb := progressbar.NewCounter(tui.Out, len(b.fileList))
 
 	for _, path := range b.fileList {
 		absPath := filepath.Join(basePath, path)
