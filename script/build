@@ -15,6 +15,8 @@ warnColor="\x1b[33;01m"
 riseCmd=${RISE_CMD:-"storm"}
 riseVersion=${RISE_VERSION:-"`cat VERSION`-`git rev-parse --short HEAD`"}
 
+# the client_id and client_secret do not need to be securely stored
+# those are exposed in the client anyway
 case $RISE_CLI_ENV in
   "staging")
     riseHost=${RISE_HOST:-"https://api.risestaging.com"}
@@ -27,8 +29,8 @@ case $RISE_CLI_ENV in
     riseHost=${RISE_HOST:-"https://api.pubstorm.com"}
     riseDefaultDomain=${RISE_DEFAULT_DOMAIN:-"pubstorm.site"}
     riseWebsiteHost=${RISE_WEBSITE_HOST:-"https://www.pubstorm.com"}
-    riseClientID=${RISE_CLIENT_ID:-"FIXME"}
-    riseClientSecret=${RISE_CLIENT_SECRET:-"FIXME"}
+    riseClientID=${RISE_CLIENT_ID:-"70211de132f778378407fd94195bc2e6"}
+    riseClientSecret=${RISE_CLIENT_SECRET:-"69f9a67ac8fd44b19b1fa3426cede97f410b7fe5335a79f0bbd0023ec64a2658c95e9511760121e7231d131e2950d485a76d3d32db3eab70745095f8fd901b79"}
     ;;
   *)
     riseHost=${RISE_HOST:-"http://localhost:3000"}
