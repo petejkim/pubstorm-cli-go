@@ -40,7 +40,7 @@ case $RISE_CLI_ENV in
 esac
 
 configPkg="github.com/nitrous-io/rise-cli-go/config"
-riseLdFlags="-X $configPkg.Version=$riseVersion -X $configPkg.Host=$riseHost -X $configPkg.DefaultDomain=$riseDefaultDomain -X $configPkg.WebsiteHost=$riseWebsiteHost -X $configPkg.ClientID=$riseClientID -X $configPkg.ClientSecret=$riseClientSecret"
+riseLdFlags="-X $configPkg.Version=$riseVersion -X $configPkg.BuildEnv=$RISE_CLI_ENV -X $configPkg.Host=$riseHost -X $configPkg.DefaultDomain=$riseDefaultDomain -X $configPkg.WebsiteHost=$riseWebsiteHost -X $configPkg.ClientID=$riseClientID -X $configPkg.ClientSecret=$riseClientSecret"
 
 echo $riseLdFlags
 

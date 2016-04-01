@@ -9,8 +9,9 @@ import (
 )
 
 var (
-	AppName = "pubstorm"
-	Version = "0.0.0"
+	AppName  = "pubstorm"
+	Version  = "0.0.0"
+	BuildEnv = "development"
 
 	Host          = "http://localhost:3000"
 	DefaultDomain = "risecloud.dev"

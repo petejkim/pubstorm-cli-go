@@ -29,12 +29,17 @@ func RequireProject() *project.Project {
 }
 
 func PrintLogo() {
+	build := config.BuildEnv
+	if build == "production" {
+		build = ""
+	}
 	tui.Printf(
-		"%s\n%s\n%s\n%s\n%s\n\n",
+		"%s\n%s\n%s\n%s\n%s%s\n\n",
 		tui.Ylo(`     ____        __   _____ __`),
 		tui.Ylo(`    / __ \__  __/ /_ / ___// /_____  _________ ___`),
 		tui.Red(`   / /_/ / / / / __ \\__ \/ __/ __ \/ ___/ __ `+"`"+`__ \`),
 		tui.Mag(`  / ____/ /_/ / /_/ /__/ / /_/ /_/ / /  / / / / / /`),
-		tui.Blu(` /_/    \__,_/_.___/____/\__/\____/_/  /_/ /_/ /_/`),
+		tui.Blu(` /_/    \__,_/_.___/____/\__/\____/_/  /_/ /_/ /_/ `),
+		build,
 	)
 }
