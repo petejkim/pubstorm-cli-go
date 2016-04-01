@@ -22,9 +22,9 @@ func Create(token, name string) *apperror.Error {
 	req := goreq.Request{
 		Method:      "POST",
 		Uri:         config.Host + "/projects",
-		Accept:      "application/vnd.rise.v0+json",
 		ContentType: "application/x-www-form-urlencoded",
-		UserAgent:   "RiseCLI",
+		Accept:      config.ReqAccept,
+		UserAgent:   config.UserAgent,
 
 		Body: url.Values{
 			"name": {name},
@@ -61,8 +61,8 @@ func Get(token, name string) *apperror.Error {
 	req := goreq.Request{
 		Method:    "GET",
 		Uri:       uri,
-		Accept:    "application/vnd.rise.v0+json",
-		UserAgent: "RiseCLI",
+		Accept:    config.ReqAccept,
+		UserAgent: config.UserAgent,
 	}
 	req.AddHeader("Authorization", "Bearer "+token)
 

@@ -34,8 +34,8 @@ func Create(token, name, bunPath string, quiet bool) (depl *Deployment, appErr *
 	req := goreq.Request{
 		Method:    "POST",
 		Uri:       config.Host + "/projects/" + name + "/deployments",
-		Accept:    "application/vnd.rise.v0+json",
-		UserAgent: "RiseCLI",
+		Accept:    config.ReqAccept,
+		UserAgent: config.UserAgent,
 	}
 	req.AddHeader("Authorization", "Bearer "+token)
 
@@ -119,8 +119,8 @@ func Get(token, projectName string, deploymentID uint) (depl *Deployment, appErr
 	req := goreq.Request{
 		Method:    "GET",
 		Uri:       uri,
-		Accept:    "application/vnd.rise.v0+json",
-		UserAgent: "RiseCLI",
+		Accept:    config.ReqAccept,
+		UserAgent: config.UserAgent,
 	}
 	req.AddHeader("Authorization", "Bearer "+token)
 

@@ -22,8 +22,8 @@ func Index(token, projectName string) (domainNames []string, appErr *apperror.Er
 	req := goreq.Request{
 		Method:    "GET",
 		Uri:       config.Host + "/projects/" + projectName + "/domains",
-		Accept:    "application/vnd.rise.v0+json",
-		UserAgent: "RiseCLI",
+		Accept:    config.ReqAccept,
+		UserAgent: config.UserAgent,
 	}
 	req.AddHeader("Authorization", "Bearer "+token)
 	res, err := req.Do()
@@ -61,9 +61,9 @@ func Create(token, projectName, name string) (appErr *apperror.Error) {
 	req := goreq.Request{
 		Method:      "POST",
 		Uri:         config.Host + "/projects/" + projectName + "/domains",
-		Accept:      "application/vnd.rise.v0+json",
 		ContentType: "application/x-www-form-urlencoded",
-		UserAgent:   "RiseCLI",
+		Accept:      config.ReqAccept,
+		UserAgent:   config.UserAgent,
 
 		Body: url.Values{
 			"name": {name},
@@ -112,11 +112,10 @@ func Create(token, projectName, name string) (appErr *apperror.Error) {
 
 func Delete(token, projectName, name string) (appErr *apperror.Error) {
 	req := goreq.Request{
-		Method:      "DELETE",
-		Uri:         config.Host + "/projects/" + projectName + "/domains/" + name,
-		Accept:      "application/vnd.rise.v0+json",
-		ContentType: "application/x-www-form-urlencoded",
-		UserAgent:   "RiseCLI",
+		Method:    "DELETE",
+		Uri:       config.Host + "/projects/" + projectName + "/domains/" + name,
+		Accept:    config.ReqAccept,
+		UserAgent: config.UserAgent,
 	}
 
 	req.AddHeader("Authorization", "Bearer "+token)

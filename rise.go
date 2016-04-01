@@ -25,7 +25,7 @@ func main() {
 	readline.Output = tui.Out
 
 	app := cli.NewApp()
-	app.Name = "rise"
+	app.Name = config.AppName
 	app.Version = config.Version
 	app.Usage = tr.T("rise_cli_desc")
 

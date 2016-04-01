@@ -52,9 +52,9 @@ var _ = Describe("Projects", func() {
 					ghttp.VerifyRequest("POST", "/projects"),
 					ghttp.VerifyHeader(http.Header{
 						"Authorization": {"Bearer t0k3n"},
-						"Accept":        {"application/vnd.rise.v0+json"},
 						"Content-Type":  {"application/x-www-form-urlencoded"},
-						"User-Agent":    {"RiseCLI"},
+						"Accept":        {config.ReqAccept},
+						"User-Agent":    {config.UserAgent},
 					}),
 					ghttp.VerifyForm(url.Values{
 						"name": {"foo-bar-express"},
@@ -135,8 +135,8 @@ var _ = Describe("Projects", func() {
 					ghttp.VerifyRequest("GET", "/projects/foo-bar-express"),
 					ghttp.VerifyHeader(http.Header{
 						"Authorization": {"Bearer t0k3n"},
-						"Accept":        {"application/vnd.rise.v0+json"},
-						"User-Agent":    {"RiseCLI"},
+						"Accept":        {config.ReqAccept},
+						"User-Agent":    {config.UserAgent},
 					}),
 					ghttp.RespondWith(e.resCode, e.resBody),
 				),

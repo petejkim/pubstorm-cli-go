@@ -42,7 +42,7 @@ func Deploy(c *cli.Context) {
 	tui.Printf(tr.T("scanning_path")+"\n", absPath)
 
 	bun := bundle.New(proj.Path)
-	count, size, err := bun.Assemble([]string{"rise.json", "Thumbs.db", "desktop.ini"}, verbose)
+	count, size, err := bun.Assemble([]string{config.ProjectJSON, "Thumbs.db", "desktop.ini"}, verbose)
 
 	log.Infof(tr.T("bundling_file_count_size"), humanize.Comma(int64(count)), humanize.Bytes(uint64(size)))
 

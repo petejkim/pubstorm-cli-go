@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/nitrous-io/rise-cli-go/bundle"
+	"github.com/nitrous-io/rise-cli-go/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -63,7 +64,7 @@ var _ = Describe("Bundle", func() {
 				"public/vendor/assets/javascripts/jquery/jquery-2.0.js",
 				"public/vendor/assets/javascripts/underscore.js",
 				"public/README.rdoc",
-				"rise.json",
+				config.ProjectJSON,
 				"extra_file.txt",
 			}
 
@@ -94,7 +95,7 @@ var _ = Describe("Bundle", func() {
 
 		It("return all files", func() {
 			b := bundle.New("public")
-			count, size, err := b.Assemble([]string{"log", "development.rb", "vendor/assets", "rise.json"}, false)
+			count, size, err := b.Assemble([]string{"log", "development.rb", "vendor/assets", config.ProjectJSON}, false)
 			Expect(err).To(BeNil())
 
 			expectedFiles := []string{

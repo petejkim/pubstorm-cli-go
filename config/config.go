@@ -9,6 +9,7 @@ import (
 )
 
 var (
+	AppName = "pubstorm"
 	Version = "0.0.0"
 
 	Host          = "http://localhost:3000"
@@ -21,6 +22,11 @@ var (
 	// these do not have to be secured
 	ClientID     = "73c24fbc2eb24bbf1d3fc3749fc8ac35"
 	ClientSecret = "0f3295e1b531191c0ce8ccf331421644d4c4fbab9eb179778e5172977bf0238cdbf4b3afe1ead11b9892ce8806e87cc1acc10263dfdade879a05b931809690a1"
+
+	UserAgent = "PubStormCLI"
+	ReqAccept = "application/vnd.pubstorm.v0+json"
+
+	ProjectJSON = "pubstorm.json"
 
 	DotRisePath string
 	AccessToken string
@@ -39,9 +45,9 @@ func init() {
 	}
 
 	if runtime.GOOS == "windows" {
-		DotRisePath = filepath.Join(os.Getenv("APPDATA"), "rise")
+		DotRisePath = filepath.Join(os.Getenv("APPDATA"), "PubStorm")
 	} else {
-		DotRisePath = filepath.Join(os.Getenv("HOME"), ".rise")
+		DotRisePath = filepath.Join(os.Getenv("HOME"), ".pubstorm")
 	}
 
 	if err := os.MkdirAll(DotRisePath, 0700); err != nil {
@@ -69,7 +75,7 @@ func Save() error {
 	})
 }
 
-// Load config from .rise/config.json
+// Load config from .pubstorm/config.json
 func Load() error {
 	configPath := filepath.Join(DotRisePath, configJSON)
 

@@ -20,9 +20,9 @@ func Create(email, password string) *apperror.Error {
 	res, err := goreq.Request{
 		Method:      "POST",
 		Uri:         config.Host + "/users",
-		Accept:      "application/vnd.rise.v0+json",
 		ContentType: "application/x-www-form-urlencoded",
-		UserAgent:   "RiseCLI",
+		Accept:      config.ReqAccept,
+		UserAgent:   config.UserAgent,
 
 		Body: url.Values{
 			"email":    {email},
@@ -57,9 +57,9 @@ func Confirm(email, confirmationCode string) *apperror.Error {
 	res, err := goreq.Request{
 		Method:      "POST",
 		Uri:         config.Host + "/user/confirm",
-		Accept:      "application/vnd.rise.v0+json",
 		ContentType: "application/x-www-form-urlencoded",
-		UserAgent:   "RiseCLI",
+		Accept:      config.ReqAccept,
+		UserAgent:   config.UserAgent,
 
 		Body: url.Values{
 			"email":             {email},
@@ -98,9 +98,9 @@ func ResendConfirmationCode(email string) *apperror.Error {
 	res, err := goreq.Request{
 		Method:      "POST",
 		Uri:         config.Host + "/user/confirm/resend",
-		Accept:      "application/vnd.rise.v0+json",
 		ContentType: "application/x-www-form-urlencoded",
-		UserAgent:   "RiseCLI",
+		Accept:      config.ReqAccept,
+		UserAgent:   config.UserAgent,
 
 		Body: url.Values{
 			"email": {email},

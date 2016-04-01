@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/nitrous-io/rise-cli-go/config"
 	"github.com/nitrous-io/rise-cli-go/project"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -105,7 +106,7 @@ var _ = Describe("Project", func() {
 		})
 
 		Describe("Save()", func() {
-			It("persists settings in rise.json file in the current working directory", func() {
+			It("persists settings in project json file in the current working directory", func() {
 				proj := &project.Project{
 					Name:        "foo-bar-express",
 					Path:        "./build",
@@ -116,7 +117,7 @@ var _ = Describe("Project", func() {
 				err = proj.Save()
 				Expect(err).To(BeNil())
 
-				f, err := os.Open(filepath.Join(tempDir, "rise.json"))
+				f, err := os.Open(filepath.Join(tempDir, config.ProjectJSON))
 				Expect(err).To(BeNil())
 				defer f.Close()
 
@@ -133,7 +134,7 @@ var _ = Describe("Project", func() {
 		})
 
 		Describe("Load()", func() {
-			Context("when rise.json does not exist", func() {
+			Context("when the project json does not exist", func() {
 				It("returns error", func() {
 					proj, err := project.Load()
 					Expect(err).NotTo(BeNil())
@@ -142,9 +143,9 @@ var _ = Describe("Project", func() {
 				})
 			})
 
-			Context("when rise.json exists", func() {
+			Context("when the project json exists", func() {
 				BeforeEach(func() {
-					err = ioutil.WriteFile("rise.json", []byte(`
+					err = ioutil.WriteFile(config.ProjectJSON, []byte(`
 						{
 							"name": "good-beer-company",
 							"path": "./output",
@@ -155,7 +156,7 @@ var _ = Describe("Project", func() {
 					Expect(err).To(BeNil())
 				})
 
-				It("loads rise.json and returns a project", func() {
+				It("loads the project json and returns a project", func() {
 					proj, err := project.Load()
 					Expect(err).To(BeNil())
 

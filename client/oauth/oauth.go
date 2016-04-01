@@ -22,9 +22,9 @@ func FetchToken(email, password string) (token string, appErr *apperror.Error) {
 	res, err := goreq.Request{
 		Method:      "POST",
 		Uri:         config.Host + "/oauth/token",
-		Accept:      "application/vnd.rise.v0+json",
 		ContentType: "application/x-www-form-urlencoded",
-		UserAgent:   "RiseCLI",
+		Accept:      config.ReqAccept,
+		UserAgent:   config.UserAgent,
 
 		BasicAuthUsername: config.ClientID,
 		BasicAuthPassword: config.ClientSecret,
@@ -71,11 +71,10 @@ func FetchToken(email, password string) (token string, appErr *apperror.Error) {
 
 func InvalidateToken(token string) (appErr *apperror.Error) {
 	req := goreq.Request{
-		Method:      "DELETE",
-		Uri:         config.Host + "/oauth/token",
-		Accept:      "application/vnd.rise.v0+json",
-		ContentType: "application/x-www-form-urlencoded",
-		UserAgent:   "RiseCLI",
+		Method:    "DELETE",
+		Uri:       config.Host + "/oauth/token",
+		Accept:    config.ReqAccept,
+		UserAgent: config.UserAgent,
 	}
 
 	req.AddHeader("Authorization", "Bearer "+token)

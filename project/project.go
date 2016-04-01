@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+
+	"github.com/nitrous-io/rise-cli-go/config"
 )
 
 type Project struct {
@@ -26,8 +28,6 @@ var (
 	ErrPathNotExist    = errors.New("Path does not exist")
 	ErrPathNotDir      = errors.New("Path must be a directory")
 )
-
-const riseJSON = "rise.json"
 
 // Validates name
 func (p *Project) ValidateName() error {
@@ -63,9 +63,9 @@ func (p *Project) ValidatePath() error {
 	return nil
 }
 
-// Save project settings to rise.json
+// Save project settings to project json file
 func (p *Project) Save() error {
-	f, err := os.OpenFile(riseJSON, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	f, err := os.OpenFile(config.ProjectJSON, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return err
 	}
@@ -80,7 +80,7 @@ func (p *Project) Save() error {
 }
 
 func Load() (*Project, error) {
-	f, err := os.Open(riseJSON)
+	f, err := os.Open(config.ProjectJSON)
 	if err != nil {
 		return nil, err
 	}

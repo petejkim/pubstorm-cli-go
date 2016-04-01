@@ -53,8 +53,8 @@ var _ = Describe("Domains", func() {
 					ghttp.VerifyRequest("GET", "/projects/foo-bar-express/domains"),
 					ghttp.VerifyHeader(http.Header{
 						"Authorization": {"Bearer t0k3n"},
-						"Accept":        {"application/vnd.rise.v0+json"},
-						"User-Agent":    {"RiseCLI"},
+						"Accept":        {config.ReqAccept},
+						"User-Agent":    {config.UserAgent},
 					}),
 					ghttp.RespondWith(e.resCode, e.resBody),
 				),
@@ -103,9 +103,9 @@ var _ = Describe("Domains", func() {
 
 		Entry("successfully fetched", expectation{
 			resCode:  http.StatusOK,
-			resBody:  `{"domains": [ "foo-bar-express.rise.cloud", "foo-bar-express.com" ]}`,
+			resBody:  `{"domains": [ "foo-bar-express.pubstorm.site", "foo-bar-express.com" ]}`,
 			errIsNil: true,
-			result:   []string{"foo-bar-express.rise.cloud", "foo-bar-express.com"},
+			result:   []string{"foo-bar-express.pubstorm.site", "foo-bar-express.com"},
 		}),
 	)
 
@@ -116,9 +116,9 @@ var _ = Describe("Domains", func() {
 					ghttp.VerifyRequest("POST", "/projects/foo-bar-express/domains"),
 					ghttp.VerifyHeader(http.Header{
 						"Authorization": {"Bearer t0k3n"},
-						"Accept":        {"application/vnd.rise.v0+json"},
 						"Content-Type":  {"application/x-www-form-urlencoded"},
-						"User-Agent":    {"RiseCLI"},
+						"Accept":        {config.ReqAccept},
+						"User-Agent":    {config.UserAgent},
 					}),
 					ghttp.VerifyForm(url.Values{
 						"name": {"foo-bar-express.com"},
@@ -208,9 +208,8 @@ var _ = Describe("Domains", func() {
 					ghttp.VerifyRequest("DELETE", "/projects/foo-bar-express/domains/foo-bar-express.com"),
 					ghttp.VerifyHeader(http.Header{
 						"Authorization": {"Bearer t0k3n"},
-						"Accept":        {"application/vnd.rise.v0+json"},
-						"Content-Type":  {"application/x-www-form-urlencoded"},
-						"User-Agent":    {"RiseCLI"},
+						"Accept":        {config.ReqAccept},
+						"User-Agent":    {config.UserAgent},
 					}),
 					ghttp.RespondWith(e.resCode, e.resBody),
 				),

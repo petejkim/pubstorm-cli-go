@@ -51,9 +51,9 @@ var _ = Describe("Users", func() {
 				ghttp.CombineHandlers(
 					ghttp.VerifyRequest("POST", "/users"),
 					ghttp.VerifyHeader(http.Header{
-						"Accept":       {"application/vnd.rise.v0+json"},
 						"Content-Type": {"application/x-www-form-urlencoded"},
-						"User-Agent":   {"RiseCLI"},
+						"Accept":       {config.ReqAccept},
+						"User-Agent":   {config.UserAgent},
 					}),
 					ghttp.VerifyForm(url.Values{
 						"email":    {"foo@example.com"},
@@ -134,9 +134,9 @@ var _ = Describe("Users", func() {
 				ghttp.CombineHandlers(
 					ghttp.VerifyRequest("POST", "/user/confirm"),
 					ghttp.VerifyHeader(http.Header{
-						"Accept":       {"application/vnd.rise.v0+json"},
 						"Content-Type": {"application/x-www-form-urlencoded"},
-						"User-Agent":   {"RiseCLI"},
+						"Accept":       {config.ReqAccept},
+						"User-Agent":   {config.UserAgent},
 					}),
 					ghttp.VerifyForm(url.Values{
 						"email":             {"foo@example.com"},
@@ -217,9 +217,9 @@ var _ = Describe("Users", func() {
 				ghttp.CombineHandlers(
 					ghttp.VerifyRequest("POST", "/user/confirm/resend"),
 					ghttp.VerifyHeader(http.Header{
-						"Accept":       {"application/vnd.rise.v0+json"},
 						"Content-Type": {"application/x-www-form-urlencoded"},
-						"User-Agent":   {"RiseCLI"},
+						"Accept":       {config.ReqAccept},
+						"User-Agent":   {config.UserAgent},
 					}),
 					ghttp.VerifyForm(url.Values{
 						"email": {"foo@example.com"},

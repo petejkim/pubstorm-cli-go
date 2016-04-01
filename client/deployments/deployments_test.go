@@ -56,8 +56,8 @@ var _ = Describe("Deployments", func() {
 					ghttp.VerifyRequest("POST", "/projects/foo-bar-express/deployments"),
 					ghttp.VerifyHeader(http.Header{
 						"Authorization": {"Bearer t0k3n"},
-						"Accept":        {"application/vnd.rise.v0+json"},
-						"User-Agent":    {"RiseCLI"},
+						"Accept":        {config.ReqAccept},
+						"User-Agent":    {config.UserAgent},
 					}),
 
 					func(w http.ResponseWriter, req *http.Request) {
@@ -163,8 +163,8 @@ var _ = Describe("Deployments", func() {
 					ghttp.VerifyRequest("GET", "/projects/foo-bar-express/deployments/123"),
 					ghttp.VerifyHeader(http.Header{
 						"Authorization": {"Bearer t0k3n"},
-						"Accept":        {"application/vnd.rise.v0+json"},
-						"User-Agent":    {"RiseCLI"},
+						"Accept":        {config.ReqAccept},
+						"User-Agent":    {config.UserAgent},
 					}),
 					ghttp.RespondWith(e.resCode, e.resBody),
 				),

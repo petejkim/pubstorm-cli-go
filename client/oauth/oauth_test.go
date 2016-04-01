@@ -52,9 +52,9 @@ var _ = Describe("OAuth", func() {
 					ghttp.VerifyRequest("POST", "/oauth/token"),
 					ghttp.VerifyBasicAuth(config.ClientID, config.ClientSecret),
 					ghttp.VerifyHeader(http.Header{
-						"Accept":       {"application/vnd.rise.v0+json"},
 						"Content-Type": {"application/x-www-form-urlencoded"},
-						"User-Agent":   {"RiseCLI"},
+						"Accept":       {config.ReqAccept},
+						"User-Agent":   {config.UserAgent},
 					}),
 					ghttp.VerifyForm(url.Values{
 						"grant_type": {"password"},
@@ -158,9 +158,8 @@ var _ = Describe("OAuth", func() {
 					ghttp.VerifyRequest("DELETE", "/oauth/token"),
 					ghttp.VerifyHeader(http.Header{
 						"Authorization": {"Bearer t0k3n"},
-						"Accept":        {"application/vnd.rise.v0+json"},
-						"Content-Type":  {"application/x-www-form-urlencoded"},
-						"User-Agent":    {"RiseCLI"},
+						"Accept":        {config.ReqAccept},
+						"User-Agent":    {config.UserAgent},
 					}),
 					ghttp.RespondWith(e.resCode, e.resBody),
 				),

@@ -12,7 +12,7 @@ okColor="\x1b[32;01m"
 errorColor="\x1b[31;01m"
 warnColor="\x1b[33;01m"
 
-riseCmd=${RISE_CMD:-"rise"}
+riseCmd=${RISE_CMD:-"storm"}
 riseVersion=${RISE_VERSION:-"`cat VERSION`-`git rev-parse --short HEAD`"}
 
 case $RISE_CLI_ENV in
@@ -24,16 +24,16 @@ case $RISE_CLI_ENV in
     riseClientSecret=${RISE_CLIENT_SECRET:-"a840567b6f0ed9f7f7d406601645d8821407da581a54b996b2d0428d2f3c5643a5124dc28b08d7c2409752de51ce6961da773341780f3c4fc683476b4a275e22"}
     ;;
   "production")
-    riseHost=${RISE_HOST:-"https://api.rise.sh"}
-    riseDefaultDomain=${RISE_DEFAULT_DOMAIN:-"rise.cloud"}
-    riseWebsiteHost=${RISE_WEBSITE_HOST:-"https://www.rise.sh"}
+    riseHost=${RISE_HOST:-"https://api.pubstorm.com"}
+    riseDefaultDomain=${RISE_DEFAULT_DOMAIN:-"pubstorm.site"}
+    riseWebsiteHost=${RISE_WEBSITE_HOST:-"https://www.pubstorm.com"}
     riseClientID=${RISE_CLIENT_ID:-"FIXME"}
     riseClientSecret=${RISE_CLIENT_SECRET:-"FIXME"}
     ;;
   *)
     riseHost=${RISE_HOST:-"http://localhost:3000"}
     riseDefaultDomain=${RISE_DEFAULT_DOMAIN:-"risecloud.dev"}
-    riseWebsiteHost=${RISE_WEBSITE_HOST:-"https://www.rise.sh"}
+    riseWebsiteHost=${RISE_WEBSITE_HOST:-"https://www.pubstorm.com"}
     riseClientID=${RISE_CLIENT_ID:-"73c24fbc2eb24bbf1d3fc3749fc8ac35"}
     riseClientSecret=${RISE_CLIENT_SECRET:-"0f3295e1b531191c0ce8ccf331421644d4c4fbab9eb179778e5172977bf0238cdbf4b3afe1ead11b9892ce8806e87cc1acc10263dfdade879a05b931809690a1"}
     ;;
@@ -58,10 +58,14 @@ build 386 linux
 build amd64 linux
 build arm linux
 
+build 386 freebsd
+build amd64 freebsd
+build arm freebsd
+
 build 386 windows
 build amd64 windows
 
 build 386 darwin
 build amd64 darwin
 
-echo -e "$okColor--> I'm done.$noColor"
+echo -e "$okColor--> Compilación Completada!$noColor"
