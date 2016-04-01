@@ -15,10 +15,10 @@ var (
 
 	Host          = "http://localhost:3000"
 	DefaultDomain = "risecloud.dev"
-	WebsiteHost   = "https://www.rise.sh"
+	WebsiteHost   = "https://www.rise.dev"
 
 	RedirectorIP = "52.38.113.95" // don't ever change this
-	DNSHelpURL   = "https://help.rise.sh/custom-domains"
+	DNSHelpURL   = "https://help.pubstorm.com/custom-domains"
 
 	// these do not have to be secured
 	ClientID     = "73c24fbc2eb24bbf1d3fc3749fc8ac35"

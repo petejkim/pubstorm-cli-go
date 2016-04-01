@@ -24,7 +24,7 @@ var strs = map[string]map[string]string{
 		"account_created":     "Your account has been created. You will receive your confirmation code shortly via email.",
 		"enter_confirmation":  "Enter Confirmation Code (Check your inbox!)",
 		"confirmation_sucess": "Thanks for confirming your email address! Your account is now active!",
-		"login_fail":          "Login failed. Please try again by running `rise login`.",
+		"login_fail":          "Login failed. Please try again by running `storm login`.",
 		"login_success":       "You are logged in as %s.",
 
 		"login_rise":                "Welcome back to PubStorm, the easiest way to publish your HTML5 websites and apps!",
@@ -33,13 +33,13 @@ var strs = map[string]map[string]string{
 		"enter_confirmation_resend": "Enter Confirmation Code (Or enter \"resend\" if you need it sent again)",
 		"confirmation_resent":       "Confirmation code has been resent. You will receive your confirmation code shortly via email.",
 
-		"rise_config_write_failed": "Could not save rise config file!",
+		"rise_config_write_failed": "Could not save PubStorm config file!",
 
 		"logout_success":       "You are now logged out.",
 		"access_token_cleared": "Access token cleared.",
 
-		"not_logged_in":   "You are not logged in. Please login by running `rise login` or create a new account by running `rise signup`.",
-		"no_rise_project": "Could not find a PubStorm project in current working directory. To initialize a new PubStorm project here, run `rise init`.",
+		"not_logged_in":   "You are not logged in. Please login by running `storm login` or create a new account by running `storm signup`.",
+		"no_rise_project": "Could not find a PubStorm project in current working directory. To initialize a new PubStorm project here, run `storm init`.",
 
 		"something_wrong": "Something went wrong. Please try again.",
 
@@ -76,7 +76,7 @@ var strs = map[string]map[string]string{
 		"write_failed":      "Failed to write to \"%s\"; aborting.",
 		"file_size_changed": "File size of \"%s\" changed while packing; aborting.",
 
-		"domains_for":                 "Domains for \"%s\"",
+		"domain_list":                 "List of Domains for \"%s\"",
 		"enter_domain_name_to_add":    "Enter Domain Name to Add",
 		"domain_limit_reached":        "You cannot add any more domains to project \"%s\".",
 		"domain_added":                "Successfully added \"%s\" to project \"%s\".",
@@ -85,7 +85,7 @@ var strs = map[string]map[string]string{
 		"enter_domain_name_to_remove": "Enter Domain Name to Remove",
 		"domain_cannot_be_deleted":    "Domain \"%s\" cannot be deleted.",
 		"domain_not_found":            "Domain \"%s\" is not found",
-		"domain_removed":              "Successfully removed \"%s\" to project \"%s\".",
+		"domain_removed":              "Successfully removed \"%s\" from project \"%s\".",
 
 		"project_not_found": "Could not find a project \"%s\" that belongs to you.",
 	},
