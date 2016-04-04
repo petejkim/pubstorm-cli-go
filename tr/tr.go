@@ -11,6 +11,7 @@ var strs = map[string]map[string]string{
 		"domains_desc":     "List all domains for a Rise project",
 		"domains_add_desc": "Add a new domain to a Rise project",
 		"domains_rm_desc":  "Remove a domain from a Rise project",
+		"projects_desc":    "List all projects",
 
 		"join_rise":           "Join Rise, the easiest way to publish your HTML5 websites and apps!",
 		"signup_disclaimer":   "By creating an account, you agree to the following:-",
@@ -88,6 +89,9 @@ var strs = map[string]map[string]string{
 		"domain_removed":              "Successfully removed \"%s\" from project \"%s\".",
 
 		"project_not_found": "Could not find a project \"%s\" that belongs to you.",
+
+		"your_projects_list": "Your projects list",
+		"no_rise_projects":   "You don't have any projects",
 	},
 }
 

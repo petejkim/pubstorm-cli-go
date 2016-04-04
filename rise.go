@@ -9,6 +9,7 @@ import (
 	"github.com/nitrous-io/rise-cli-go/cli/initcmd"
 	"github.com/nitrous-io/rise-cli-go/cli/login"
 	"github.com/nitrous-io/rise-cli-go/cli/logout"
+	"github.com/nitrous-io/rise-cli-go/cli/projects"
 	"github.com/nitrous-io/rise-cli-go/cli/signup"
 	"github.com/nitrous-io/rise-cli-go/config"
 	"github.com/nitrous-io/rise-cli-go/pkg/readline"
@@ -88,6 +89,11 @@ func main() {
 			Name:   "domains.rm",
 			Usage:  tr.T("domains_rm_desc"),
 			Action: domains.Remove,
+		},
+		{
+			Name:   "projects",
+			Usage:  tr.T("projects_desc"),
+			Action: projects.List,
 		},
 	}
 
