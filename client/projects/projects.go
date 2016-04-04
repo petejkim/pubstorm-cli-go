@@ -8,6 +8,7 @@ import (
 	"github.com/franela/goreq"
 	"github.com/nitrous-io/rise-cli-go/apperror"
 	"github.com/nitrous-io/rise-cli-go/config"
+	"github.com/nitrous-io/rise-cli-go/project"
 	"github.com/nitrous-io/rise-cli-go/util"
 )
 
@@ -83,4 +84,35 @@ func Get(token, name string) *apperror.Error {
 	}
 
 	return apperror.New(ErrCodeUnexpectedError, err, "", true)
+}
+
+func Index(token string) (projects []*project.Project, appErr *apperror.Error) {
+	uri := fmt.Sprintf("%s/projects", config.Host)
+	req := goreq.Request{
+		Method:    "GET",
+		Uri:       uri,
+		Accept:    config.ReqAccept,
+		UserAgent: config.UserAgent,
+	}
+	req.AddHeader("Authorization", "Bearer "+token)
+
+	res, err := req.Do()
+	if err != nil {
+		return nil, apperror.New(ErrCodeRequestFailed, err, "", true)
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	var j struct {
+		Projects []*project.Project `json: "projects"`
+	}
+
+	if err := res.Body.FromJsonTo(&j); err != nil {
+		return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	return j.Projects, nil
 }

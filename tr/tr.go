@@ -11,6 +11,7 @@ var strs = map[string]map[string]string{
 		"domains_desc":     "List all domains for a PubStorm project",
 		"domains_add_desc": "Add a new domain to a PubStorm project",
 		"domains_rm_desc":  "Remove a domain from a PubStorm project",
+		"projects_desc":    "List your PubStorm projects",
 
 		"join_rise":           "Join PubStorm, the easiest way to publish your HTML5 websites and apps!",
 		"signup_disclaimer":   "By creating an account, you agree to the following:-",
@@ -88,6 +89,9 @@ var strs = map[string]map[string]string{
 		"domain_removed":              "Successfully removed \"%s\" from project \"%s\".",
 
 		"project_not_found": "Could not find a project \"%s\" that belongs to you.",
+
+		"project_list": "Your Projects",
+		"no_project":   "You do not have any PubStorm project created.",
 	},
 }
 

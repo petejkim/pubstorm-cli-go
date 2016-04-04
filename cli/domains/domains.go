@@ -29,7 +29,7 @@ func List(c *cli.Context) {
 		appErr.Handle()
 	}
 
-	tui.Printf(tui.Undl(tui.Bold(tr.T("domains_for")))+"\n", proj.Name)
+	tui.Printf(tui.Undl(tui.Bold(tr.T("domain_list")))+"\n", proj.Name)
 	for _, domainName := range domainNames {
 		tui.Println("- " + domainName)
 	}
