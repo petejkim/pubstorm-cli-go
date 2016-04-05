@@ -9,6 +9,7 @@ import (
 	"github.com/nitrous-io/rise-cli-go/cli/initcmd"
 	"github.com/nitrous-io/rise-cli-go/cli/login"
 	"github.com/nitrous-io/rise-cli-go/cli/logout"
+	"github.com/nitrous-io/rise-cli-go/cli/password"
 	"github.com/nitrous-io/rise-cli-go/cli/projects"
 	"github.com/nitrous-io/rise-cli-go/cli/signup"
 	"github.com/nitrous-io/rise-cli-go/config"
@@ -94,6 +95,21 @@ func main() {
 			Name:   "projects",
 			Usage:  tr.T("projects_desc"),
 			Action: projects.List,
+		},
+		{
+			Name: "password",
+			Subcommands: []cli.Command{
+				{
+					Name:   "change",
+					Usage:  tr.T("password_change_desc"),
+					Action: password.Change,
+				},
+			},
+		},
+		{
+			Name:   "password.change",
+			Usage:  tr.T("password_change_desc"),
+			Action: password.Change,
 		},
 	}
 
