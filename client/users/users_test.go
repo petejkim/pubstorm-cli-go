@@ -283,4 +283,87 @@ var _ = Describe("Users", func() {
 			errIsNil: true,
 		}),
 	)
+
+	DescribeTable("ChangePassword",
+		func(e expectation) {
+			server.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("PUT", "/user"),
+					ghttp.VerifyHeader(http.Header{
+						"Content-Type": {"application/x-www-form-urlencoded"},
+						"Accept":       {config.ReqAccept},
+						"User-Agent":   {config.UserAgent},
+					}),
+					ghttp.VerifyForm(url.Values{
+						"existing_password": {"old-pass"},
+						"password":          {"new-pass"},
+					}),
+					ghttp.RespondWith(e.resCode, e.resBody),
+				),
+			)
+
+			appErr := users.ChangePassword("t0k3n", "old-pass", "new-pass")
+			Expect(server.ReceivedRequests()).To(HaveLen(1))
+
+			if e.errIsNil {
+				Expect(appErr).To(BeNil())
+			} else {
+				Expect(appErr).NotTo(BeNil())
+				Expect(appErr.Code).To(Equal(e.errCode))
+				Expect(appErr.Description).To(ContainSubstring(e.errDesc))
+				Expect(appErr.IsFatal).To(Equal(e.errIsFatal))
+			}
+		},
+
+		Entry("unexpected response code", expectation{
+			resCode:    http.StatusInternalServerError,
+			resBody:    "",
+			errIsNil:   false,
+			errCode:    users.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("malformed json", expectation{
+			resCode:    http.StatusOK,
+			resBody:    `{"foo": }`,
+			errIsNil:   false,
+			errCode:    users.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("invalid params", expectation{
+			resCode:    422,
+			resBody:    `{"error": "invalid_params", "errors": {"password": "is too short (min. 6 characters)"}}`,
+			errIsNil:   false,
+			errCode:    users.ErrCodeValidationFailed,
+			errDesc:    "Password is too short (min. 6 characters)",
+			errIsFatal: false,
+		}),
+
+		Entry("invalid params with existing_password", expectation{
+			resCode:    422,
+			resBody:    `{"error": "invalid_params", "errors": {"existing_password": "is incorrect"}}`,
+			errIsNil:   false,
+			errCode:    users.ErrCodeValidationFailed,
+			errDesc:    "The existing password you've entered is incorrect.",
+			errIsFatal: false,
+		}),
+
+		Entry("invalid params with password", expectation{
+			resCode:    422,
+			resBody:    `{"error": "invalid_params", "errors": {"password": "cannot be the same as the existing password"}}`,
+			errIsNil:   false,
+			errCode:    users.ErrCodeValidationFailed,
+			errDesc:    "You cannot reuse your previous password.",
+			errIsFatal: false,
+		}),
+
+		Entry("successful password update", expectation{
+			resCode:  http.StatusOK,
+			resBody:  `{"user": { "email": "foo@example.com", "name": "", "organization": ""}}`,
+			errIsNil: true,
+		}),
+	)
 })

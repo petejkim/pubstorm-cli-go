@@ -3,10 +3,12 @@ package users
 import (
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/franela/goreq"
 	"github.com/nitrous-io/rise-cli-go/apperror"
 	"github.com/nitrous-io/rise-cli-go/config"
+	"github.com/nitrous-io/rise-cli-go/tr"
 	"github.com/nitrous-io/rise-cli-go/util"
 )
 
@@ -128,6 +130,52 @@ func ResendConfirmationCode(email string) *apperror.Error {
 	}
 
 	if v, ok := j["sent"].(bool); !v || !ok {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	return nil
+}
+
+func ChangePassword(token, existingPassword, password string) *apperror.Error {
+	req := goreq.Request{
+		Method:      "PUT",
+		Uri:         config.Host + "/user",
+		ContentType: "application/x-www-form-urlencoded",
+		Accept:      config.ReqAccept,
+		UserAgent:   config.UserAgent,
+
+		Body: url.Values{
+			"existing_password": {existingPassword},
+			"password":          {password},
+		}.Encode(),
+	}
+
+	req.AddHeader("Authorization", "Bearer "+token)
+	res, err := req.Do()
+
+	if err != nil {
+		return apperror.New(ErrCodeRequestFailed, err, "", true)
+	}
+
+	if !util.ContainsInt([]int{http.StatusOK, 422}, res.StatusCode) {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+	var j map[string]interface{}
+	if err := res.Body.FromJsonTo(&j); err != nil {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	if res.StatusCode == 422 {
+		if j["error"] == "invalid_params" {
+			if errors, ok := j["errors"].(map[string]interface{}); ok {
+				if msg, ok := errors["existing_password"].(string); ok && strings.Contains(msg, "incorrect") {
+					return apperror.New(ErrCodeValidationFailed, nil, tr.T("existing_password_incorrect"), false)
+				} else if msg, ok := errors["password"].(string); ok && strings.Contains(msg, "existing password") {
+					return apperror.New(ErrCodeValidationFailed, nil, tr.T("new_password_same"), false)
+				}
+				return apperror.New(ErrCodeValidationFailed, nil, util.ValidationErrorsToString(j), false)
+			}
+		}
 		return apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
 
