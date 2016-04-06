@@ -81,6 +81,7 @@ func Signup(c *cli.Context) {
 		}
 	}
 
+	config.Email = email
 	config.AccessToken = token
 	config.Save()
 	log.Infof(tr.T("login_success"), email)
