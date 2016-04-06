@@ -88,6 +88,7 @@ func Login(c *cli.Context) {
 		}
 	}
 
+	config.Email = email
 	config.AccessToken = token
 	if err := config.Save(); err != nil {
 		log.Fatal(tr.T("rise_config_write_failed"))

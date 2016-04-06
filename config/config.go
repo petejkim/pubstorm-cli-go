@@ -33,6 +33,7 @@ var (
 
 	DotRisePath string
 	AccessToken string
+	Email       string
 
 	MaxProjectSize = int64(1024 * 1024 * 1000) // 1 GiB
 	MaxBundleSize  = int64(1024 * 1024 * 1000) // 1 GiB
@@ -74,6 +75,7 @@ func Save() error {
 	defer f.Close()
 
 	return json.NewEncoder(f).Encode(map[string]interface{}{
+		"email":        Email,
 		"access_token": AccessToken,
 	})
 }
@@ -89,6 +91,7 @@ func Load() error {
 	defer f.Close()
 
 	var j struct {
+		Email       string `json:"email"`
 		AccessToken string `json:"access_token"`
 	}
 
@@ -96,6 +99,7 @@ func Load() error {
 		return err
 	}
 
+	Email = j.Email
 	AccessToken = j.AccessToken
 
 	return nil
