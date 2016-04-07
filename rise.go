@@ -123,6 +123,18 @@ func main() {
 			Name:   "projects",
 			Usage:  tr.T("projects_desc"),
 			Action: projects.List,
+			Subcommands: []cli.Command{
+				{
+					Name:   "rm",
+					Usage:  tr.T("projects_add_desc"),
+					Action: projects.Remove,
+				},
+			},
+		},
+		{
+			Name:   "projects.rm",
+			Usage:  tr.T("projects_rm_desc"),
+			Action: projects.Remove,
 		},
 		{
 			Name: "password",

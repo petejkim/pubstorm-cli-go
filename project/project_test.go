@@ -168,5 +168,33 @@ var _ = Describe("Project", func() {
 				})
 			})
 		})
+
+		Describe("Delete()", func() {
+			var proj *project.Project
+
+			BeforeEach(func() {
+				err = ioutil.WriteFile(config.ProjectJSON, []byte(`
+					{
+						"name": "good-beer-company",
+						"path": "./output",
+						"enable_stats": false,
+						"force_https": true
+					}
+				`), 0600)
+				Expect(err).To(BeNil())
+
+				var err error
+				proj, err = project.Load()
+				Expect(err).To(BeNil())
+			})
+
+			It("deletes the project json file", func() {
+				err := proj.Delete()
+				Expect(err).To(BeNil())
+
+				_, err = os.Stat(config.ProjectJSON)
+				Expect(os.IsNotExist(err)).To(BeTrue())
+			})
+		})
 	})
 })
