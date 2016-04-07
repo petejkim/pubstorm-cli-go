@@ -27,6 +27,7 @@ var strs = map[string]map[string]string{
 		"confirmation_sucess": "Thanks for confirming your email address! Your account is now active!",
 		"login_fail":          "Login failed. Please try again by running `storm login`.",
 		"login_success":       "You are logged in as %s.",
+		"oauth_misconfigured": "Your version of the PubStorm CLI has expired, please update it by running `npm -g install pubstorm`.",
 
 		"login_rise":                "Welcome back to PubStorm, the easiest way to publish your HTML5 websites and apps!",
 		"enter_credentials":         "Enter your PubStorm credentials",

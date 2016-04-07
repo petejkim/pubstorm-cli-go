@@ -125,6 +125,15 @@ var _ = Describe("OAuth", func() {
 			errIsFatal: true,
 		}),
 
+		Entry("401 with unauthorized", expectation{
+			resCode:    http.StatusUnauthorized,
+			resBody:    `{"error": "invalid_client", "error_description": "client credentials are invalid"}`,
+			errIsNil:   false,
+			errCode:    oauth.ErrCodeOAuthMisconfigured,
+			errDesc:    "OAuth Client ID/Secret misconfigured",
+			errIsFatal: true,
+		}),
+
 		Entry("status is ok but no token", expectation{
 			resCode:    http.StatusOK,
 			resBody:    `{"site": "is_hacked", "result": "DROP TABLE *;"}`,

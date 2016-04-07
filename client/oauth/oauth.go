@@ -16,6 +16,7 @@ const (
 	ErrCodeInvalidGrant         = "invalid_grant"
 	ErrCodeUnconfirmedEmail     = "unconfirmed_email"
 	ErrCodeInvalidAuthorization = "invalid_authorization"
+	ErrCodeOAuthMisconfigured   = "oauth_misconfigured"
 )
 
 func FetchToken(email, password string) (token string, appErr *apperror.Error) {
@@ -40,7 +41,7 @@ func FetchToken(email, password string) (token string, appErr *apperror.Error) {
 		return "", apperror.New(ErrCodeRequestFailed, err, "", true)
 	}
 
-	if !util.ContainsInt([]int{http.StatusOK, http.StatusBadRequest}, res.StatusCode) {
+	if !util.ContainsInt([]int{http.StatusOK, http.StatusBadRequest, http.StatusUnauthorized}, res.StatusCode) {
 		return "", apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
 
@@ -49,7 +50,8 @@ func FetchToken(email, password string) (token string, appErr *apperror.Error) {
 		return "", apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
 
-	if res.StatusCode == http.StatusBadRequest {
+	switch res.StatusCode {
+	case http.StatusBadRequest:
 		if j["error"] == "invalid_grant" {
 			switch j["error_description"] {
 			case "user credentials are invalid":
@@ -59,6 +61,10 @@ func FetchToken(email, password string) (token string, appErr *apperror.Error) {
 			}
 		}
 		return "", apperror.New(ErrCodeUnexpectedError, err, "", true)
+	case http.StatusUnauthorized:
+		// The configured OAuth client ID and/or secret are invalid - this is a
+		// build time error.
+		return "", apperror.New(ErrCodeOAuthMisconfigured, nil, "OAuth Client ID/Secret misconfigured", true)
 	}
 
 	token, ok := j["access_token"].(string)
