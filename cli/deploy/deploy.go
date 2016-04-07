@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/codegangsta/cli"
-	"github.com/dustin/go-humanize"
+	humanize "github.com/dustin/go-humanize"
 	"github.com/nitrous-io/rise-cli-go/bundle"
 	"github.com/nitrous-io/rise-cli-go/cli/common"
 	"github.com/nitrous-io/rise-cli-go/client/deployments"
@@ -48,6 +48,11 @@ func Deploy(c *cli.Context) {
 
 	if size > config.MaxProjectSize {
 		log.Fatalf(tr.T("project_size_exceeded"), humanize.Bytes(uint64(config.MaxProjectSize)))
+	}
+
+	indexHTMLPath := filepath.Join(absPath, "index.html")
+	if _, err := os.Stat(indexHTMLPath); os.IsNotExist(err) {
+		log.Warnf(tr.T("bundle_root_index_missing"))
 	}
 
 	tempDir, err := ioutil.TempDir("", "rise-deploy")
