@@ -13,6 +13,7 @@ var strs = map[string]map[string]string{
 		"domains_rm_desc":      "Remove a domain from a PubStorm project",
 		"projects_desc":        "List your PubStorm projects",
 		"password_change_desc": "Change your password",
+		"projects_rm_desc":     "Remove a PubStorm project",
 
 		"update_available":       "A PubStorm update is available.",
 		"update_current_version": "Your version: %s",
@@ -105,6 +106,12 @@ var strs = map[string]map[string]string{
 		"reenter_email":               "Please re-enter your email address to login with your new password.",
 		"existing_password_incorrect": "The existing password you've entered is incorrect.",
 		"new_password_same":           "You cannot reuse your previous password.",
+
+		"project_delete_success":        "Successfully delete the project \"%s\".",
+		"project_json_failed_to_delete": "Failed to delete \"pubstorm.json\".",
+		"project_destroy_all":           "This will delete \"%s\" including all domains that belong to it. To proceed, type \"%s\"",
+		"project_name_not_match":        "Project name did not match. type again",
+		"enter":                         "Enter",
 	},
 }
 
