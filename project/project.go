@@ -22,7 +22,7 @@ var (
 	projectNameRe = regexp.MustCompile(`(?m)(^[A-Za-z0-9][A-Za-z0-9\-]{1,61}[A-Za-z0-9]$)`)
 
 	ErrNameInvalidLength = errors.New("Name must have minimum 3 and maximum 63 characters")
-	ErrNameInvalid       = errors.New("Name may contain alphabets, numbers and hyphens, but may not begin or end with hyphens")
+	ErrNameInvalid       = errors.New("Name may contain letters, numbers and hyphens, but may not begin or end with hyphens")
 
 	ErrPathNotRelative = errors.New("Path must be relative to current working directory")
 	ErrPathNotExist    = errors.New("Path does not exist")
