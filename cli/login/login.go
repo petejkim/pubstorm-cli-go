@@ -82,6 +82,10 @@ func Login(c *cli.Context) {
 		}
 
 		if appErr != nil {
+			if appErr.Code == oauth.ErrCodeOAuthMisconfigured {
+				log.Fatal(tr.T("oauth_misconfigured"))
+			}
+
 			appErr.Handle()
 		} else {
 			util.ExitSomethingWentWrong()
