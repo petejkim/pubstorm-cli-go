@@ -76,6 +76,43 @@ func main() {
 			Action: logout.Logout,
 		},
 		{
+			Name: "password",
+			Subcommands: []cli.Command{
+				{
+					Name:   "change",
+					Usage:  tr.T("password_change_desc"),
+					Action: password.Change,
+				},
+				{
+					Name:   "reset",
+					Usage:  tr.T("password_reset_desc"),
+					Action: password.Reset,
+					Flags: []cli.Flag{
+						cli.BoolFlag{
+							Name:  "continue, c",
+							Usage: "Use this flag if you already have a password reset token",
+						},
+					},
+				},
+			},
+		},
+		{
+			Name:   "password.change",
+			Usage:  tr.T("password_change_desc"),
+			Action: password.Change,
+		},
+		{
+			Name:   "password.reset",
+			Usage:  tr.T("password_reset_desc"),
+			Action: password.Reset,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "continue, c",
+					Usage: "Use this flag if you already have a password reset token",
+				},
+			},
+		},
+		{
 			Name:   "init",
 			Usage:  tr.T("init_desc"),
 			Action: initcmd.Init,
@@ -147,21 +184,6 @@ func main() {
 					Usage: "Delete project without confirmation",
 				},
 			},
-		},
-		{
-			Name: "password",
-			Subcommands: []cli.Command{
-				{
-					Name:   "change",
-					Usage:  tr.T("password_change_desc"),
-					Action: password.Change,
-				},
-			},
-		},
-		{
-			Name:   "password.change",
-			Usage:  tr.T("password_change_desc"),
-			Action: password.Change,
 		},
 	}
 
