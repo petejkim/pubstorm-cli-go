@@ -71,7 +71,7 @@ func Login(c *cli.Context) {
 
 				appErr.Handle()
 			}
-			log.Info(tr.T("confirmation_sucess"))
+			log.Info(tr.T("confirmation_success"))
 			tui.Println()
 
 			token, appErr = oauth.FetchToken(email, password)

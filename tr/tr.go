@@ -6,6 +6,7 @@ var strs = map[string]map[string]string{
 		"signup_desc":          "Create a new PubStorm account",
 		"login_desc":           "Log in to a PubStorm account",
 		"logout_desc":          "Log out from current session",
+		"password_reset_desc":  "Reset your PubStorm password",
 		"init_desc":            "Initialize a PubStorm project",
 		"deploy_desc":          "Publish a PubStorm project",
 		"domains_desc":         "List all domains for a PubStorm project",
@@ -39,6 +40,13 @@ var strs = map[string]map[string]string{
 		"confirmation_required":     "You have to confirm your email address to continue. Please check your inbox for the confirmation code.",
 		"enter_confirmation_resend": "Enter Confirmation Code (Or enter \"resend\" if you need it sent again)",
 		"confirmation_resent":       "Confirmation code has been resent. You will receive your confirmation code shortly via email.",
+
+		"reset_password": "Reset your PubStorm password",
+		"reset_password_quote": `"I forgot the password for the file where I keep all my passwords"
+                                              - Not you, hopefully`,
+		"reset_password_email_sent": "An email with password reset instructions has been sent to %s",
+		"enter_password_reset_code": "Enter Password Reset Code (Check your inbox!)",
+		"password_reset_success":    "All good! Please login with your new password by running `storm login`.",
 
 		"rise_config_write_failed": "Could not save PubStorm config file!",
 
