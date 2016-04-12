@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/codegangsta/cli"
+	"github.com/nitrous-io/rise-cli-go/cli/common"
 	"github.com/nitrous-io/rise-cli-go/cli/deploy"
 	"github.com/nitrous-io/rise-cli-go/cli/domains"
 	"github.com/nitrous-io/rise-cli-go/cli/initcmd"
@@ -24,6 +25,8 @@ func main() {
 	log.SetOutput(tui.Out)
 	log.SetLevel(log.InfoLevel)
 	readline.Output = tui.Out
+
+	common.CheckForUpdates()
 
 	app := cli.NewApp()
 	app.Name = config.AppName
