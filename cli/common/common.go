@@ -1,7 +1,10 @@
 package common
 
 import (
+	"io/ioutil"
 	"os"
+	"path/filepath"
+	"sync"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/nitrous-io/rise-cli-go/config"
@@ -10,6 +13,27 @@ import (
 	"github.com/nitrous-io/rise-cli-go/tui"
 	"github.com/nitrous-io/rise-cli-go/util"
 )
+
+var (
+	sharedDebugLogger *log.Logger
+	once              sync.Once
+)
+
+func DebugLog() *log.Logger {
+	p := filepath.Join(config.DotRisePath, "debug.log")
+
+	once.Do(func() {
+		sharedDebugLogger = log.New()
+		sharedDebugLogger.Level = log.DebugLevel
+		sharedDebugLogger.Out = ioutil.Discard
+
+		if f, err := os.OpenFile(p, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644); err == nil {
+			sharedDebugLogger.Out = f
+		}
+	})
+
+	return sharedDebugLogger
+}
 
 func RequireAccessToken() string {
 	token := config.AccessToken
