@@ -17,6 +17,8 @@ var (
 	DefaultDomain = "risecloud.dev"
 	WebsiteHost   = "https://www.rise.dev"
 
+	LatestVersionURL = "https://s3-us-west-2.amazonaws.com/rise-development-usw2/versions/latest.json"
+
 	RedirectorIP = "52.38.113.95" // don't ever change this
 	DNSHelpURL   = "https://help.pubstorm.com/custom-domains"
 
@@ -37,7 +39,7 @@ var (
 )
 
 const (
-	configJSON = "config.json"
+	configJSONPath = "config.json"
 )
 
 func init() {
@@ -64,7 +66,7 @@ func init() {
 
 // Saves config to a json file
 func Save() error {
-	configPath := filepath.Join(DotRisePath, configJSON)
+	configPath := filepath.Join(DotRisePath, configJSONPath)
 	f, err := os.OpenFile(configPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return err
@@ -78,7 +80,7 @@ func Save() error {
 
 // Load config from .pubstorm/config.json
 func Load() error {
-	configPath := filepath.Join(DotRisePath, configJSON)
+	configPath := filepath.Join(DotRisePath, configJSONPath)
 
 	f, err := os.Open(configPath)
 	if err != nil {

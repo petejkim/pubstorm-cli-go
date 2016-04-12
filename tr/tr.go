@@ -13,6 +13,11 @@ var strs = map[string]map[string]string{
 		"domains_rm_desc":  "Remove a domain from a PubStorm project",
 		"projects_desc":    "List your PubStorm projects",
 
+		"update_available":       "A PubStorm update is available.",
+		"update_current_version": "Your version: %s",
+		"update_latest_version":  "Latest version: %s",
+		"update_instructions":    "Run `npm -g install pubstorm` to update to version %s.",
+
 		"join_rise":           "Join PubStorm, the easiest way to publish your HTML5 websites and apps!",
 		"signup_disclaimer":   "By creating an account, you agree to the following:-",
 		"rise_tos":            "PubStorm Terms of Service",

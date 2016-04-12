@@ -19,30 +19,33 @@ riseVersion=${RISE_VERSION:-"`cat VERSION`-`git rev-parse --short HEAD`"}
 # those are exposed in the client anyway
 case $RISE_CLI_ENV in
   "staging")
-    riseHost=${RISE_HOST:-"https://api.risestaging.com"}
+    riseHost=${RISE_HOST:-"http://api.risestaging.com"}
     riseDefaultDomain=${RISE_DEFAULT_DOMAIN:-"risestaging.cloud"}
-    riseWebsiteHost=${RISE_WEBSITE_HOST:-"https://www.risestaging.com"}
+    riseWebsiteHost=${RISE_WEBSITE_HOST:-"http://www.risestaging.com"}
+    riseLatestVersionURL=${RISE_LATEST_VERSION_URL:-"https://pubstorm-updates-staging.s3-us-west-2.amazonaws.com/latest.json"}
     riseClientID=${RISE_CLIENT_ID:-"6614ee34ecc460a1b960c660cdd71e02"}
     riseClientSecret=${RISE_CLIENT_SECRET:-"a840567b6f0ed9f7f7d406601645d8821407da581a54b996b2d0428d2f3c5643a5124dc28b08d7c2409752de51ce6961da773341780f3c4fc683476b4a275e22"}
     ;;
   "production")
     riseHost=${RISE_HOST:-"https://api.pubstorm.com"}
     riseDefaultDomain=${RISE_DEFAULT_DOMAIN:-"pubstorm.site"}
-    riseWebsiteHost=${RISE_WEBSITE_HOST:-"https://www.pubstorm.com"}
+    riseWebsiteHost=${RISE_WEBSITE_HOST:-"http://www.pubstorm.com"}
+    riseLatestVersionURL=${RISE_LATEST_VERSION_URL:-"https://pubstorm-updates.s3-us-west-2.amazonaws.com/latest.json"}
     riseClientID=${RISE_CLIENT_ID:-"70211de132f778378407fd94195bc2e6"}
     riseClientSecret=${RISE_CLIENT_SECRET:-"69f9a67ac8fd44b19b1fa3426cede97f410b7fe5335a79f0bbd0023ec64a2658c95e9511760121e7231d131e2950d485a76d3d32db3eab70745095f8fd901b79"}
     ;;
   *)
     riseHost=${RISE_HOST:-"http://localhost:3000"}
     riseDefaultDomain=${RISE_DEFAULT_DOMAIN:-"risecloud.dev"}
-    riseWebsiteHost=${RISE_WEBSITE_HOST:-"https://www.pubstorm.com"}
+    riseWebsiteHost=${RISE_WEBSITE_HOST:-"http://www.pubstorm.com"}
+    riseLatestVersionURL=${RISE_LATEST_VERSION_URL:-"https://s3-us-west-2.amazonaws.com/rise-development-usw2/versions/latest.json"}
     riseClientID=${RISE_CLIENT_ID:-"73c24fbc2eb24bbf1d3fc3749fc8ac35"}
     riseClientSecret=${RISE_CLIENT_SECRET:-"0f3295e1b531191c0ce8ccf331421644d4c4fbab9eb179778e5172977bf0238cdbf4b3afe1ead11b9892ce8806e87cc1acc10263dfdade879a05b931809690a1"}
     ;;
 esac
 
 configPkg="github.com/nitrous-io/rise-cli-go/config"
-riseLdFlags="-X $configPkg.Version=$riseVersion -X $configPkg.BuildEnv=$RISE_CLI_ENV -X $configPkg.Host=$riseHost -X $configPkg.DefaultDomain=$riseDefaultDomain -X $configPkg.WebsiteHost=$riseWebsiteHost -X $configPkg.ClientID=$riseClientID -X $configPkg.ClientSecret=$riseClientSecret"
+riseLdFlags="-X $configPkg.Version=$riseVersion -X $configPkg.BuildEnv=$RISE_CLI_ENV -X $configPkg.Host=$riseHost -X $configPkg.DefaultDomain=$riseDefaultDomain -X $configPkg.WebsiteHost=$riseWebsiteHost -X $configPkg.LatestVersionURL=$riseLatestVersionURL -X $configPkg.ClientID=$riseClientID -X $configPkg.ClientSecret=$riseClientSecret"
 
 echo $riseLdFlags
 
@@ -70,4 +73,4 @@ build amd64 windows
 build 386 darwin
 build amd64 darwin
 
-echo -e "$okColor--> Compilación Completada!$noColor"
+echo -e "$okColor--> Compilación 完成!$noColor"
