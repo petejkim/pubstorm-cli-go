@@ -107,8 +107,9 @@ var strs = map[string]map[string]string{
 
 		"project_not_found": "Could not find a project \"%s\" that belongs to you.",
 
-		"project_list": "Your Projects",
-		"no_project":   "You do not have any PubStorm project created.",
+		"projects_list_header":        "Your Projects",
+		"shared_projects_list_header": "Projects Shared With You",
+		"no_project":                  "You do not have any PubStorm project created.",
 
 		"will_invalidate_session":     "Changing password will log you out from all other active sessions.",
 		"enter_existing_password":     "Enter Existing Password",

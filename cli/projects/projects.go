@@ -21,19 +21,28 @@ import (
 func List(c *cli.Context) {
 	common.RequireAccessToken()
 
-	projs, appErr := projects.Index(config.AccessToken)
+	projs, sharedProjs, appErr := projects.Index(config.AccessToken)
 	if appErr != nil {
 		appErr.Handle()
 	}
 
-	if len(projs) == 0 {
+	if len(projs)+len(sharedProjs) == 0 {
 		log.Info(tr.T("no_project"))
 		return
 	}
 
-	tui.Printf(tui.Undl(tui.Bold(tr.T("project_list"))) + "\n")
-	for _, proj := range projs {
-		tui.Println("- " + proj.Name)
+	if len(projs) > 0 {
+		tui.Printf(tui.Undl(tui.Bold(tr.T("projects_list_header"))) + "\n")
+		for _, proj := range projs {
+			tui.Println("- " + proj.Name)
+		}
+	}
+
+	if len(sharedProjs) > 0 {
+		tui.Printf(tui.Undl(tui.Bold(tr.T("shared_projects_list_header"))) + "\n")
+		for _, proj := range sharedProjs {
+			tui.Println("- " + proj.Name)
+		}
 	}
 }
 
