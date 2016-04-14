@@ -2,8 +2,10 @@ package main
 
 import (
 	"os"
+	"time"
 
 	"github.com/codegangsta/cli"
+	"github.com/franela/goreq"
 	"github.com/nitrous-io/rise-cli-go/cli/common"
 	"github.com/nitrous-io/rise-cli-go/cli/deploy"
 	"github.com/nitrous-io/rise-cli-go/cli/domains"
@@ -53,6 +55,10 @@ func main() {
 	readline.Output = tui.Out
 
 	common.CheckForUpdates()
+
+	// Set Goreq's connect timeout to 10s globally (its default is 1s which
+	// can be too short).
+	goreq.SetConnectTimeout(10 * time.Second)
 
 	app := cli.NewApp()
 	app.Name = config.AppName
