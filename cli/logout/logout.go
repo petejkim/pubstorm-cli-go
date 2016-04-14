@@ -19,6 +19,7 @@ func Logout(c *cli.Context) {
 		log.Info(tr.T("logout_success"))
 	}
 
+	config.Email = ""
 	config.AccessToken = ""
 	if err := config.Save(); err != nil {
 		log.Fatal(tr.T("rise_config_write_failed"))

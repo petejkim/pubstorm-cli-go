@@ -2,16 +2,17 @@ package tr
 
 var strs = map[string]map[string]string{
 	"en": {
-		"rise_cli_desc":    "Command line interface for PubStorm, the easiest way to publish your HTML5 websites and apps",
-		"signup_desc":      "Create a new PubStorm account",
-		"login_desc":       "Log in to a PubStorm account",
-		"logout_desc":      "Log out from current session",
-		"init_desc":        "Initialize a PubStorm project",
-		"deploy_desc":      "Publish a PubStorm project",
-		"domains_desc":     "List all domains for a PubStorm project",
-		"domains_add_desc": "Add a new domain to a PubStorm project",
-		"domains_rm_desc":  "Remove a domain from a PubStorm project",
-		"projects_desc":    "List your PubStorm projects",
+		"rise_cli_desc":        "Command line interface for PubStorm, the easiest way to publish your HTML5 websites and apps",
+		"signup_desc":          "Create a new PubStorm account",
+		"login_desc":           "Log in to a PubStorm account",
+		"logout_desc":          "Log out from current session",
+		"init_desc":            "Initialize a PubStorm project",
+		"deploy_desc":          "Publish a PubStorm project",
+		"domains_desc":         "List all domains for a PubStorm project",
+		"domains_add_desc":     "Add a new domain to a PubStorm project",
+		"domains_rm_desc":      "Remove a domain from a PubStorm project",
+		"projects_desc":        "List your PubStorm projects",
+		"password_change_desc": "Change your password",
 
 		"update_available":       "A PubStorm update is available.",
 		"update_current_version": "Your version: %s",
@@ -97,6 +98,13 @@ var strs = map[string]map[string]string{
 
 		"project_list": "Your Projects",
 		"no_project":   "You do not have any PubStorm project created.",
+
+		"will_invalidate_session":     "This will invalidate all other active sessions",
+		"enter_existing_password":     "Enter Existing Password",
+		"password_changed":            "Successfully changed your password.",
+		"reenter_email":               "Please provider your email address to login.",
+		"existing_password_incorrect": "Given existing password is incorrect",
+		"enter_different_password":    "Please enter different password",
 	},
 }
 

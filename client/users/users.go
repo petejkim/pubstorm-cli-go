@@ -7,6 +7,7 @@ import (
 	"github.com/franela/goreq"
 	"github.com/nitrous-io/rise-cli-go/apperror"
 	"github.com/nitrous-io/rise-cli-go/config"
+	"github.com/nitrous-io/rise-cli-go/tr"
 	"github.com/nitrous-io/rise-cli-go/util"
 )
 
@@ -128,6 +129,64 @@ func ResendConfirmationCode(email string) *apperror.Error {
 	}
 
 	if v, ok := j["sent"].(bool); !v || !ok {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	return nil
+}
+
+func ChangePassword(token, existingPassword, password string) *apperror.Error {
+	req := goreq.Request{
+		Method:      "PUT",
+		Uri:         config.Host + "/user",
+		ContentType: "application/x-www-form-urlencoded",
+		Accept:      config.ReqAccept,
+		UserAgent:   config.UserAgent,
+
+		Body: url.Values{
+			"existing_password": {existingPassword},
+			"password":          {password},
+		}.Encode(),
+	}
+
+	req.AddHeader("Authorization", "Bearer "+token)
+	res, err := req.Do()
+
+	if err != nil {
+		return apperror.New(ErrCodeRequestFailed, err, "", true)
+	}
+
+	if !util.ContainsInt([]int{http.StatusOK, 422}, res.StatusCode) {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	var j map[string]interface{}
+	if err := res.Body.FromJsonTo(&j); err != nil {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	if res.StatusCode == 422 {
+		if j["error"] == "invalid_params" {
+			if j["errors"] != nil {
+				return apperror.New(ErrCodeValidationFailed, nil, util.ValidationErrorsToString(j), false)
+			}
+
+			if errDesc, ok := j["error_description"].(string); ok {
+				if errDesc == "existing_password is incorrect" {
+					return apperror.New(ErrCodeValidationFailed, nil, tr.T("existing_password_incorrect"), false)
+				}
+
+				if errDesc == "password is same as existing_password" {
+					return apperror.New(ErrCodeValidationFailed, nil, tr.T("enter_different_password"), false)
+				}
+
+				return apperror.New(ErrCodeValidationFailed, nil, errDesc, false)
+			}
+		}
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	if v, ok := j["changed"].(bool); !v || !ok {
 		return apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
 

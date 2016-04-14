@@ -1,4 +1,4 @@
-package signup
+package password
 
 import (
 	"github.com/codegangsta/cli"
@@ -14,21 +14,19 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-func Signup(c *cli.Context) {
+func Change(c *cli.Context) {
+	common.RequireAccessToken()
+
 	var (
-		err      error
-		email    string
-		password string
+		err              error
+		existingPassword string
+		password         string
 	)
 
-	common.PrintLogo()
-	tui.Println(tui.Bold(tr.T("join_rise")) + "\n")
-	tui.Println(tr.T("signup_disclaimer") + "\n")
-	tui.Println("  * " + tr.T("rise_tos") + " - " + tui.Undl(tui.Blu(config.WebsiteHost+"/terms-of-service")))
-	tui.Println("  * " + tr.T("rise_privacy_policy") + " - " + tui.Undl(tui.Blu(config.WebsiteHost+"/privacy-policy")) + "\n")
+	log.Info(tr.T("will_invalidate_session"))
 
 	for {
-		email, err = readline.Read(tui.Bold(tr.T("enter_email")+": "), true, "")
+		existingPassword, err = readline.ReadSecurely(tui.Bold(tr.T("enter_existing_password")+": "), true, "")
 		util.ExitIfErrorOrEOF(err)
 
 		var passwordConf string
@@ -47,7 +45,7 @@ func Signup(c *cli.Context) {
 			readPw()
 		}
 
-		appErr := users.Create(email, password)
+		appErr := users.ChangePassword(config.AccessToken, existingPassword, password)
 		if appErr == nil {
 			break
 		}
@@ -55,22 +53,15 @@ func Signup(c *cli.Context) {
 		tui.Println(tr.T("error_in_input"))
 	}
 
-	log.Info(tr.T("account_created"))
-	tui.Println()
+	log.Infof(tr.T("password_changed"))
 
-	for {
-		confirmationCode, err := readline.Read(tui.Bold(tr.T("enter_confirmation")+": "), true, "")
+	// If email is empty, ask users to input again
+	email := config.Email
+	if config.Email == "" {
+		log.Info(tr.T("reenter_email"))
+		email, err = readline.Read(tui.Bold(tr.T("enter_email")+": "), true, "")
 		util.ExitIfErrorOrEOF(err)
-
-		appErr := users.Confirm(email, confirmationCode)
-		if appErr == nil {
-			break
-		}
-		appErr.Handle()
 	}
-
-	log.Info(tr.T("confirmation_sucess"))
-	tui.Println()
 
 	token, appErr := oauth.FetchToken(email, password)
 	if token == "" {
@@ -84,5 +75,5 @@ func Signup(c *cli.Context) {
 	config.Email = email
 	config.AccessToken = token
 	config.Save()
-	log.Infof(tr.T("login_success"), email)
+	log.Infof(tr.T("login_success"), config.Email)
 }
