@@ -124,6 +124,15 @@ var strs = map[string]map[string]string{
 		"project_name_does_not_match":   "The name you've entered does not match the project name, please try again.",
 		"project_json_failed_to_delete": "Failed to delete \"pubstorm.json\".",
 		"project_rm_success":            "Successfully deleted project \"%s\".",
+
+		"collab_list_header":        "Collaborators of \"%s\"",
+		"collab_add_user_not_found": "We do not know of a PubStorm user with the email address \"%s\".",
+		"collab_cannot_add_owner":   "You cannot add yourself as a collaborator of a project that belongs to you.",
+		"collab_enter_email_to_add": "Enter Email of Collaborator to Add",
+		"collab_enter_email_to_rm":  "Enter Email of Collaborator to Remove",
+		"collab_rm_user_not_found":  "User with the email address \"%s\" is not a collaborator of the project \"%s\".",
+		"collab_added_success":      "Successfully added \"%s\" as a collaborator of \"%s\"",
+		"collab_removed_success":    "Successfully removed \"%s\" as a collaborator of \"%s\"",
 	},
 }
 

@@ -6,6 +6,8 @@ import (
 
 	"github.com/codegangsta/cli"
 	"github.com/franela/goreq"
+
+	"github.com/nitrous-io/rise-cli-go/cli/collab"
 	"github.com/nitrous-io/rise-cli-go/cli/common"
 	"github.com/nitrous-io/rise-cli-go/cli/deploy"
 	"github.com/nitrous-io/rise-cli-go/cli/domains"
@@ -190,6 +192,33 @@ func main() {
 					Usage: "Delete project without confirmation",
 				},
 			},
+		},
+		{
+			Name:   "collab",
+			Usage:  "Lists collaborators for the current project",
+			Action: collab.List,
+			Subcommands: []cli.Command{
+				{
+					Name:   "add",
+					Usage:  "Add a collaborator to the current project",
+					Action: collab.Add,
+				},
+				{
+					Name:   "rm",
+					Usage:  "Remove a collaborator from the current project",
+					Action: collab.Remove,
+				},
+			},
+		},
+		{
+			Name:   "collab.add",
+			Usage:  "Add a collaborator to the current project",
+			Action: collab.Add,
+		},
+		{
+			Name:   "collab.rm",
+			Usage:  "Remove a collaborator from the current project",
+			Action: collab.Remove,
 		},
 	}
 
