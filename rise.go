@@ -21,6 +21,31 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
+func init() {
+	cli.AppHelpTemplate = `NAME:
+   {{.Name}} - {{.Usage}}
+
+USAGE:
+   {{if .UsageText}}{{.UsageText}}{{else}}{{.HelpName}} {{if .Flags}}[global options]{{end}}{{if .Commands}} command [command options]{{end}} {{if .ArgsUsage}}{{.ArgsUsage}}{{else}}[arguments...]{{end}}{{end}}
+   {{if .Version}}
+VERSION:
+   {{.Version}}
+   {{end}}{{if len .Authors}}
+AUTHOR(S):
+   {{range .Authors}}{{ . }}{{end}}
+   {{end}}{{if .Commands}}
+COMMANDS:
+   {{range .Commands}}{{if .Usage}}{{join .Names ", "}}{{ "\t" }}{{.Usage}}
+   {{end}}{{end}}{{end}}{{if .Flags}}
+GLOBAL OPTIONS:
+   {{range .Flags}}{{.}}
+   {{end}}{{end}}{{if .Copyright }}
+COPYRIGHT:
+   {{.Copyright}}
+   {{end}}
+`
+}
+
 func main() {
 	log.SetFormatter(&tui.Formatter{})
 	log.SetOutput(tui.Out)
