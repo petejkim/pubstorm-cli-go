@@ -39,7 +39,7 @@ func Add(c *cli.Context) {
 	common.RequireAccessToken()
 	proj := common.RequireProject()
 
-	domainName := c.Args().First()
+	domainName := strings.TrimSpace(c.Args().First())
 
 	var err error
 	interactive := domainName == ""
