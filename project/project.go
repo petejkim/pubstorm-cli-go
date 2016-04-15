@@ -104,3 +104,8 @@ func Load() (*Project, error) {
 		ForceHTTPS:  j.ForceHTTPS,
 	}, nil
 }
+
+// Delete project json file
+func (p *Project) Delete() error {
+	return os.Remove(config.ProjectJSON)
+}

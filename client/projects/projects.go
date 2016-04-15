@@ -9,6 +9,7 @@ import (
 	"github.com/nitrous-io/rise-cli-go/apperror"
 	"github.com/nitrous-io/rise-cli-go/config"
 	"github.com/nitrous-io/rise-cli-go/project"
+	"github.com/nitrous-io/rise-cli-go/tr"
 	"github.com/nitrous-io/rise-cli-go/util"
 )
 
@@ -80,7 +81,7 @@ func Get(token, name string) *apperror.Error {
 	if res.StatusCode == http.StatusOK {
 		return nil
 	} else if res.StatusCode == http.StatusNotFound {
-		return apperror.New(ErrCodeNotFound, nil, "project could not be found", true)
+		return apperror.New(ErrCodeNotFound, nil, fmt.Sprintf(tr.T("project_not_found"), name), true)
 	}
 
 	return apperror.New(ErrCodeUnexpectedError, err, "", true)
@@ -115,4 +116,36 @@ func Index(token string) (projects []*project.Project, appErr *apperror.Error) {
 	}
 
 	return j.Projects, nil
+}
+
+func Delete(token, name string) *apperror.Error {
+	req := goreq.Request{
+		Method:      "DELETE",
+		Uri:         config.Host + "/projects/" + name,
+		ContentType: "application/x-www-form-urlencoded",
+		Accept:      config.ReqAccept,
+		UserAgent:   config.UserAgent,
+	}
+
+	req.AddHeader("Authorization", "Bearer "+token)
+	res, err := req.Do()
+	if err != nil {
+		return apperror.New(ErrCodeRequestFailed, err, "", true)
+	}
+	defer res.Body.Close()
+
+	if !util.ContainsInt([]int{http.StatusOK, http.StatusNotFound}, res.StatusCode) {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	var j map[string]interface{}
+	if err := res.Body.FromJsonTo(&j); err != nil {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	if res.StatusCode == http.StatusNotFound {
+		return apperror.New(ErrCodeNotFound, nil, fmt.Sprintf(tr.T("project_not_found"), name), true)
+	}
+
+	return nil
 }
