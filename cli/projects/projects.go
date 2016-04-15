@@ -35,20 +35,24 @@ func List(c *cli.Context) {
 }
 
 func Remove(c *cli.Context) {
+	force := c.Bool("force")
+
 	common.RequireAccessToken()
 	proj := common.RequireProject()
 
-	log.Warnf(tui.Undl(tui.Bold(tr.T("project_rm_cannot_undo")))+" "+tr.T("project_rm_permanent_delete"), proj.Name)
-	for {
-		projectName, err := readline.Read(tui.Bold(fmt.Sprintf(tr.T("enter_project_name_to_confirm"), proj.Name)+": "), true, "")
-		util.ExitIfErrorOrEOF(err)
+	if !force {
+		log.Warnf(tui.Undl(tui.Bold(tr.T("project_rm_cannot_undo")))+" "+tr.T("project_rm_permanent_delete"), proj.Name)
+		for {
+			projectName, err := readline.Read(tui.Bold(fmt.Sprintf(tr.T("enter_project_name_to_confirm"), proj.Name)+": "), true, "")
+			util.ExitIfErrorOrEOF(err)
 
-		if projectName != proj.Name {
-			log.Error(tr.T("project_name_does_not_match"))
-			continue
+			if projectName != proj.Name {
+				log.Error(tr.T("project_name_does_not_match"))
+				continue
+			}
+
+			break
 		}
-
-		break
 	}
 
 	if appErr := projects.Delete(config.AccessToken, proj.Name); appErr != nil {

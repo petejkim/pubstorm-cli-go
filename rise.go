@@ -128,6 +128,12 @@ func main() {
 					Name:   "rm",
 					Usage:  tr.T("projects_add_desc"),
 					Action: projects.Remove,
+					Flags: []cli.Flag{
+						cli.BoolFlag{
+							Name:  "force, f",
+							Usage: "Delete project without confirmation",
+						},
+					},
 				},
 			},
 		},
@@ -135,6 +141,12 @@ func main() {
 			Name:   "projects.rm",
 			Usage:  tr.T("projects_rm_desc"),
 			Action: projects.Remove,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "force, f",
+					Usage: "Delete project without confirmation",
+				},
+			},
 		},
 		{
 			Name: "password",
