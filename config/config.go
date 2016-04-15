@@ -54,6 +54,10 @@ func init() {
 		DotRisePath = filepath.Join(os.Getenv("HOME"), ".pubstorm")
 	}
 
+	if BuildEnv != "production" {
+		DotRisePath += "-" + BuildEnv
+	}
+
 	if err := os.MkdirAll(DotRisePath, 0700); err != nil {
 		log.Fatalln("Fatal Error: Failed to make data directory!")
 	}
