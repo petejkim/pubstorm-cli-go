@@ -87,7 +87,7 @@ func Get(token, name string) *apperror.Error {
 	return apperror.New(ErrCodeUnexpectedError, err, "", true)
 }
 
-func Index(token string) (projects []*project.Project, appErr *apperror.Error) {
+func Index(token string) (projects []*project.Project, sharedProjects []*project.Project, appErr *apperror.Error) {
 	uri := fmt.Sprintf("%s/projects", config.Host)
 	req := goreq.Request{
 		Method:    "GET",
@@ -99,23 +99,24 @@ func Index(token string) (projects []*project.Project, appErr *apperror.Error) {
 
 	res, err := req.Do()
 	if err != nil {
-		return nil, apperror.New(ErrCodeRequestFailed, err, "", true)
+		return nil, nil, apperror.New(ErrCodeRequestFailed, err, "", true)
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
+		return nil, nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
 
 	var j struct {
-		Projects []*project.Project `json: "projects"`
+		Projects       []*project.Project `json:"projects"`
+		SharedProjects []*project.Project `json:"shared_projects"`
 	}
 
 	if err := res.Body.FromJsonTo(&j); err != nil {
-		return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
+		return nil, nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
 
-	return j.Projects, nil
+	return j.Projects, j.SharedProjects, nil
 }
 
 func Delete(token, name string) *apperror.Error {

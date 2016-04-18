@@ -196,16 +196,26 @@ var _ = Describe("Projects", func() {
 				),
 			)
 
-			result, appErr := projects.Index("t0k3n")
+			projs, sharedProjs, appErr := projects.Index("t0k3n")
 			Expect(server.ReceivedRequests()).To(HaveLen(1))
 
 			if e.errIsNil {
 				Expect(appErr).To(BeNil())
-				expectedResult, ok := e.result.([]*project.Project)
+				expectedResult, ok := e.result.(map[string][]*project.Project)
 				Expect(ok).To(BeTrue())
-				Expect(len(result)).To(Equal(len(expectedResult)))
-				for i, r := range expectedResult {
-					Expect(result[i].Name).To(Equal(r.Name))
+
+				expectedProjs, ok := expectedResult["projects"]
+				Expect(ok).To(BeTrue())
+				Expect(len(projs)).To(Equal(len(expectedProjs)))
+				for i, p := range expectedProjs {
+					Expect(projs[i].Name).To(Equal(p.Name))
+				}
+
+				expectedSharedProjs, ok := expectedResult["shared_projects"]
+				Expect(ok).To(BeTrue())
+				Expect(len(sharedProjs)).To(Equal(len(expectedSharedProjs)))
+				for i, p := range expectedSharedProjs {
+					Expect(sharedProjs[i].Name).To(Equal(p.Name))
 				}
 			} else {
 				Expect(appErr).NotTo(BeNil())
@@ -236,9 +246,35 @@ var _ = Describe("Projects", func() {
 		Entry("successfully fetched", expectation{
 			resCode: http.StatusOK,
 			resBody: `{"projects": [{"name": "foo-bar-express"}, {"name": "baz-qux-entertainment"}]}`,
-			result: []*project.Project{
-				&project.Project{Name: "foo-bar-express"},
-				&project.Project{Name: "baz-qux-entertainment"},
+			result: map[string][]*project.Project{
+				"projects": []*project.Project{
+					&project.Project{Name: "foo-bar-express"},
+					&project.Project{Name: "baz-qux-entertainment"},
+				},
+				"shared_projects": nil,
+			},
+			errIsNil: true,
+		}),
+
+		Entry("successfully fetched with shared projects", expectation{
+			resCode: http.StatusOK,
+			resBody: `{
+				"projects": [
+					{"name": "foo-bar-express"},
+					{"name": "baz-qux-entertainment"}
+				],
+				"shared_projects": [
+					{"name": "nestorbot"}
+				]
+			}`,
+			result: map[string][]*project.Project{
+				"projects": []*project.Project{
+					&project.Project{Name: "foo-bar-express"},
+					&project.Project{Name: "baz-qux-entertainment"},
+				},
+				"shared_projects": []*project.Project{
+					&project.Project{Name: "nestorbot"},
+				},
 			},
 			errIsNil: true,
 		}),

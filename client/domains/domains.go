@@ -97,14 +97,14 @@ func Create(token, projectName, name string) (appErr *apperror.Error) {
 
 		if j["error"] == "invalid_request" {
 			if j["error_description"] == "project cannot have more domains" {
-				return apperror.New(ErrCodeLimitReached, err, "", true)
+				return apperror.New(ErrCodeLimitReached, nil, "", true)
 			} else if errDesc, ok := j["error_description"].(string); ok {
-				return apperror.New(ErrCodeUnexpectedError, err, errDesc, true)
+				return apperror.New(ErrCodeUnexpectedError, nil, errDesc, true)
 			} else {
-				return apperror.New(ErrCodeUnexpectedError, err, "", true)
+				return apperror.New(ErrCodeUnexpectedError, nil, "", true)
 			}
 		}
-		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+		return apperror.New(ErrCodeUnexpectedError, nil, "", true)
 	}
 
 	return nil
