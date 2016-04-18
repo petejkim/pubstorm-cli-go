@@ -58,6 +58,7 @@ var strs = map[string]map[string]string{
 		"access_token_cleared": "Access token cleared.",
 
 		"not_logged_in":   "You are not logged in. Please login by running `storm login` or create a new account by running `storm signup`.",
+		"login_expired":   "Your previous session has expired. Please login again by running `storm login`.",
 		"no_rise_project": "Could not find a PubStorm project in current working directory. To initialize a new PubStorm project here, run `storm init`.",
 
 		"something_wrong": "Something went wrong. Please try again.",

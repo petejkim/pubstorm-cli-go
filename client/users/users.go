@@ -16,7 +16,14 @@ const (
 	ErrCodeRequestFailed    = "request_failed"
 	ErrCodeUnexpectedError  = "unexpected_error"
 	ErrCodeValidationFailed = "validation_failed"
+	ErrCodeAuthFailed       = "auth_failed"
 )
+
+type User struct {
+	Email        string `json:"email"`
+	Name         string `json:"name"`
+	Organization string `json:"organization"`
+}
 
 func Create(email, password string) *apperror.Error {
 	res, err := goreq.Request{
@@ -31,10 +38,10 @@ func Create(email, password string) *apperror.Error {
 			"password": {password},
 		}.Encode(),
 	}.Do()
-
 	if err != nil {
 		return apperror.New(ErrCodeRequestFailed, err, "", true)
 	}
+	defer res.Body.Close()
 
 	if !util.ContainsInt([]int{http.StatusCreated, 422}, res.StatusCode) {
 		return apperror.New(ErrCodeUnexpectedError, err, "", true)
@@ -68,10 +75,10 @@ func Confirm(email, confirmationCode string) *apperror.Error {
 			"confirmation_code": {confirmationCode},
 		}.Encode(),
 	}.Do()
-
 	if err != nil {
 		return apperror.New(ErrCodeRequestFailed, err, "", true)
 	}
+	defer res.Body.Close()
 
 	if !util.ContainsInt([]int{http.StatusOK, 422}, res.StatusCode) {
 		return apperror.New(ErrCodeUnexpectedError, err, "", true)
@@ -108,10 +115,10 @@ func ResendConfirmationCode(email string) *apperror.Error {
 			"email": {email},
 		}.Encode(),
 	}.Do()
-
 	if err != nil {
 		return apperror.New(ErrCodeRequestFailed, err, "", true)
 	}
+	defer res.Body.Close()
 
 	if !util.ContainsInt([]int{http.StatusOK, 422}, res.StatusCode) {
 		return apperror.New(ErrCodeUnexpectedError, err, "", true)
@@ -136,6 +143,38 @@ func ResendConfirmationCode(email string) *apperror.Error {
 	return nil
 }
 
+func Show(token string) (*User, *apperror.Error) {
+	req := goreq.Request{
+		Method:    "GET",
+		Uri:       config.Host + "/user",
+		Accept:    config.ReqAccept,
+		UserAgent: config.UserAgent,
+	}
+	req.AddHeader("Authorization", "Bearer "+token)
+	res, err := req.Do()
+	if err != nil {
+		return nil, apperror.New(ErrCodeRequestFailed, err, "", true)
+	}
+	defer res.Body.Close()
+
+	if !util.ContainsInt([]int{http.StatusOK, http.StatusUnauthorized}, res.StatusCode) {
+		return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	if res.StatusCode == http.StatusUnauthorized {
+		return nil, apperror.New(ErrCodeAuthFailed, err, "", true)
+	}
+
+	var j struct {
+		User *User `json:"user"`
+	}
+	if err := res.Body.FromJsonTo(&j); err != nil {
+		return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	return j.User, nil
+}
+
 func ChangePassword(token, existingPassword, password string) *apperror.Error {
 	req := goreq.Request{
 		Method:      "PUT",
@@ -149,17 +188,17 @@ func ChangePassword(token, existingPassword, password string) *apperror.Error {
 			"password":          {password},
 		}.Encode(),
 	}
-
 	req.AddHeader("Authorization", "Bearer "+token)
 	res, err := req.Do()
-
 	if err != nil {
 		return apperror.New(ErrCodeRequestFailed, err, "", true)
 	}
+	defer res.Body.Close()
 
 	if !util.ContainsInt([]int{http.StatusOK, 422}, res.StatusCode) {
 		return apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
+
 	var j map[string]interface{}
 	if err := res.Body.FromJsonTo(&j); err != nil {
 		return apperror.New(ErrCodeUnexpectedError, err, "", true)
