@@ -2,8 +2,10 @@ package initcmd
 
 import (
 	"os"
+	"strings"
 
 	"github.com/codegangsta/cli"
+	"github.com/nitrous-io/rise-cli-go/apperror"
 	"github.com/nitrous-io/rise-cli-go/cli/common"
 	"github.com/nitrous-io/rise-cli-go/client/projects"
 	"github.com/nitrous-io/rise-cli-go/config"
@@ -83,6 +85,88 @@ func Init(c *cli.Context) {
 	}
 
 	log.Infof(tr.T("project_initialized"), proj.Name)
+	if err = proj.Save(); err != nil {
+		log.Fatal(err.Error())
+	}
+	log.Info(tr.T("rise_json_saved"))
+}
+
+func ReInit(c *cli.Context) {
+	token := common.RequireAccessToken()
+
+	projName := strings.TrimSpace(c.Args().First())
+	var (
+		proj   *project.Project
+		appErr *apperror.Error
+	)
+
+	currentProj, err := project.Load()
+	// Unexpected error on loading storm.json file
+	if err != nil && !os.IsNotExist(err) {
+		util.ExitIfError(err)
+	}
+
+	// Ask if a user wants to overwrite existing storm.json
+	if err == nil {
+		log.Infof(tr.T("existing_project"), currentProj.Name)
+		for {
+			reinit, err := readline.Read(tui.Bold(tr.T("re_init_project")+"? [y/N] "), true, "n")
+			util.ExitIfErrorOrEOF(err)
+
+			answer := strings.ToLower(reinit)
+			if answer == "n" || answer == "no" {
+				log.Infof(tr.T("re_init_project_aborted"))
+				return
+			}
+
+			// Continue to re-initialize the project
+			if answer == "y" || answer == "yes" {
+				break
+			}
+		}
+	}
+
+	if projName != "" {
+		if proj, appErr = projects.Get(token, projName); appErr != nil {
+			appErr.Handle()
+		}
+
+		// Assume project path is current directory
+		proj.Path = "."
+	} else {
+		// Ask project name interactively when the project name is not given
+		proj = &project.Project{}
+		for {
+			proj.Path, err = readline.Read(tui.Bold(tr.T("enter_project_path")+": [.] "), true, ".")
+			util.ExitIfErrorOrEOF(err)
+
+			if err := proj.ValidatePath(); err != nil {
+				log.Error(err.Error())
+				continue
+			}
+
+			break
+		}
+
+		for {
+			proj.Name, err = readline.Read(tui.Bold(tr.T("enter_project_name")+": "), true, "")
+			util.ExitIfErrorOrEOF(err)
+
+			if err := proj.ValidateName(); err != nil {
+				log.Error(err.Error())
+				continue
+			}
+
+			if _, appErr = projects.Get(token, proj.Name); appErr != nil {
+				appErr.Handle()
+				continue
+			}
+
+			break
+		}
+	}
+
+	log.Infof(tr.T("project_re_initialized"), proj.Name)
 	if err = proj.Save(); err != nil {
 		log.Fatal(err.Error())
 	}
