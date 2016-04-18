@@ -37,8 +37,10 @@ var _ = Describe("Users", func() {
 	})
 
 	type expectation struct {
-		resCode    int
-		resBody    string
+		resCode int
+		resBody string
+
+		user       *users.User
 		errIsNil   bool
 		errCode    string
 		errDesc    string
@@ -280,6 +282,76 @@ var _ = Describe("Users", func() {
 		Entry("successful confirmation", expectation{
 			resCode:  http.StatusOK,
 			resBody:  `{"sent": true}`,
+			errIsNil: true,
+		}),
+	)
+
+	DescribeTable("Show",
+		func(e expectation) {
+			server.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("GET", "/user"),
+					ghttp.VerifyHeader(http.Header{
+						"Accept":     {config.ReqAccept},
+						"User-Agent": {config.UserAgent},
+					}),
+					ghttp.RespondWith(e.resCode, e.resBody),
+				),
+			)
+
+			u, appErr := users.Show("t0k3n")
+			Expect(server.ReceivedRequests()).To(HaveLen(1))
+
+			if e.errIsNil {
+				Expect(appErr).To(BeNil())
+				Expect(u).To(Equal(e.user))
+			} else {
+				Expect(appErr).NotTo(BeNil())
+				Expect(appErr.Code).To(Equal(e.errCode))
+				Expect(appErr.Description).To(ContainSubstring(e.errDesc))
+				Expect(appErr.IsFatal).To(Equal(e.errIsFatal))
+			}
+		},
+
+		Entry("unexpected response code", expectation{
+			resCode:    http.StatusInternalServerError,
+			resBody:    "",
+			errIsNil:   false,
+			errCode:    users.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("malformed json", expectation{
+			resCode:    http.StatusOK,
+			resBody:    `{"foo": }`,
+			errIsNil:   false,
+			errCode:    users.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("401 Unauthorized", expectation{
+			resCode:    http.StatusUnauthorized,
+			resBody:    ``,
+			errIsNil:   false,
+			errCode:    users.ErrCodeAuthFailed,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("200 OK", expectation{
+			resCode: http.StatusOK,
+			resBody: `{"user": {
+				"email": "foo@example.com",
+				"name": "Foo Boss",
+				"organization": "FooBarWidget"
+			}}`,
+			user: &users.User{
+				Email:        "foo@example.com",
+				Name:         "Foo Boss",
+				Organization: "FooBarWidget",
+			},
 			errIsNil: true,
 		}),
 	)

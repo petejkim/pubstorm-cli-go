@@ -32,6 +32,7 @@ func Forgot(email string) *apperror.Error {
 	if err != nil {
 		return apperror.New(ErrCodeRequestFailed, err, "", true)
 	}
+	defer res.Body.Close()
 
 	if !util.ContainsInt([]int{http.StatusOK, 422}, res.StatusCode) {
 		return apperror.New(ErrCodeUnexpectedError, err, "", true)
@@ -74,6 +75,7 @@ func Reset(email, resetToken, newPassword string) *apperror.Error {
 	if err != nil {
 		return apperror.New(ErrCodeRequestFailed, err, "", true)
 	}
+	defer res.Body.Close()
 
 	if !util.ContainsInt([]int{http.StatusOK, http.StatusForbidden, 422}, res.StatusCode) {
 		return apperror.New(ErrCodeUnexpectedError, err, "", true)

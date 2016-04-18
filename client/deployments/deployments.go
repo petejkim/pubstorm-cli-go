@@ -88,7 +88,7 @@ func Create(token, name, bunPath string, quiet bool) (depl *Deployment, appErr *
 
 	if res.StatusCode == http.StatusAccepted {
 		var j struct {
-			Deployment Deployment `json: "deployment"`
+			Deployment Deployment `json:"deployment"`
 		}
 
 		if err := res.Body.FromJsonTo(&j); err != nil {
@@ -137,7 +137,7 @@ func Get(token, projectName string, deploymentID uint) (depl *Deployment, appErr
 
 	if res.StatusCode == http.StatusOK {
 		var j struct {
-			Deployment *Deployment `json: "deployment"`
+			Deployment *Deployment `json:"deployment"`
 		}
 
 		if err := res.Body.FromJsonTo(&j); err != nil {

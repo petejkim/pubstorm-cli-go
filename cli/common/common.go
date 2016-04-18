@@ -10,6 +10,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/franela/goreq"
+	"github.com/nitrous-io/rise-cli-go/client/users"
 	"github.com/nitrous-io/rise-cli-go/config"
 	"github.com/nitrous-io/rise-cli-go/project"
 	"github.com/nitrous-io/rise-cli-go/tr"
@@ -43,6 +44,23 @@ func RequireAccessToken() string {
 	if token == "" {
 		log.Fatal(tr.T("not_logged_in"))
 	}
+
+	_, appErr := users.Show(token)
+	if appErr != nil {
+		if appErr.Code == users.ErrCodeAuthFailed {
+			// Remove saved access token since it's invalid.
+			config.Email = ""
+			config.AccessToken = ""
+			if err := config.Save(); err != nil {
+				DebugLog().Warnf("failed to remove access token from config, err: %v", err)
+			}
+
+			log.Fatal(tr.T("login_expired"))
+		}
+
+		appErr.Handle()
+	}
+
 	return token
 }
 
