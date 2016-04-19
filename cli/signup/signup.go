@@ -24,8 +24,8 @@ func Signup(c *cli.Context) {
 	common.PrintLogo()
 	tui.Println(tui.Bold(tr.T("join_rise")) + "\n")
 	tui.Println(tr.T("signup_disclaimer") + "\n")
-	tui.Println("  * " + tr.T("rise_tos") + " - " + tui.Undl(tui.Blu(config.WebsiteHost+"/terms-of-service")))
-	tui.Println("  * " + tr.T("rise_privacy_policy") + " - " + tui.Undl(tui.Blu(config.WebsiteHost+"/privacy-policy")) + "\n")
+	tui.Println("  * " + tr.T("rise_tos") + " - " + tui.Undl(config.WebsiteHost+"/terms-of-service"))
+	tui.Println("  * " + tr.T("rise_privacy_policy") + " - " + tui.Undl(config.WebsiteHost+"/privacy-policy") + "\n")
 
 	for {
 		email, err = readline.Read(tui.Bold(tr.T("enter_email")+": "), true, "")

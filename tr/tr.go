@@ -81,7 +81,8 @@ var strs = map[string]map[string]string{
 		"bundle_size_exceeded":      "Your bundle size cannot exceed %s!",
 		"uploading_bundle":          "Uploading bundle \"%s\" to PubStorm Cloud...",
 		"launching":                 "Launching v%d...",
-		"published":                 "%s published on PubStorm Cloud.",
+		"published":                 "Successfully published \"%s\" on PubStorm Cloud.",
+		"published_no_domain":       "Successfully published \"%s\" on PubStorm Cloud, but no domain name is configured. To add a domain name, run `storm domains add`.",
 
 		"ignore_file_reason":    "Ignoring \"%s\", %s...",
 		"symlink_error":         "could not follow symlink",

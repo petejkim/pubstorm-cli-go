@@ -109,7 +109,7 @@ func Reset(c *cli.Context) {
 
 		appErr := password.Forgot(email)
 		if appErr == nil {
-			log.Infof(tr.T("reset_password_email_sent"), tui.Bold(tui.Blu(email)))
+			log.Infof(tr.T("reset_password_email_sent"), tui.Bold(email))
 			tui.Println()
 			break
 		}

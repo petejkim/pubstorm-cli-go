@@ -10,7 +10,6 @@ import (
 	"github.com/nitrous-io/rise-cli-go/client/projects"
 	"github.com/nitrous-io/rise-cli-go/config"
 	"github.com/nitrous-io/rise-cli-go/pkg/readline"
-	"github.com/nitrous-io/rise-cli-go/project"
 	"github.com/nitrous-io/rise-cli-go/tr"
 	"github.com/nitrous-io/rise-cli-go/tui"
 	"github.com/nitrous-io/rise-cli-go/util"
@@ -88,7 +87,7 @@ func Add(c *cli.Context) {
 	}
 	log.Info(dns_inst)
 	tui.Println()
-	log.Infof(tr.T("dns_more_info"), tui.Undl(tui.Blu(config.DNSHelpURL)))
+	log.Infof(tr.T("dns_more_info"), tui.Undl(config.DNSHelpURL))
 }
 
 func Remove(c *cli.Context) {
