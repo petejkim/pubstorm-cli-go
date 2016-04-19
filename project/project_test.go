@@ -45,6 +45,24 @@ var _ = Describe("Project", func() {
 		Entry("disallows special characters", "good&one", project.ErrNameInvalid),
 	)
 
+	DescribeTable("DefaultDomain()",
+		func(name, expectedDomain string) {
+			origDefaultDomain := config.DefaultDomain
+			config.DefaultDomain = "test.dev"
+			defer func() {
+				config.DefaultDomain = origDefaultDomain
+			}()
+			proj := &project.Project{Name: name}
+			result := proj.DefaultDomain()
+
+			Expect(result).To(Equal(expectedDomain))
+		},
+
+		Entry("equals", "aaa", "aaa.test.dev"),
+		Entry("equals", "foo-1", "foo-1.test.dev"),
+		Entry("equals", "完成", "完成.test.dev"),
+	)
+
 	Describe("file system dependent tests", func() {
 		var (
 			currDir string
