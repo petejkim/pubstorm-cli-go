@@ -16,8 +16,8 @@ import (
 )
 
 func Rollback(c *cli.Context) {
-	common.RequireAccessToken()
-	proj := common.RequireProject()
+	token := common.RequireAccessToken()
+	proj := common.RequireProject(token)
 
 	var (
 		verStr = c.Args().First()

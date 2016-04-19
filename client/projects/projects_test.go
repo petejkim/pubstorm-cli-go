@@ -144,11 +144,12 @@ var _ = Describe("Projects", func() {
 				),
 			)
 
-			appErr := projects.Get("t0k3n", "foo-bar-express")
+			result, appErr := projects.Get("t0k3n", "foo-bar-express")
 			Expect(server.ReceivedRequests()).To(HaveLen(1))
 
 			if e.errIsNil {
 				Expect(appErr).To(BeNil())
+				Expect(result).To(Equal(e.result))
 			} else {
 				Expect(appErr).NotTo(BeNil())
 				Expect(appErr.Code).To(Equal(e.errCode))
@@ -177,8 +178,9 @@ var _ = Describe("Projects", func() {
 
 		Entry("successfully fetched", expectation{
 			resCode:  http.StatusOK,
-			resBody:  `{"project": {"name": "foo-bar-express" }}`,
+			resBody:  `{"project": {"name": "foo-bar-express", "default_domain_enabled": true }}`,
 			errIsNil: true,
+			result:   &project.Project{Name: "foo-bar-express", DefaultDomainEnabled: true},
 		}),
 	)
 

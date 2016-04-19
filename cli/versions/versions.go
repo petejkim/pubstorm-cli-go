@@ -13,8 +13,8 @@ import (
 )
 
 func Versions(c *cli.Context) {
-	common.RequireAccessToken()
-	proj := common.RequireProject()
+	token := common.RequireAccessToken()
+	proj := common.RequireProject(token)
 
 	depls, appErr := deployments.List(config.AccessToken, proj.Name)
 	if appErr != nil {

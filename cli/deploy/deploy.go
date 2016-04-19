@@ -25,16 +25,8 @@ import (
 func Deploy(c *cli.Context) {
 	verbose := c.Bool("verbose")
 
-	common.RequireAccessToken()
-	proj := common.RequireProject()
-
-	appErr := projects.Get(config.AccessToken, proj.Name)
-	if appErr != nil {
-		if appErr.Code == projects.ErrCodeNotFound {
-			log.Fatalf(tr.T("project_not_found"), proj.Name)
-		}
-		appErr.Handle()
-	}
+	token := common.RequireAccessToken()
+	proj := common.RequireProject(token)
 
 	absPath, err := filepath.Abs(proj.Path)
 	util.ExitIfError(err)

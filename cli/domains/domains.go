@@ -10,6 +10,7 @@ import (
 	"github.com/nitrous-io/rise-cli-go/client/projects"
 	"github.com/nitrous-io/rise-cli-go/config"
 	"github.com/nitrous-io/rise-cli-go/pkg/readline"
+	"github.com/nitrous-io/rise-cli-go/project"
 	"github.com/nitrous-io/rise-cli-go/tr"
 	"github.com/nitrous-io/rise-cli-go/tui"
 	"github.com/nitrous-io/rise-cli-go/util"
@@ -18,8 +19,8 @@ import (
 )
 
 func List(c *cli.Context) {
-	common.RequireAccessToken()
-	proj := common.RequireProject()
+	token := common.RequireAccessToken()
+	proj := common.RequireProject(token)
 
 	domainNames, appErr := domains.Index(config.AccessToken, proj.Name)
 	if appErr != nil {
@@ -36,8 +37,8 @@ func List(c *cli.Context) {
 }
 
 func Add(c *cli.Context) {
-	common.RequireAccessToken()
-	proj := common.RequireProject()
+	token := common.RequireAccessToken()
+	proj := common.RequireProject(token)
 
 	domainName := strings.TrimSpace(c.Args().First())
 
@@ -91,10 +92,10 @@ func Add(c *cli.Context) {
 }
 
 func Remove(c *cli.Context) {
-	common.RequireAccessToken()
-	proj := common.RequireProject()
+	token := common.RequireAccessToken()
+	proj := common.RequireProject(token)
 
-	domainName := c.Args().First()
+	domainName := strings.TrimSpace(c.Args().First())
 
 	var err error
 	interactive := domainName == ""

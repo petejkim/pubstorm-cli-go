@@ -11,11 +11,15 @@ import (
 )
 
 type Project struct {
-	Name string
-	Path string
+	Name string `json:"name"`
+	Path string `json:"path"`
 
-	EnableStats bool
-	ForceHTTPS  bool
+	DefaultDomainEnabled bool `json:"default_domain_enabled"`
+
+	// TODO These 2 flags should be read from the API server (like
+	// DefaultDomainEnabled).
+	EnableStats bool `json:"enable_stats"`
+	ForceHTTPS  bool `json:"force_https"`
 }
 
 var (
@@ -71,12 +75,7 @@ func (p *Project) Save() error {
 	}
 	defer f.Close()
 
-	return json.NewEncoder(f).Encode(map[string]interface{}{
-		"name":         p.Name,
-		"path":         p.Path,
-		"enable_stats": p.EnableStats,
-		"force_https":  p.ForceHTTPS,
-	})
+	return json.NewEncoder(f).Encode(p)
 }
 
 func Load() (*Project, error) {
@@ -86,23 +85,12 @@ func Load() (*Project, error) {
 	}
 	defer f.Close()
 
-	var j struct {
-		Name        string `json:"name"`
-		Path        string `json:"path"`
-		EnableStats bool   `json:"enable_stats"`
-		ForceHTTPS  bool   `json:"force_https"`
-	}
-
-	if err = json.NewDecoder(f).Decode(&j); err != nil {
+	proj := Project{}
+	if err = json.NewDecoder(f).Decode(&proj); err != nil {
 		return nil, err
 	}
 
-	return &Project{
-		Name:        j.Name,
-		Path:        j.Path,
-		EnableStats: j.EnableStats,
-		ForceHTTPS:  j.ForceHTTPS,
-	}, nil
+	return &proj, nil
 }
 
 // Delete project json file
