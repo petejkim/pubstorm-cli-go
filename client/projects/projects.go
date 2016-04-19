@@ -58,7 +58,7 @@ func Create(token, name string) *apperror.Error {
 	return nil
 }
 
-func Get(token, name string) *apperror.Error {
+func Get(token, name string) (*project.Project, *apperror.Error) {
 	uri := fmt.Sprintf("%s/projects/%s", config.Host, name)
 	req := goreq.Request{
 		Method:    "GET",
@@ -70,21 +70,26 @@ func Get(token, name string) *apperror.Error {
 
 	res, err := req.Do()
 	if err != nil {
-		return apperror.New(ErrCodeRequestFailed, err, "", true)
+		return nil, apperror.New(ErrCodeRequestFailed, err, "", true)
 	}
 	defer res.Body.Close()
 
 	if !util.ContainsInt([]int{http.StatusOK, http.StatusNotFound}, res.StatusCode) {
-		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+		return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
 
-	if res.StatusCode == http.StatusOK {
-		return nil
-	} else if res.StatusCode == http.StatusNotFound {
-		return apperror.New(ErrCodeNotFound, nil, fmt.Sprintf(tr.T("project_not_found"), name), true)
+	if res.StatusCode == http.StatusNotFound {
+		return nil, apperror.New(ErrCodeNotFound, nil, fmt.Sprintf(tr.T("project_not_found"), name), true)
 	}
 
-	return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	var j struct {
+		Project *project.Project `json:"project"`
+	}
+	if err := res.Body.FromJsonTo(&j); err != nil {
+		return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	return j.Project, nil
 }
 
 func Index(token string) (projects []*project.Project, sharedProjects []*project.Project, appErr *apperror.Error) {
@@ -111,7 +116,6 @@ func Index(token string) (projects []*project.Project, sharedProjects []*project
 		Projects       []*project.Project `json:"projects"`
 		SharedProjects []*project.Project `json:"shared_projects"`
 	}
-
 	if err := res.Body.FromJsonTo(&j); err != nil {
 		return nil, nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
@@ -126,7 +130,6 @@ func Delete(token, name string) *apperror.Error {
 		Accept:    config.ReqAccept,
 		UserAgent: config.UserAgent,
 	}
-
 	req.AddHeader("Authorization", "Bearer "+token)
 	res, err := req.Do()
 	if err != nil {

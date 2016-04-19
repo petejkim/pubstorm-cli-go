@@ -10,6 +10,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/franela/goreq"
+	"github.com/nitrous-io/rise-cli-go/client/projects"
 	"github.com/nitrous-io/rise-cli-go/config"
 	"github.com/nitrous-io/rise-cli-go/project"
 	"github.com/nitrous-io/rise-cli-go/tr"
@@ -46,12 +47,23 @@ func RequireAccessToken() string {
 	return token
 }
 
-func RequireProject() *project.Project {
+func RequireProject(accessToken string) *project.Project {
 	proj, err := project.Load()
 	if os.IsNotExist(err) {
 		log.Fatal(tr.T("no_rise_project"))
 	}
 	util.ExitIfError(err)
+
+	apiProj, appErr := projects.Get(accessToken, proj.Name)
+	if appErr != nil {
+		if appErr.Code == projects.ErrCodeNotFound {
+			log.Fatalf(tr.T("project_not_found"), proj.Name)
+		}
+		appErr.Handle()
+	}
+
+	proj.DefaultDomainEnabled = apiProj.DefaultDomainEnabled
+
 	return proj
 }
 
