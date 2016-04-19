@@ -3,6 +3,7 @@ package projects_test
 import (
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -38,8 +39,10 @@ var _ = Describe("Projects", func() {
 	})
 
 	type expectation struct {
-		resCode    int
-		resBody    string
+		proj    *project.Project
+		resCode int
+		resBody string
+
 		errIsNil   bool
 		errCode    string
 		errDesc    string
@@ -279,6 +282,85 @@ var _ = Describe("Projects", func() {
 				},
 			},
 			errIsNil: true,
+		}),
+	)
+
+	DescribeTable("Update",
+		func(e expectation) {
+			server.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("PUT", "/projects/"+e.proj.Name),
+					ghttp.VerifyHeader(http.Header{
+						"Authorization": {"Bearer t0k3n"},
+						"Content-Type":  {"application/x-www-form-urlencoded"},
+						"Accept":        {config.ReqAccept},
+						"User-Agent":    {config.UserAgent},
+					}),
+					ghttp.VerifyForm(url.Values{
+						"default_domain_enabled": {
+							strconv.FormatBool(e.proj.DefaultDomainEnabled),
+						},
+					}),
+					ghttp.RespondWith(e.resCode, e.resBody),
+				),
+			)
+
+			result, appErr := projects.Update("t0k3n", e.proj)
+			Expect(server.ReceivedRequests()).To(HaveLen(1))
+
+			if e.errIsNil {
+				Expect(appErr).To(BeNil())
+				Expect(result).To(Equal(e.result))
+			} else {
+				Expect(appErr).NotTo(BeNil())
+				Expect(appErr.Code).To(Equal(e.errCode))
+				Expect(strings.ToLower(appErr.Description)).To(ContainSubstring(strings.ToLower(e.errDesc)))
+				Expect(appErr.IsFatal).To(Equal(e.errIsFatal))
+			}
+		},
+
+		Entry("unexpected response code", expectation{
+			proj:       &project.Project{Name: "foo-bar-express"},
+			resCode:    http.StatusInternalServerError,
+			resBody:    "",
+			errIsNil:   false,
+			errCode:    projects.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("malformed json", expectation{
+			proj:       &project.Project{Name: "foo-bar-express"},
+			resCode:    http.StatusOK,
+			resBody:    `{"foo": }`,
+			errIsNil:   false,
+			errCode:    projects.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("successful update", expectation{
+			proj:     &project.Project{Name: "foo-bar-express"},
+			resCode:  http.StatusOK,
+			resBody:  `{"project": { "name": "foo-bar-express", "default_domain_enabled": true }}`,
+			errIsNil: true,
+			result:   &project.Project{Name: "foo-bar-express", DefaultDomainEnabled: true},
+		}),
+
+		Entry("successful update to set default domain enabled to true", expectation{
+			proj:     &project.Project{Name: "foo-bar-express", DefaultDomainEnabled: true},
+			resCode:  http.StatusOK,
+			resBody:  `{"project": { "name": "foo-bar-express", "default_domain_enabled": true }}`,
+			errIsNil: true,
+			result:   &project.Project{Name: "foo-bar-express", DefaultDomainEnabled: true},
+		}),
+
+		Entry("successful update to set default domain enabled to false", expectation{
+			proj:     &project.Project{Name: "foo-bar-express", DefaultDomainEnabled: false},
+			resCode:  http.StatusOK,
+			resBody:  `{"project": { "name": "foo-bar-express", "default_domain_enabled": false }}`,
+			errIsNil: true,
+			result:   &project.Project{Name: "foo-bar-express", DefaultDomainEnabled: false},
 		}),
 	)
 
