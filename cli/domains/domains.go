@@ -10,6 +10,7 @@ import (
 	"github.com/nitrous-io/rise-cli-go/client/projects"
 	"github.com/nitrous-io/rise-cli-go/config"
 	"github.com/nitrous-io/rise-cli-go/pkg/readline"
+	"github.com/nitrous-io/rise-cli-go/project"
 	"github.com/nitrous-io/rise-cli-go/tr"
 	"github.com/nitrous-io/rise-cli-go/tui"
 	"github.com/nitrous-io/rise-cli-go/util"
@@ -17,11 +18,14 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
+// If the user types in this value, they're referring to the default domain.
+const defaultDomainArg = "default"
+
 func List(c *cli.Context) {
 	token := common.RequireAccessToken()
 	proj := common.RequireProject(token)
 
-	domainNames, appErr := domains.Index(config.AccessToken, proj.Name)
+	domainNames, appErr := domains.Index(token, proj.Name)
 	if appErr != nil {
 		if appErr.Code == projects.ErrCodeNotFound {
 			log.Fatalf(tr.T("project_not_found"), proj.Name)
@@ -52,7 +56,29 @@ func Add(c *cli.Context) {
 
 		domainName = util.SanitizeDomain(domainName)
 
-		appErr := domains.Create(config.AccessToken, proj.Name, domainName)
+		if isDefaultDomain(domainName, proj) {
+			// If default domain is already enabled, there's nothing to do.
+			if proj.DefaultDomainEnabled {
+				log.Infof(tr.T("default_domain_already_added"), proj.DefaultDomain(), proj.Name)
+				return
+			}
+
+			// Enable the default domain.
+			proj.DefaultDomainEnabled = true
+			updatedProj, appErr := projects.Update(token, proj)
+			if appErr != nil {
+				appErr.Handle()
+			}
+
+			proj = updatedProj
+
+			log.Infof(tr.T("default_domain_added"), proj.DefaultDomain(), proj.Name)
+
+			return
+		}
+
+		// Add a "regular" custom domain.
+		appErr := domains.Create(token, proj.Name, domainName)
 		if appErr != nil {
 			if appErr.Code == domains.ErrCodeValidationFailed {
 				if interactive {
@@ -78,10 +104,9 @@ func Add(c *cli.Context) {
 	tui.Println()
 
 	subDn, Dn := util.SplitDomain(domainName)
-	riseDn := fmt.Sprintf("%s.%s", proj.Name, config.DefaultDomain)
 
 	dns_inst := fmt.Sprintf(tr.T("dns_instructions"), Dn) + "\n\n"
-	dns_inst += fmt.Sprintf("  * %s: %s ---> %s", tui.Bold("CNAME (Alias)"), tui.Undl(subDn), tui.Undl(riseDn))
+	dns_inst += fmt.Sprintf("  * %s: %s ---> %s", tui.Bold("CNAME (Alias)"), tui.Undl(subDn), tui.Undl(proj.DefaultDomain()))
 	if subDn == "www" {
 		dns_inst += fmt.Sprintf("\n  * %s: %s ---> %s", tui.Bold("A (Host)"), tui.Undl("@"), tui.Undl(config.RedirectorIP))
 	}
@@ -96,7 +121,10 @@ func Remove(c *cli.Context) {
 
 	domainName := strings.TrimSpace(c.Args().First())
 
-	var err error
+	var (
+		err       error
+		isDefault bool
+	)
 	interactive := domainName == ""
 
 	for {
@@ -107,16 +135,27 @@ func Remove(c *cli.Context) {
 
 		domainName = util.SanitizeDomain(domainName)
 
-		if domainName == proj.Name+"."+config.DefaultDomain {
-			if interactive {
-				log.Errorf(tr.T("domain_cannot_be_deleted"), domainName)
-				continue
-			} else {
-				log.Fatalf(tr.T("domain_cannot_be_deleted"), domainName)
+		isDefault = isDefaultDomain(domainName, proj)
+		if isDefault {
+			// If default domain is already disabled, there's nothing to do.
+			if !proj.DefaultDomainEnabled {
+				log.Infof(tr.T("default_domain_already_removed"), proj.DefaultDomain(), proj.Name)
+				return
 			}
+
+			// Disable the default domain.
+			proj.DefaultDomainEnabled = false
+			updatedProj, appErr := projects.Update(token, proj)
+			if appErr != nil {
+				appErr.Handle()
+			}
+
+			proj = updatedProj
+			break
 		}
 
-		appErr := domains.Delete(config.AccessToken, proj.Name, domainName)
+		// Delete a "regular" custom domain.
+		appErr := domains.Delete(token, proj.Name, domainName)
 		if appErr != nil {
 			if appErr.Code == domains.ErrCodeNotFound {
 				if strings.Contains(appErr.Description, "project") {
@@ -138,5 +177,13 @@ func Remove(c *cli.Context) {
 		}
 	}
 
-	log.Infof(tr.T("domain_removed"), domainName, proj.Name)
+	if isDefault {
+		log.Infof(tr.T("default_domain_removed"), proj.DefaultDomain(), proj.Name)
+	} else {
+		log.Infof(tr.T("domain_removed"), domainName, proj.Name)
+	}
+}
+
+func isDefaultDomain(domain string, proj *project.Project) bool {
+	return domain == defaultDomainArg || domain == proj.DefaultDomain()
 }

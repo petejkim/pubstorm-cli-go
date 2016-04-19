@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -148,11 +149,17 @@ func main() {
 					Name:   "add",
 					Usage:  tr.T("domains_add_desc"),
 					Action: domains.Add,
+					ArgsUsage: fmt.Sprintf(`[domain]
+
+      domain - Domain to add. Specify "default" to enable the default .%s domain]`, config.DefaultDomain),
 				},
 				{
 					Name:   "rm",
 					Usage:  tr.T("domains_rm_desc"),
 					Action: domains.Remove,
+					ArgsUsage: fmt.Sprintf(`[domain]
+
+      domain - Domain to remove. Specify "default" to disable the default .%s domain]`, config.DefaultDomain),
 				},
 			},
 		},
@@ -160,11 +167,17 @@ func main() {
 			Name:   "domains.add",
 			Usage:  tr.T("domains_add_desc"),
 			Action: domains.Add,
+			ArgsUsage: fmt.Sprintf(`[domain]
+
+      domain - Domain to add. Specify "default" to enable the default .%s domain]`, config.DefaultDomain),
 		},
 		{
 			Name:   "domains.rm",
 			Usage:  tr.T("domains_rm_desc"),
 			Action: domains.Remove,
+			ArgsUsage: fmt.Sprintf(`[domain]
+
+      domain - Domain to remove. Specify "default" to disable the default .%s domain]`, config.DefaultDomain),
 		},
 		{
 			Name:   "projects",
