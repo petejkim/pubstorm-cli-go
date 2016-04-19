@@ -3,6 +3,7 @@ package project
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -32,6 +33,10 @@ var (
 	ErrPathNotExist    = errors.New("Path does not exist")
 	ErrPathNotDir      = errors.New("Path must be a directory")
 )
+
+func (p *Project) DefaultDomain() string {
+	return fmt.Sprintf("%s.%s", p.Name, config.DefaultDomain)
+}
 
 // Validates name
 func (p *Project) ValidateName() error {
