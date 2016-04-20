@@ -17,6 +17,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
+// List displays all domains belonging to a user's project.
 func List(c *cli.Context) {
 	common.RequireAccessToken()
 	proj := common.RequireProject()
@@ -35,6 +36,7 @@ func List(c *cli.Context) {
 	}
 }
 
+// Add creates a new custom domain for a user's project.
 func Add(c *cli.Context) {
 	common.RequireAccessToken()
 	proj := common.RequireProject()
@@ -80,16 +82,17 @@ func Add(c *cli.Context) {
 	subDn, Dn := util.SplitDomain(domainName)
 	riseDn := fmt.Sprintf("%s.%s", proj.Name, config.DefaultDomain)
 
-	dns_inst := fmt.Sprintf(tr.T("dns_instructions"), Dn) + "\n\n"
-	dns_inst += fmt.Sprintf("  * %s: %s ---> %s", tui.Bold("CNAME (Alias)"), tui.Undl(subDn), tui.Undl(riseDn))
+	dnsInst := fmt.Sprintf(tr.T("dns_instructions"), Dn) + "\n\n"
+	dnsInst += fmt.Sprintf("  * %s: %s ---> %s", tui.Bold("CNAME (Alias)"), tui.Undl(subDn), tui.Undl(riseDn))
 	if subDn == "www" {
-		dns_inst += fmt.Sprintf("\n  * %s: %s ---> %s", tui.Bold("A (Host)"), tui.Undl("@"), tui.Undl(config.RedirectorIP))
+		dnsInst += fmt.Sprintf("\n  * %s: %s ---> %s", tui.Bold("A (Host)"), tui.Undl("@"), tui.Undl(config.RedirectorIP))
 	}
-	log.Info(dns_inst)
+	log.Info(dnsInst)
 	tui.Println()
 	log.Infof(tr.T("dns_more_info"), tui.Undl(tui.Blu(config.DNSHelpURL)))
 }
 
+// Remove removes a custom domain from a user's project.
 func Remove(c *cli.Context) {
 	common.RequireAccessToken()
 	proj := common.RequireProject()
