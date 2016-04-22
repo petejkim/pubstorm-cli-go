@@ -101,6 +101,34 @@ func Create(c *cli.Context) {
 	tui.Printf(tui.Undl(tui.Bold(tr.T("cert_uploaded")))+"\n", proj.Name, domainName)
 }
 
+func Get(c *cli.Context) {
+	token := common.RequireAccessToken()
+	proj := common.RequireProject(token)
+
+	if len(c.Args()) < 1 {
+		cli.ShowCommandHelp(c, c.Command.Name)
+		return
+	}
+
+	domainName := util.SanitizeDomain(c.Args().Get(0))
+	ct, appErr := certs.Get(token, proj.Name, domainName)
+	if appErr != nil {
+		switch appErr.Code {
+		case certs.ErrCodeProjectNotFound:
+			log.Fatalf(tr.T("project_not_found"), proj.Name)
+		case certs.ErrCodeNotFound:
+			log.Fatalf(tr.T("cert_not_found"), domainName)
+		}
+
+		appErr.Handle()
+	}
+
+	tui.Printf(tui.Undl(tui.Bold(tr.T("cert_details")+":"))+"\n", domainName)
+	tui.Println(tr.T("cert_common_name") + ": " + ct.CommonName)
+	tui.Println(tr.T("cert_starts_at") + ": " + ct.StartsAt.String())
+	tui.Println(tr.T("cert_expires_at") + ": " + ct.ExpiresAt.String())
+}
+
 func checkCertFile(filePath string) error {
 	fi, err := os.Stat(filePath)
 	if err != nil {

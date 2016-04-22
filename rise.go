@@ -240,6 +240,12 @@ func main() {
 			Action: versions.Versions,
 		},
 		{
+			Name:      "certs.info",
+			Usage:     tr.T("cert_info_desc"),
+			Action:    certs.Get,
+			ArgsUsage: "DOMAIN",
+		},
+		{
 			Name:      "certs.upload",
 			Usage:     tr.T("cert_upload_desc"),
 			Action:    certs.Create,
@@ -248,6 +254,12 @@ func main() {
 		{
 			Name: "certs",
 			Subcommands: []cli.Command{
+				{
+					Name:      "info",
+					Usage:     tr.T("cert_info_desc"),
+					Action:    certs.Get,
+					ArgsUsage: "DOMAIN",
+				},
 				{
 					Name:      "upload",
 					Usage:     tr.T("cert_upload_desc"),
