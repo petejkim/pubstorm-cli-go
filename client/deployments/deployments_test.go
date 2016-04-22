@@ -152,7 +152,7 @@ var _ = Describe("Deployments", func() {
 			resCode:  http.StatusAccepted,
 			resBody:  `{"deployment": {"id": 10, "state": "uploaded" }}`,
 			errIsNil: true,
-			result:   &deployments.Deployment{10, "uploaded"},
+			result:   &deployments.Deployment{ID: 10, State: "uploaded"},
 		}),
 	)
 

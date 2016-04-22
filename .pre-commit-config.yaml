@@ -1,0 +1,13 @@
+-   repo: git://github.com/pre-commit/pre-commit-hooks
+    language: script
+    sha: 17478a0a50faf20fd8e5b3fefe7435cea410df0b
+    hooks:
+    -   id: trailing-whitespace
+    -   id: check-merge-conflict
+-   repo: git://github.com/nitrous-io/golang-pre-commit-hooks
+    sha: 895710777127b8f3dd52bbb867d287d4211dc83c
+    hooks:
+    -   id: go-lint
+    -   id: go-vet
+    -   id: go-fmt
+    -   id: go-metalinter

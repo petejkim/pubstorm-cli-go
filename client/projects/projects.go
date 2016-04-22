@@ -13,6 +13,7 @@ import (
 	"github.com/nitrous-io/rise-cli-go/util"
 )
 
+// Error codes for apperror.Error returned from this package.
 const (
 	ErrCodeRequestFailed    = "request_failed"
 	ErrCodeUnexpectedError  = "unexpected_error"
@@ -20,6 +21,7 @@ const (
 	ErrCodeNotFound         = "not_found"
 )
 
+// Create makes an API request to create a project with the given name.
 func Create(token, name string) *apperror.Error {
 	req := goreq.Request{
 		Method:      "POST",
@@ -58,6 +60,7 @@ func Create(token, name string) *apperror.Error {
 	return nil
 }
 
+// Get makes an API request for the project with the given name.
 func Get(token, name string) *apperror.Error {
 	uri := fmt.Sprintf("%s/projects/%s", config.Host, name)
 	req := goreq.Request{
@@ -87,6 +90,7 @@ func Get(token, name string) *apperror.Error {
 	return apperror.New(ErrCodeUnexpectedError, err, "", true)
 }
 
+// Index makes an API request for all projects.
 func Index(token string) (projects []*project.Project, sharedProjects []*project.Project, appErr *apperror.Error) {
 	uri := fmt.Sprintf("%s/projects", config.Host)
 	req := goreq.Request{
@@ -119,6 +123,7 @@ func Index(token string) (projects []*project.Project, sharedProjects []*project
 	return j.Projects, j.SharedProjects, nil
 }
 
+// Delete makes an API request to delete the project with the given name.
 func Delete(token, name string) *apperror.Error {
 	req := goreq.Request{
 		Method:    "DELETE",
