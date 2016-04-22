@@ -14,7 +14,7 @@ var strs = map[string]map[string]string{
 		"publish_verbose":         "Show additional information",
 		"domains_desc":            "List all domains for a PubStorm project",
 		"domains_add_desc":        "Add a new domain to a PubStorm project",
-		"domains_add_args":        "[DOMAIN]\n\nDOMAIN: Domain to add. Specify \"default\" to enable the default .%s domain.",
+		"domains_add_args":        "[DOMAIN] [CRT_FILE_PATH] [KEY_FILE_PATH]\n\nDOMAIN: Domain to add. Specify \"default\" to enable the default .%s domain.",
 		"domains_rm_desc":         "Remove a domain from a PubStorm project",
 		"domains_rm_args":         "[DOMAIN]\n\nDOMAIN: Domain to remove. Specify \"default\" to disable the default .%s domain.",
 		"projects_desc":           "List your PubStorm projects",
@@ -164,9 +164,10 @@ var strs = map[string]map[string]string{
 
 		"versions_list": "Completed deployments for \"%s\"",
 
+		"will_upload_cert":        "Uploading your ssl cert",
 		"cert_uploaded":           "Successfully uploaded ssl cert to project \"%s\" for domain \"%s\"",
 		"cert_file_not_found":     "\"%s\" file could not be found",
-		"cert_file_invalid":       "\"%s\" is invalid",
+		"cert_file_invalid":       "\"%s\" file is invalid",
 		"cert_not_allowed_domain": "You cannot upload ssl cert for domain \"%s\"",
 		"cert_too_large":          "The given cert file size is too large",
 		"cert_invalid":            "The given cert file is not valid",
@@ -178,6 +179,7 @@ var strs = map[string]map[string]string{
 		"cert_common_name":        "Common Name",
 		"cert_starts_at":          "Starts At",
 		"cert_expires_at":         "Expires At",
+		"want_upload_cert":        "Would you like to upload ssl cert for the domain",
 	},
 }
 
