@@ -4,7 +4,6 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/nitrous-io/rise-cli-go/cli/common"
 	"github.com/nitrous-io/rise-cli-go/client/collaborators"
-	"github.com/nitrous-io/rise-cli-go/config"
 	"github.com/nitrous-io/rise-cli-go/pkg/readline"
 	"github.com/nitrous-io/rise-cli-go/tr"
 	"github.com/nitrous-io/rise-cli-go/tui"
@@ -14,10 +13,10 @@ import (
 )
 
 func List(c *cli.Context) {
-	common.RequireAccessToken()
-	proj := common.RequireProject()
+	token := common.RequireAccessToken()
+	proj := common.RequireProject(token)
 
-	cols, appErr := collaborators.List(config.AccessToken, proj.Name)
+	cols, appErr := collaborators.List(token, proj.Name)
 	if appErr != nil {
 		if appErr.Code == collaborators.ErrCodeNotFound {
 			log.Fatalf(tr.T("project_not_found"), proj.Name)
@@ -32,8 +31,8 @@ func List(c *cli.Context) {
 }
 
 func Add(c *cli.Context) {
-	common.RequireAccessToken()
-	proj := common.RequireProject()
+	token := common.RequireAccessToken()
+	proj := common.RequireProject(token)
 
 	collabEmail := c.Args().First()
 
@@ -46,7 +45,7 @@ func Add(c *cli.Context) {
 			util.ExitIfErrorOrEOF(err)
 		}
 
-		appErr := collaborators.Add(config.AccessToken, proj.Name, collabEmail)
+		appErr := collaborators.Add(token, proj.Name, collabEmail)
 		if appErr != nil {
 			switch appErr.Code {
 			case collaborators.ErrCodeAlreadyExists:
@@ -76,8 +75,8 @@ func Add(c *cli.Context) {
 }
 
 func Remove(c *cli.Context) {
-	common.RequireAccessToken()
-	proj := common.RequireProject()
+	token := common.RequireAccessToken()
+	proj := common.RequireProject(token)
 
 	collabEmail := c.Args().First()
 
@@ -90,7 +89,7 @@ func Remove(c *cli.Context) {
 			util.ExitIfErrorOrEOF(err)
 		}
 
-		appErr := collaborators.Remove(config.AccessToken, proj.Name, collabEmail)
+		appErr := collaborators.Remove(token, proj.Name, collabEmail)
 		if appErr != nil {
 			switch appErr.Code {
 			case collaborators.ErrCodeNotFound:
