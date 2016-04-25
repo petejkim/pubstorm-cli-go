@@ -91,11 +91,12 @@ func Create(token, name, bunPath string, quiet bool) (depl *Deployment, appErr *
 	}
 	defer res.Body.Close()
 
-	if !util.ContainsInt([]int{http.StatusAccepted, http.StatusBadRequest, http.StatusNotFound}, res.StatusCode) {
+	if !util.ContainsInt([]int{http.StatusAccepted, http.StatusBadRequest, http.StatusNotFound, 423}, res.StatusCode) {
 		return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
 
-	if res.StatusCode == http.StatusAccepted {
+	switch res.StatusCode {
+	case http.StatusAccepted:
 		var j struct {
 			Deployment Deployment `json:"deployment"`
 		}
@@ -105,7 +106,7 @@ func Create(token, name, bunPath string, quiet bool) (depl *Deployment, appErr *
 		}
 
 		return &j.Deployment, nil
-	} else if res.StatusCode == http.StatusBadRequest {
+	case http.StatusBadRequest:
 		var j map[string]interface{}
 		if err := res.Body.FromJsonTo(&j); err != nil {
 			return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
@@ -117,9 +118,10 @@ func Create(token, name, bunPath string, quiet bool) (depl *Deployment, appErr *
 				return nil, apperror.New(ErrCodeValidationFailed, nil, "project size is too large", true)
 			}
 		}
-	} else if res.StatusCode == http.StatusNotFound {
+	case http.StatusNotFound:
 		return nil, apperror.New(ErrCodeNotFound, nil, "project could not be found", true)
-	} else if res.StatusCode == 423 {
+	case 423:
+		return nil, apperror.New(ErrCodeProjectLocked, nil, "project is locked", true)
 	}
 
 	return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)

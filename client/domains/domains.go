@@ -16,6 +16,7 @@ const (
 	ErrCodeNotFound         = "not_found"
 	ErrCodeValidationFailed = "validation_failed"
 	ErrCodeLimitReached     = "limit_reached"
+	ErrCodeProjectLocked    = "project_locked"
 )
 
 func Index(token, projectName string) (domainNames []string, appErr *apperror.Error) {
@@ -77,7 +78,7 @@ func Create(token, projectName, name string) (appErr *apperror.Error) {
 		return apperror.New(ErrCodeRequestFailed, err, "", true)
 	}
 
-	if !util.ContainsInt([]int{http.StatusCreated, http.StatusNotFound, 422}, res.StatusCode) {
+	if !util.ContainsInt([]int{http.StatusCreated, http.StatusNotFound, 422, 423}, res.StatusCode) {
 		return apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
 
@@ -105,6 +106,8 @@ func Create(token, projectName, name string) (appErr *apperror.Error) {
 			}
 		}
 		return apperror.New(ErrCodeUnexpectedError, nil, "", true)
+	} else if res.StatusCode == 423 {
+		return apperror.New(ErrCodeProjectLocked, nil, "", true)
 	}
 
 	return nil
@@ -125,7 +128,7 @@ func Delete(token, projectName, name string) (appErr *apperror.Error) {
 		return apperror.New(ErrCodeRequestFailed, err, "", true)
 	}
 
-	if res.StatusCode != http.StatusNotFound && res.StatusCode != http.StatusOK {
+	if !util.ContainsInt([]int{http.StatusOK, http.StatusNotFound, 423}, res.StatusCode) {
 		return apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
 
@@ -136,6 +139,8 @@ func Delete(token, projectName, name string) (appErr *apperror.Error) {
 
 	if res.StatusCode == http.StatusNotFound {
 		return apperror.New(ErrCodeNotFound, nil, j["error_description"].(string), true)
+	} else if res.StatusCode == 423 {
+		return apperror.New(ErrCodeProjectLocked, nil, "", true)
 	}
 
 	return nil

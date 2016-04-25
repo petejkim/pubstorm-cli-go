@@ -131,6 +131,7 @@ var strs = map[string]map[string]string{
 		"default_domain_already_removed": "Default domain \"%s\" is already disabled for project \"%s\", nothing to do.",
 
 		"project_not_found": "Could not find a project \"%s\" that belongs to you.",
+		"project_is_locked": "The project \"%s\" is locked by another user or process, please try again.",
 
 		"projects_list_header":        "Your Projects",
 		"shared_projects_list_header": "Projects Shared With You",

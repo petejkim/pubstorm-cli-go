@@ -91,6 +91,8 @@ func Add(c *cli.Context) {
 				log.Fatalf(tr.T("domain_limit_reached"), proj.Name)
 			} else if appErr.Code == domains.ErrCodeNotFound {
 				log.Fatalf(tr.T("project_not_found"), proj.Name)
+			} else if appErr.Code == domains.ErrCodeProjectLocked {
+				log.Fatalf(tr.T("project_is_locked"), proj.Name)
 			}
 			appErr.Handle()
 		}
@@ -161,12 +163,15 @@ func Remove(c *cli.Context) {
 				if strings.Contains(appErr.Description, "project") {
 					log.Fatalf(tr.T("project_not_found"), proj.Name)
 				}
+
 				if interactive {
 					log.Errorf(tr.T("domain_not_found"), domainName)
 					continue
 				} else {
 					log.Fatalf(tr.T("domain_not_found"), domainName)
 				}
+			} else if appErr.Code == domains.ErrCodeProjectLocked {
+				log.Fatalf(tr.T("project_is_locked"), proj.Name)
 			}
 
 			appErr.Handle()

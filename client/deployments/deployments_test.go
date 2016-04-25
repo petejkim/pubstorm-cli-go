@@ -157,6 +157,15 @@ var _ = Describe("Deployments", func() {
 			errIsFatal: true,
 		}),
 
+		Entry("423 with locked", expectation{
+			resCode:    423,
+			resBody:    `{"error": "locked", "error_description": "project is locked"}`,
+			errIsNil:   false,
+			errCode:    deployments.ErrCodeProjectLocked,
+			errDesc:    "project is locked",
+			errIsFatal: true,
+		}),
+
 		Entry("successful deployment", expectation{
 			resCode:  http.StatusAccepted,
 			resBody:  `{"deployment": {"id": 123, "state": "deployed", "deployed_at": ` + formattedTime + `}}`,
