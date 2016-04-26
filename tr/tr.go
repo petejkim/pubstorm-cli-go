@@ -46,6 +46,8 @@ var strs = map[string]map[string]string{
 		"protect_desc":            "Protect your PubStorm project by HTTP basic authentication",
 		"protect_args":            "[USERNAME] [PASSWORD]",
 		"unprotect_desc":          "Disable protection for your PubStorm project",
+		"env_set_desc":            "Set one or more js environment variables",
+		"env_set_args":            "KEY1=VALUE1 [KEY2=VALUE2 ...]",
 
 		"update_available":       "A PubStorm update is available.",
 		"update_current_version": "Your version: %s",
@@ -244,6 +246,10 @@ var strs = map[string]map[string]string{
 		"enter_basic_auth_password": "Basic Auth Password",
 		"protect_success":           "Successfully protected project \"%s\".",
 		"unprotect_success":         "Successfully disabled protection for project \"%s\".",
+
+		"env_set":         "Successfully added env vars\n%s",
+		"env_invalid_arg": "%s is invalid. Must be in the format FOO=bar.",
+		"env_key_empty":   "Key must not be empty.",
 	},
 }
 
