@@ -346,4 +346,91 @@ var _ = Describe("Deployments", func() {
 			result:   &deployments.Deployment{ID: 123, State: "deployed", DeployedAt: deployedTime, Version: 13},
 		}),
 	)
+
+	DescribeTable("List",
+		func(e expectation) {
+			server.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("GET", "/projects/foo-bar-express/deployments"),
+					ghttp.VerifyHeader(http.Header{
+						"Authorization": {"Bearer t0k3n"},
+						"Accept":        {config.ReqAccept},
+						"User-Agent":    {config.UserAgent},
+					}),
+					ghttp.RespondWith(e.resCode, e.resBody),
+				),
+			)
+
+			depls, appErr := deployments.List("t0k3n", "foo-bar-express")
+			Expect(server.ReceivedRequests()).To(HaveLen(1))
+
+			if e.errIsNil {
+				Expect(appErr).To(BeNil())
+				Expect(depls).To(HaveLen(2))
+				expectedDepls, ok := e.result.([]deployments.Deployment)
+				Expect(ok).To(BeTrue())
+
+				Expect(depls[0].ID).To(Equal(expectedDepls[0].ID))
+				Expect(depls[0].State).To(Equal(expectedDepls[0].State))
+				Expect(depls[0].DeployedAt.Unix()).To(Equal(expectedDepls[0].DeployedAt.Unix()))
+				Expect(depls[1].ID).To(Equal(expectedDepls[1].ID))
+				Expect(depls[1].State).To(Equal(expectedDepls[1].State))
+				Expect(depls[1].DeployedAt.Unix()).To(Equal(expectedDepls[1].DeployedAt.Unix()))
+			} else {
+				Expect(appErr).NotTo(BeNil())
+				Expect(appErr.Code).To(Equal(e.errCode))
+				Expect(strings.ToLower(appErr.Description)).To(ContainSubstring(strings.ToLower(e.errDesc)))
+				Expect(appErr.IsFatal).To(Equal(e.errIsFatal))
+			}
+		},
+
+		Entry("unexpected response code", expectation{
+			resCode:    http.StatusInternalServerError,
+			resBody:    "",
+			errIsNil:   false,
+			errCode:    deployments.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("malformed json", expectation{
+			resCode:    http.StatusOK,
+			resBody:    `{"foo": }`,
+			errIsNil:   false,
+			errCode:    deployments.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("404 with not found", expectation{
+			resCode:    http.StatusNotFound,
+			resBody:    `{"error": "not_found", "error_description": "project could not be found"}`,
+			errIsNil:   false,
+			errCode:    deployments.ErrCodeProjectNotFound,
+			errDesc:    "Could not find a project \"foo-bar-express\" that belongs to you.",
+			errIsFatal: true,
+		}),
+
+		Entry("successfully fetched", expectation{
+			resCode: http.StatusOK,
+			resBody: `{"deployments": [
+			  {
+					"id": 123,
+					"state": "deployed",
+					"active": true,
+					"deployed_at": ` + formattedTime + `
+				},
+			  {
+					"id": 234,
+					"state": "deployed",
+					"deployed_at": ` + formattedTime + `
+				}
+		  ]}`,
+			errIsNil: true,
+			result: []deployments.Deployment{
+				deployments.Deployment{ID: 123, State: "deployed", DeployedAt: deployedTime},
+				deployments.Deployment{ID: 234, State: "deployed", DeployedAt: deployedTime},
+			},
+		}),
+	)
 })
