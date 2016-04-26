@@ -59,12 +59,12 @@ func init() {
 	}
 
 	if err := os.MkdirAll(DotRisePath, 0700); err != nil {
-		log.Fatalln("Fatal Error: Failed to make data directory!")
+		log.Fatalln("Failed to make data directory!")
 	}
 
 	if err := Load(); err != nil {
 		if !os.IsNotExist(err) {
-			log.Fatalln("Fatal Error: Failed to load rise config file!")
+			log.Fatalln("Failed to load rise config file!")
 		}
 	}
 }
