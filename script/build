@@ -59,18 +59,18 @@ build() {
   GO15VENDOREXPERIMENT=1 GOARCH=$1 GOOS=$2 go build -v -ldflags "$riseLdFlags" -o "dist/$2-$1/$cmd"
 }
 
-build 386 linux
 build amd64 linux
+build 386 linux
 build arm linux
 
-build 386 freebsd
 build amd64 freebsd
+build 386 freebsd
 build arm freebsd
 
-build 386 windows
 build amd64 windows
+build 386 windows
 
-build 386 darwin
 build amd64 darwin
+build 386 darwin
 
 echo -e "$okColor--> Compilación 完成!$noColor"
