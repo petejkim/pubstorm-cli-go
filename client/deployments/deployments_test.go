@@ -3,10 +3,12 @@ package deployments_test
 import (
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/nitrous-io/rise-cli-go/client/deployments"
 	"github.com/nitrous-io/rise-cli-go/client/projects"
@@ -26,6 +28,10 @@ var _ = Describe("Deployments", func() {
 	var (
 		origHost string
 		server   *ghttp.Server
+
+		deployedTime          = time.Now()
+		formattedTimeBytes, _ = deployedTime.MarshalJSON()
+		formattedTime         = string(formattedTimeBytes)
 	)
 
 	BeforeEach(func() {
@@ -46,7 +52,7 @@ var _ = Describe("Deployments", func() {
 		errCode    string
 		errDesc    string
 		errIsFatal bool
-		result     *deployments.Deployment
+		result     interface{}
 	}
 
 	DescribeTable("Create",
@@ -102,8 +108,11 @@ var _ = Describe("Deployments", func() {
 
 			if e.errIsNil {
 				Expect(appErr).To(BeNil())
-				Expect(deployment.ID).To(Equal(e.result.ID))
-				Expect(deployment.State).To(Equal(e.result.State))
+				depl, ok := e.result.(*deployments.Deployment)
+				Expect(ok).To(BeTrue())
+				Expect(deployment.ID).To(Equal(depl.ID))
+				Expect(deployment.State).To(Equal(depl.State))
+				Expect(deployment.DeployedAt.Unix()).To(Equal(depl.DeployedAt.Unix()))
 			} else {
 				Expect(appErr).NotTo(BeNil())
 				Expect(appErr.Code).To(Equal(e.errCode))
@@ -150,9 +159,9 @@ var _ = Describe("Deployments", func() {
 
 		Entry("successful deployment", expectation{
 			resCode:  http.StatusAccepted,
-			resBody:  `{"deployment": {"id": 10, "state": "uploaded" }}`,
+			resBody:  `{"deployment": {"id": 123, "state": "deployed", "deployed_at": ` + formattedTime + `}}`,
 			errIsNil: true,
-			result:   &deployments.Deployment{10, "uploaded"},
+			result:   &deployments.Deployment{ID: 123, State: "deployed", DeployedAt: deployedTime},
 		}),
 	)
 
@@ -175,8 +184,11 @@ var _ = Describe("Deployments", func() {
 
 			if e.errIsNil {
 				Expect(appErr).To(BeNil())
-				Expect(deployment.ID).To(Equal(e.result.ID))
-				Expect(deployment.State).To(Equal(e.result.State))
+				depl, ok := e.result.(*deployments.Deployment)
+				Expect(ok).To(BeTrue())
+				Expect(deployment.ID).To(Equal(depl.ID))
+				Expect(deployment.State).To(Equal(depl.State))
+				Expect(deployment.DeployedAt.Unix()).To(Equal(depl.DeployedAt.Unix()))
 			} else {
 				Expect(appErr).NotTo(BeNil())
 				Expect(appErr.Code).To(Equal(e.errCode))
@@ -214,9 +226,124 @@ var _ = Describe("Deployments", func() {
 
 		Entry("successfully fetched", expectation{
 			resCode:  http.StatusOK,
-			resBody:  `{"deployment": {"id": 123, "state": "uploaded" }}`,
+			resBody:  `{"deployment": {"id": 123, "state": "deployed", "deployed_at": ` + formattedTime + `}}`,
 			errIsNil: true,
-			result:   &deployments.Deployment{ID: 123, State: "uploaded"},
+			result:   &deployments.Deployment{ID: 123, State: "deployed", DeployedAt: deployedTime},
+		}),
+	)
+
+	DescribeTable("Rollback",
+		func(e expectation) {
+			server.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("POST", "/projects/foo-bar-express/rollback"),
+					ghttp.VerifyHeader(http.Header{
+						"Authorization": {"Bearer t0k3n"},
+						"Accept":        {config.ReqAccept},
+						"User-Agent":    {config.UserAgent},
+						"Content-Type":  {"application/x-www-form-urlencoded"},
+					}),
+					ghttp.VerifyForm(url.Values{
+						"version": {"12"},
+					}),
+					ghttp.RespondWith(e.resCode, e.resBody),
+				),
+			)
+
+			deployment, appErr := deployments.Rollback("t0k3n", "foo-bar-express", 12)
+			Expect(server.ReceivedRequests()).To(HaveLen(1))
+
+			if e.errIsNil {
+				Expect(appErr).To(BeNil())
+				depl, ok := e.result.(*deployments.Deployment)
+				Expect(ok).To(BeTrue())
+				Expect(deployment.ID).To(Equal(depl.ID))
+				Expect(deployment.State).To(Equal(depl.State))
+				Expect(deployment.DeployedAt.Unix()).To(Equal(depl.DeployedAt.Unix()))
+			} else {
+				Expect(appErr).NotTo(BeNil())
+				Expect(appErr.Code).To(Equal(e.errCode))
+				Expect(strings.ToLower(appErr.Description)).To(ContainSubstring(strings.ToLower(e.errDesc)))
+				Expect(appErr.IsFatal).To(Equal(e.errIsFatal))
+			}
+		},
+
+		Entry("unexpected response code", expectation{
+			resCode:    http.StatusInternalServerError,
+			resBody:    "",
+			errIsNil:   false,
+			errCode:    deployments.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("malformed json", expectation{
+			resCode:    http.StatusOK,
+			resBody:    `{"foo": }`,
+			errIsNil:   false,
+			errCode:    deployments.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("404 with project not found error", expectation{
+			resCode:    http.StatusNotFound,
+			resBody:    `{"error": "not_found", "error_description": "project could not be found"}`,
+			errIsNil:   false,
+			errCode:    deployments.ErrCodeProjectNotFound,
+			errIsFatal: true,
+		}),
+
+		Entry("412 with active deployment not found error", expectation{
+			resCode:    http.StatusPreconditionFailed,
+			resBody:    `{"error": "precondition_failed", "error_description": "active deployment could not be found"}`,
+			errIsNil:   false,
+			errCode:    deployments.ErrCodeNotFound,
+			errDesc:    "does not have any completed deployment",
+			errIsFatal: true,
+		}),
+
+		Entry("412 with no previous deployment found error", expectation{
+			resCode:    http.StatusPreconditionFailed,
+			resBody:    `{"error": "precondition_failed", "error_description": "previous completed deployment could not be found"}`,
+			errIsNil:   false,
+			errCode:    deployments.ErrCodeNotFound,
+			errDesc:    "no previous version",
+			errIsFatal: true,
+		}),
+
+		Entry("422 with deployment could not be found", expectation{
+			resCode:    422,
+			resBody:    `{"error": "invalid_request", "error_description": "completed deployment with a given version could not be found"}`,
+			errIsNil:   false,
+			errCode:    deployments.ErrCodeValidationFailed,
+			errDesc:    "v12 could not be found",
+			errIsFatal: true,
+		}),
+
+		Entry("422 with invalid_request", expectation{
+			resCode:    422,
+			resBody:    `{"error": "invalid_request", "error_description": "the specified deployment is already active"}`,
+			errIsNil:   false,
+			errCode:    deployments.ErrCodeValidationFailed,
+			errDesc:    "already on v12",
+			errIsFatal: true,
+		}),
+
+		Entry("423 with locked", expectation{
+			resCode:    423,
+			resBody:    `{"error": "locked", "error_description": "project is locked"}`,
+			errIsNil:   false,
+			errCode:    deployments.ErrCodeProjectLocked,
+			errDesc:    "locked",
+			errIsFatal: true,
+		}),
+
+		Entry("rollback accepted", expectation{
+			resCode:  http.StatusAccepted,
+			resBody:  `{"deployment": {"id": 123, "state": "deployed", "deployed_at": ` + formattedTime + `, "version": 13}}`,
+			errIsNil: true,
+			result:   &deployments.Deployment{ID: 123, State: "deployed", DeployedAt: deployedTime, Version: 13},
 		}),
 	)
 })

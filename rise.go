@@ -16,6 +16,7 @@ import (
 	"github.com/nitrous-io/rise-cli-go/cli/logout"
 	"github.com/nitrous-io/rise-cli-go/cli/password"
 	"github.com/nitrous-io/rise-cli-go/cli/projects"
+	"github.com/nitrous-io/rise-cli-go/cli/rollback"
 	"github.com/nitrous-io/rise-cli-go/cli/signup"
 	"github.com/nitrous-io/rise-cli-go/config"
 	"github.com/nitrous-io/rise-cli-go/pkg/readline"
@@ -219,6 +220,12 @@ func main() {
 			Name:   "collab.rm",
 			Usage:  "Remove a collaborator from the current project",
 			Action: collab.Remove,
+		},
+		{
+			Name:      "rollback",
+			Usage:     tr.T("rollback_desc"),
+			ArgsUsage: "[RELEASE]",
+			Action:    rollback.Rollback,
 		},
 	}
 

@@ -15,6 +15,7 @@ var strs = map[string]map[string]string{
 		"domains_rm_desc":      "Remove a domain from a PubStorm project",
 		"projects_desc":        "List your PubStorm projects",
 		"projects_rm_desc":     "Delete a PubStorm project",
+		"rollback_desc":        "Rollback to a previous or a specified version",
 
 		"update_available":       "A PubStorm update is available.",
 		"update_current_version": "Your version: %s",
@@ -133,6 +134,15 @@ var strs = map[string]map[string]string{
 		"collab_rm_user_not_found":  "User with the email address \"%s\" is not a collaborator of the project \"%s\".",
 		"collab_added_success":      "Successfully added \"%s\" as a collaborator of \"%s\"",
 		"collab_removed_success":    "Successfully removed \"%s\" as a collaborator of \"%s\"",
+
+		"rollback_no_active_deployment":   "This PubStorm project does not have any completed deployment.",
+		"rollback_no_previous_version":    "There is no previous version to rollback to.",
+		"rollback_success":                "Successfully rolled back to v%d.",
+		"rollback_invalid_version":        "The specified version is not valid",
+		"rollback_version_not_found":      "Version v%d could not be found",
+		"rollback_version_already_active": "This PubStorm project is already on v%d",
+
+		"project_locked": "This PubStorm project is locked",
 	},
 }
 
