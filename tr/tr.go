@@ -138,7 +138,7 @@ var strs = map[string]map[string]string{
 
 		"rollback_no_active_deployment":   "This PubStorm project does not have any completed deployment.",
 		"rollback_no_previous_version":    "There is no previous version to rollback to.",
-		"rollback_success":                "Successfully rolled back to v%d.",
+		"rollback_success":                "Successfully rolled back \"%s\" to v%d.",
 		"rollback_invalid_version":        "The specified version is not valid",
 		"rollback_version_not_found":      "Version v%d could not be found",
 		"rollback_version_already_active": "This PubStorm project is already on v%d",

@@ -87,9 +87,10 @@ func Deploy(c *cli.Context) {
 	tui.Printf("\n"+tr.T("launching")+" "+tui.Blu("%s"), deployment.Version, string(spin.Next()))
 
 	for deployment.State != deployments.DeploymentStateDeployed {
-		time.Sleep(500 * time.Millisecond)
-
-		tui.Printf(tui.Blu("\b%s"), string(spin.Next()))
+		for i := 0; i < 5; i++ {
+			time.Sleep(100 * time.Millisecond)
+			tui.Printf(tui.Blu("\b%s"), string(spin.Next()))
+		}
 
 		deployment, appErr = deployments.Get(config.AccessToken, proj.Name, deployment.ID)
 		if appErr != nil {
