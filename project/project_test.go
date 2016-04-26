@@ -36,6 +36,7 @@ var _ = Describe("Project", func() {
 		Entry("normal", "abc", nil),
 		Entry("allows hyphens", "good-one", nil),
 		Entry("allows multiple hyphens", "hello-world--foobar", nil),
+		Entry("disallows uppercase characters", "Bad-One", project.ErrNameInvalid),
 		Entry("disallows starting with a hyphen", "-abc", project.ErrNameInvalid),
 		Entry("disallows ending with a hyphen", "abc-", project.ErrNameInvalid),
 		Entry("disallows spaces", "good one", project.ErrNameInvalid),

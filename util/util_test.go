@@ -67,4 +67,17 @@ var _ = Describe("Util", func() {
 		Entry("capitalize the first word, not touching the rest", "foo Bar baz", "Foo Bar baz"),
 		Entry("unicode shouldn't break", "유니코드", "유니코드"),
 	)
+
+	DescribeTable("SanitizeDomain",
+		func(domain, expected string) {
+			Expect(util.SanitizeDomain(domain)).To(Equal(expected))
+		},
+
+		Entry("empty string", "", ""),
+		Entry("trims whitespace from the end", "www.example.com ", "www.example.com"),
+		Entry("trims whitespace from the beginning", "  www.example.com ", "www.example.com"),
+		Entry("prefixes www. if domain contains only 2 labels", "example.com", "www.example.com"),
+		Entry("converts uppercase characters to lowercase", "Www.example.COM", "www.example.com"),
+		Entry("unicode shouldn't break", "유니코드.co.kr", "유니코드.co.kr"),
+	)
 })

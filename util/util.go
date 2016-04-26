@@ -71,7 +71,7 @@ func SanitizeDomain(domain string) string {
 	if len(labels) == 2 {
 		domain = "www." + domain
 	}
-	return domain
+	return strings.ToLower(domain)
 }
 
 func SplitDomain(name string) (subdomain string, domain string) {
