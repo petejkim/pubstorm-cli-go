@@ -21,10 +21,6 @@ func New(code string, err error, description string, isFatal bool) *Error {
 func (e *Error) Error() string {
 	m := []string{}
 
-	if e.IsFatal {
-		m = append(m, "Fatal Error:")
-	}
-
 	if e.Description != "" {
 		m = append(m, e.Description)
 	} else {
