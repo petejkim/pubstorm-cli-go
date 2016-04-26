@@ -98,6 +98,29 @@ func Load() (*Project, error) {
 	return &proj, nil
 }
 
+func LoadDefault() (*Project, error) {
+	f, err := os.Open(config.DefaultProjectJSONPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return &Project{}, nil
+		}
+		return nil, err
+	}
+	defer f.Close()
+
+	var j struct {
+		Path string `json:"path"`
+	}
+
+	if err = json.NewDecoder(f).Decode(&j); err != nil {
+		return nil, err
+	}
+
+	return &Project{
+		Path: j.Path,
+	}, nil
+}
+
 // Delete project json file
 func (p *Project) Delete() error {
 	return os.Remove(config.ProjectJSON)

@@ -188,6 +188,35 @@ var _ = Describe("Project", func() {
 			})
 		})
 
+		Describe("LoadDefault()", func() {
+			Context("when pubstorm.default.json does not exist", func() {
+				It("returns a zero value pointer to a project", func() {
+					proj, err := project.LoadDefault()
+					Expect(err).To(BeNil())
+					Expect(proj).To(Equal(&project.Project{}))
+				})
+			})
+
+			Context("when a pubstorm.default.json file exists", func() {
+				BeforeEach(func() {
+					err = ioutil.WriteFile(config.DefaultProjectJSONPath, []byte(`
+						{
+							"path": "./_site"
+						}
+					`), 0600)
+					Expect(err).To(BeNil())
+				})
+
+				It("loads the project from it", func() {
+					proj, err := project.LoadDefault()
+					Expect(err).To(BeNil())
+
+					Expect(proj).NotTo(BeNil())
+					Expect(proj.Path).To(Equal("./_site"))
+				})
+			})
+		})
+
 		Describe("Delete()", func() {
 			var proj *project.Project
 

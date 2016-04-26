@@ -29,7 +29,8 @@ var (
 	UserAgent = "PubStormCLI"
 	ReqAccept = "application/vnd.pubstorm.v0+json"
 
-	ProjectJSON = "pubstorm.json"
+	ProjectJSON            = "pubstorm.json"
+	DefaultProjectJSONPath = "pubstorm.default.json"
 
 	DotRisePath string
 	AccessToken string
@@ -64,7 +65,7 @@ func init() {
 
 	if err := Load(); err != nil {
 		if !os.IsNotExist(err) {
-			log.Fatalln("Failed to load rise config file!")
+			log.Fatalln("Failed to load PubStorm config file!")
 		}
 	}
 }

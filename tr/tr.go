@@ -65,13 +65,13 @@ var strs = map[string]map[string]string{
 
 		"existing_rise_project": "A PubStorm project already exists in the current working directory; aborting.",
 
-		"init_rise_project":   "Set up your PubStorm project",
-		"enter_project_path":  "Enter Project Path",
-		"enable_basic_stats":  "Enable Basic Stats",
-		"force_https":         "Redirect \"http\" to \"https\" URL",
-		"enter_project_name":  "Enter Project Name",
-		"project_initialized": "Successfully created project \"%s\".",
-		"rise_json_saved":     "Saved project settings to \"pubstorm.json\". This file should not be deleted.",
+		"init_rise_project":          "Set up your PubStorm project",
+		"enter_project_path":         "Enter Project Path (path to be deployed)",
+		"project_path_create_ok":     "Created project directory \"%s\".",
+		"project_path_create_failed": "Could not create a directory at \"%s\".",
+		"enter_project_name":         "Enter Project Name",
+		"project_initialized":        "Successfully created project \"%s\".",
+		"rise_json_saved":            "Saved project settings to \"pubstorm.json\". This file should not be deleted.",
 
 		"scanning_path":             "Scanning \"%s\"...",
 		"bundling_file_count_size":  "Bundling %s files (%s)...",

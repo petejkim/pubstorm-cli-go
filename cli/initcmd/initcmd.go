@@ -26,79 +26,68 @@ func Init(c *cli.Context) {
 
 	if proj != nil {
 		log.Fatal(tr.T("existing_rise_project"))
-	} else {
-		proj = &project.Project{}
-
-		tui.Println(tr.T("init_rise_project"))
-
-		for {
-			proj.Path, err = readline.Read(tui.Bold(tr.T("enter_project_path")+": [.] "), true, ".")
-			util.ExitIfErrorOrEOF(err)
-
-			if err := proj.ValidatePath(); err != nil {
-				log.Error(err.Error())
-				continue
-			}
-
-			break
-		}
-
-		/*for {
-			enableStats, err := readline.Read(tui.Bold(tr.T("enable_basic_stats")+"? [Y/n] "), true, "y")
-			util.ExitIfErrorOrEOF(err)
-
-			switch strings.ToLower(enableStats) {
-			case "y", "yes":
-				proj.EnableStats = true
-			case "n", "no":
-				proj.EnableStats = false
-			default:
-				continue
-			}
-
-			break
-		}
-
-		for {
-			forceHTTPS, err := readline.Read(tui.Bold(tr.T("force_https")+"? [y/N] "), true, "n")
-			util.ExitIfErrorOrEOF(err)
-
-			switch strings.ToLower(forceHTTPS) {
-			case "y", "yes":
-				proj.ForceHTTPS = true
-			case "n", "no":
-				proj.ForceHTTPS = false
-			default:
-				continue
-			}
-
-			break
-		}*/
-		proj.EnableStats = true
-		proj.ForceHTTPS = false
-
-		for {
-			proj.Name, err = readline.Read(tui.Bold(tr.T("enter_project_name")+": "), true, "")
-			util.ExitIfErrorOrEOF(err)
-
-			if err := proj.ValidateName(); err != nil {
-				log.Error(err.Error())
-				continue
-			}
-
-			appErr := projects.Create(config.AccessToken, proj.Name)
-			if appErr != nil {
-				appErr.Handle()
-				continue
-			}
-
-			break
-		}
-
-		log.Infof(tr.T("project_initialized"), proj.Name)
-		if err = proj.Save(); err != nil {
-			log.Fatal(err.Error())
-		}
-		log.Info(tr.T("rise_json_saved"))
 	}
+
+	// Check for existence of a pubstorm.default.json file. If it's present, use
+	// its values as defaults.
+	proj, err = project.LoadDefault()
+	if err != nil {
+		common.DebugLog().Warnf("error trying to load default project config, err: %v", err)
+		proj = &project.Project{}
+	}
+
+	tui.Println(tr.T("init_rise_project"))
+
+	for {
+		defaultPath := "."
+		if proj.Path != "" {
+			defaultPath = proj.Path
+		}
+		proj.Path, err = readline.Read(tui.Bold(tr.T("enter_project_path")+": ["+defaultPath+"] "), true, defaultPath)
+		util.ExitIfErrorOrEOF(err)
+
+		if err := proj.ValidatePath(); err != nil {
+			if err == project.ErrPathNotExist {
+				if err := os.MkdirAll(proj.Path, 0700); err != nil {
+					log.Infof(tr.T("project_path_create_failed"), proj.Path)
+					common.DebugLog().Warnf("failed to create project directory at %q, err: %v", proj.Path, err)
+					continue
+				}
+
+				log.Infof(tr.T("project_path_create_ok"), proj.Path)
+			} else {
+				log.Error(err.Error())
+				continue
+			}
+		}
+
+		break
+	}
+
+	proj.EnableStats = true
+	proj.ForceHTTPS = false
+
+	for {
+		proj.Name, err = readline.Read(tui.Bold(tr.T("enter_project_name")+": "), true, "")
+		util.ExitIfErrorOrEOF(err)
+
+		if err := proj.ValidateName(); err != nil {
+			log.Error(err.Error())
+			continue
+		}
+
+		appErr := projects.Create(config.AccessToken, proj.Name)
+		if appErr != nil {
+			appErr.Handle()
+			continue
+		}
+
+		break
+	}
+
+	log.Infof(tr.T("project_initialized"), proj.Name)
+	if err = proj.Save(); err != nil {
+		log.Fatal(err.Error())
+	}
+	log.Info(tr.T("rise_json_saved"))
 }
