@@ -222,5 +222,50 @@ func Rollback(token, projectName string, version int64) (depl *Deployment, appEr
 	}
 
 	return d.Deployment, nil
+}
 
+func List(token, projectName string) (depls []Deployment, appErr *apperror.Error) {
+	req := goreq.Request{
+		Method:    "GET",
+		Uri:       config.Host + "/projects/" + projectName + "/deployments",
+		Accept:    config.ReqAccept,
+		UserAgent: config.UserAgent,
+	}
+	req.AddHeader("Authorization", "Bearer "+token)
+
+	res, err := req.Do()
+	if err != nil {
+		return nil, apperror.New(ErrCodeRequestFailed, err, "", true)
+	}
+	defer res.Body.Close()
+
+	if !util.ContainsInt([]int{http.StatusOK, http.StatusNotFound}, res.StatusCode) {
+		return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	if res.StatusCode == http.StatusOK {
+		var j struct {
+			Deployments []Deployment `json:"deployments"`
+		}
+
+		if err := res.Body.FromJsonTo(&j); err != nil {
+			return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
+		}
+
+		return j.Deployments, nil
+	} else if res.StatusCode == http.StatusNotFound {
+		var j map[string]interface{}
+		if err := res.Body.FromJsonTo(&j); err != nil {
+			return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
+		}
+
+		if errDesc, ok := j["error_description"].(string); ok {
+			if errDesc == "project could not be found" {
+				return nil, apperror.New(ErrCodeProjectNotFound, err, fmt.Sprintf(tr.T("project_not_found"), projectName), true)
+			}
+		}
+		return nil, apperror.New(ErrCodeProjectNotFound, err, fmt.Sprintf(tr.T("project_not_found"), projectName), true)
+	}
+
+	return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
 }

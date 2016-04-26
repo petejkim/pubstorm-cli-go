@@ -16,6 +16,7 @@ var strs = map[string]map[string]string{
 		"projects_desc":        "List your PubStorm projects",
 		"projects_rm_desc":     "Delete a PubStorm project",
 		"rollback_desc":        "Rollback to a previous or a specified version",
+		"versions_desc":        "List versions of all completed deployments for a PubStorm project",
 
 		"update_available":       "A PubStorm update is available.",
 		"update_current_version": "Your version: %s",
@@ -143,6 +144,8 @@ var strs = map[string]map[string]string{
 		"rollback_version_already_active": "This PubStorm project is already on v%d",
 
 		"project_locked": "This PubStorm project is locked",
+
+		"versions_list": "Completed deployments for \"%s\"",
 	},
 }
 

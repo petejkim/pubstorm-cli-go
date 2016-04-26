@@ -18,6 +18,7 @@ import (
 	"github.com/nitrous-io/rise-cli-go/cli/projects"
 	"github.com/nitrous-io/rise-cli-go/cli/rollback"
 	"github.com/nitrous-io/rise-cli-go/cli/signup"
+	"github.com/nitrous-io/rise-cli-go/cli/versions"
 	"github.com/nitrous-io/rise-cli-go/config"
 	"github.com/nitrous-io/rise-cli-go/pkg/readline"
 	"github.com/nitrous-io/rise-cli-go/tr"
@@ -226,6 +227,11 @@ func main() {
 			Usage:     tr.T("rollback_desc"),
 			ArgsUsage: "[RELEASE]",
 			Action:    rollback.Rollback,
+		},
+		{
+			Name:   "versions",
+			Usage:  tr.T("versions_desc"),
+			Action: versions.Versions,
 		},
 	}
 
