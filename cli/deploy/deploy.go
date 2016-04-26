@@ -84,7 +84,7 @@ func Deploy(c *cli.Context) {
 	}
 
 	spin := spinner.New()
-	tui.Printf("\n"+tr.T("launching")+" "+tui.Blu("%s"), string(spin.Next()))
+	tui.Printf("\n"+tr.T("launching")+" "+tui.Blu("%s"), deployment.Version, string(spin.Next()))
 
 	for deployment.State != deployments.DeploymentStateDeployed {
 		time.Sleep(500 * time.Millisecond)

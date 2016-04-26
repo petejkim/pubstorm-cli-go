@@ -79,7 +79,7 @@ var strs = map[string]map[string]string{
 		"packing_bundle":            "Packing bundle \"%s\"...",
 		"bundle_size_exceeded":      "Your bundle size cannot exceed %s!",
 		"uploading_bundle":          "Uploading bundle \"%s\" to PubStorm Cloud...",
-		"launching":                 "Launching...",
+		"launching":                 "Launching v%d...",
 		"published":                 "%s published on PubStorm Cloud.",
 
 		"ignore_file_reason":    "Ignoring \"%s\", %s...",
