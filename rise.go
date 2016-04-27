@@ -101,7 +101,7 @@ func main() {
 					Flags: []cli.Flag{
 						cli.BoolFlag{
 							Name:  "continue, c",
-							Usage: "Use this flag if you already have a password reset token",
+							Usage: tr.T("password_reset_continue"),
 						},
 					},
 				},
@@ -119,7 +119,7 @@ func main() {
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "continue, c",
-					Usage: "Use this flag if you already have a password reset token",
+					Usage: tr.T("password_reset_continue"),
 				},
 			},
 		},
@@ -131,12 +131,12 @@ func main() {
 		{
 			Name:    "publish",
 			Aliases: []string{"deploy"},
-			Usage:   tr.T("deploy_desc"),
+			Usage:   tr.T("publish_desc"),
 			Action:  deploy.Deploy,
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "verbose, v",
-					Usage: "Show additional information",
+					Usage: tr.T("publish_verbose"),
 				},
 			},
 		},
@@ -146,38 +146,30 @@ func main() {
 			Action: domains.List,
 			Subcommands: []cli.Command{
 				{
-					Name:   "add",
-					Usage:  tr.T("domains_add_desc"),
-					Action: domains.Add,
-					ArgsUsage: fmt.Sprintf(`[domain]
-
-      domain - Domain to add. Specify "default" to enable the default .%s domain]`, config.DefaultDomain),
+					Name:      "add",
+					Usage:     tr.T("domains_add_desc"),
+					Action:    domains.Add,
+					ArgsUsage: fmt.Sprintf(tr.T("domains_add_args"), config.DefaultDomain),
 				},
 				{
-					Name:   "rm",
-					Usage:  tr.T("domains_rm_desc"),
-					Action: domains.Remove,
-					ArgsUsage: fmt.Sprintf(`[domain]
-
-      domain - Domain to remove. Specify "default" to disable the default .%s domain]`, config.DefaultDomain),
+					Name:      "rm",
+					Usage:     tr.T("domains_rm_desc"),
+					Action:    domains.Remove,
+					ArgsUsage: fmt.Sprintf(tr.T("domains_rm_args"), config.DefaultDomain),
 				},
 			},
 		},
 		{
-			Name:   "domains.add",
-			Usage:  tr.T("domains_add_desc"),
-			Action: domains.Add,
-			ArgsUsage: fmt.Sprintf(`[domain]
-
-      domain - Domain to add. Specify "default" to enable the default .%s domain]`, config.DefaultDomain),
+			Name:      "domains.add",
+			Usage:     tr.T("domains_add_desc"),
+			Action:    domains.Add,
+			ArgsUsage: fmt.Sprintf(tr.T("domains_add_args"), config.DefaultDomain),
 		},
 		{
-			Name:   "domains.rm",
-			Usage:  tr.T("domains_rm_desc"),
-			Action: domains.Remove,
-			ArgsUsage: fmt.Sprintf(`[domain]
-
-      domain - Domain to remove. Specify "default" to disable the default .%s domain]`, config.DefaultDomain),
+			Name:      "domains.rm",
+			Usage:     tr.T("domains_rm_desc"),
+			Action:    domains.Remove,
+			ArgsUsage: fmt.Sprintf(tr.T("domains_rm_args"), config.DefaultDomain),
 		},
 		{
 			Name:   "projects",
@@ -191,7 +183,7 @@ func main() {
 					Flags: []cli.Flag{
 						cli.BoolFlag{
 							Name:  "force, f",
-							Usage: "Delete project without confirmation",
+							Usage: tr.T("projects_rm_force"),
 						},
 					},
 				},
@@ -204,41 +196,41 @@ func main() {
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "force, f",
-					Usage: "Delete project without confirmation",
+					Usage: tr.T("projects_rm_force"),
 				},
 			},
 		},
 		{
 			Name:   "collab",
-			Usage:  "Lists collaborators for the current project",
+			Usage:  tr.T("collab_desc"),
 			Action: collab.List,
 			Subcommands: []cli.Command{
 				{
 					Name:   "add",
-					Usage:  "Add a collaborator to the current project",
+					Usage:  tr.T("collab_add_desc"),
 					Action: collab.Add,
 				},
 				{
 					Name:   "rm",
-					Usage:  "Remove a collaborator from the current project",
+					Usage:  tr.T("collab_rm_desc"),
 					Action: collab.Remove,
 				},
 			},
 		},
 		{
 			Name:   "collab.add",
-			Usage:  "Add a collaborator to the current project",
+			Usage:  tr.T("collab_add_desc"),
 			Action: collab.Add,
 		},
 		{
 			Name:   "collab.rm",
-			Usage:  "Remove a collaborator from the current project",
+			Usage:  tr.T("collab_rm_desc"),
 			Action: collab.Remove,
 		},
 		{
 			Name:      "rollback",
 			Usage:     tr.T("rollback_desc"),
-			ArgsUsage: "[RELEASE]",
+			ArgsUsage: tr.T("rollback_args"),
 			Action:    rollback.Rollback,
 		},
 		{

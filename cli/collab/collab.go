@@ -71,7 +71,6 @@ func Add(c *cli.Context) {
 	}
 
 	log.Infof(tr.T("collab_added_success"), collabEmail, proj.Name)
-	tui.Println()
 }
 
 func Remove(c *cli.Context) {
@@ -106,5 +105,4 @@ func Remove(c *cli.Context) {
 	}
 
 	log.Infof(tr.T("collab_removed_success"), collabEmail, proj.Name)
-	tui.Println()
 }
