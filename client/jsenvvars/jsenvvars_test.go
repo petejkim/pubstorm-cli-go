@@ -2,6 +2,7 @@ package jsenvvars_test
 
 import (
 	"net/http"
+	"net/url"
 	"strings"
 	"testing"
 
@@ -115,6 +116,82 @@ var _ = Describe("JsEnvVars", func() {
 		}),
 
 		Entry("successful adding a variable", expectation{
+			resCode:  http.StatusAccepted,
+			resBody:  `{"deployment": {"id": 10, "state": "uploaded" }}`,
+			errIsNil: true,
+			result:   &deployments.Deployment{ID: 10, State: "uploaded"},
+		}),
+	)
+
+	DescribeTable("Delete",
+		func(e expectation) {
+			server.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("PUT", "/projects/foo-bar-express/jsenvvars/delete"),
+					ghttp.VerifyHeader(http.Header{
+						"Authorization": {"Bearer t0k3n"},
+						"Content-Type":  {"application/x-www-form-urlencoded"},
+						"Accept":        {config.ReqAccept},
+						"User-Agent":    {config.UserAgent},
+					}),
+					ghttp.VerifyForm(url.Values{
+						"keys": {"foo", "baz"},
+					}),
+					ghttp.RespondWith(e.resCode, e.resBody),
+				),
+			)
+
+			deployment, appErr := jsenvvars.Delete("t0k3n", "foo-bar-express", []string{"foo", "baz"})
+			Expect(server.ReceivedRequests()).To(HaveLen(1))
+
+			if e.errIsNil {
+				Expect(appErr).To(BeNil())
+				Expect(deployment).To(Equal(e.result))
+			} else {
+				Expect(appErr).NotTo(BeNil())
+				Expect(appErr.Code).To(Equal(e.errCode))
+				Expect(strings.ToLower(appErr.Description)).To(ContainSubstring(e.errDesc))
+				Expect(appErr.IsFatal).To(Equal(e.errIsFatal))
+			}
+		},
+
+		Entry("unexpected response code", expectation{
+			resCode:    http.StatusInternalServerError,
+			resBody:    "",
+			errIsNil:   false,
+			errCode:    jsenvvars.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("malformed json", expectation{
+			resCode:    http.StatusAccepted,
+			resBody:    `{"foo": }`,
+			errIsNil:   false,
+			errCode:    jsenvvars.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("404 with not found", expectation{
+			resCode:    http.StatusNotFound,
+			resBody:    `{"error": "not_found", "error_description": "project could not be found"}`,
+			errIsNil:   false,
+			errCode:    jsenvvars.ErrCodeProjectNotFound,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("412 with precondition failed", expectation{
+			resCode:    http.StatusPreconditionFailed,
+			resBody:    `{"error": "not_found", "error_description": "current active deployment could not be found"}`,
+			errIsNil:   false,
+			errCode:    jsenvvars.ErrCodeActiveDeploymentNotFound,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("successful deleting a variable", expectation{
 			resCode:  http.StatusAccepted,
 			resBody:  `{"deployment": {"id": 10, "state": "uploaded" }}`,
 			errIsNil: true,

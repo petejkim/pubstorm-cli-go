@@ -325,6 +325,12 @@ func main() {
 					Action:    env.Add,
 					ArgsUsage: tr.T("env_set_args"),
 				},
+				{
+					Name:      "rm",
+					Usage:     tr.T("env_rm_desc"),
+					Action:    env.Delete,
+					ArgsUsage: tr.T("env_rm_args"),
+				},
 			},
 		},
 		{
@@ -332,6 +338,12 @@ func main() {
 			Usage:     tr.T("env_set_desc"),
 			Action:    env.Add,
 			ArgsUsage: tr.T("env_set_args"),
+		},
+		{
+			Name:      "env.rm",
+			Usage:     tr.T("env_rm_desc"),
+			Action:    env.Delete,
+			ArgsUsage: tr.T("env_rm_args"),
 		},
 	}
 

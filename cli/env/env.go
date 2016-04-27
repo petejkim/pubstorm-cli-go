@@ -5,10 +5,12 @@ import (
 	"time"
 
 	"github.com/codegangsta/cli"
+	"github.com/nitrous-io/rise-cli-go/apperror"
 	"github.com/nitrous-io/rise-cli-go/cli/common"
 	"github.com/nitrous-io/rise-cli-go/client/deployments"
 	"github.com/nitrous-io/rise-cli-go/client/jsenvvars"
 	"github.com/nitrous-io/rise-cli-go/pkg/spinner"
+	"github.com/nitrous-io/rise-cli-go/project"
 	"github.com/nitrous-io/rise-cli-go/tr"
 	"github.com/nitrous-io/rise-cli-go/tui"
 
@@ -48,9 +50,35 @@ func Add(c *cli.Context) {
 		appErr.Handle()
 	}
 
+	showSpinnerForRelease(token, proj, deployment)
+
+	log.Infof(tr.T("env_set"), output)
+}
+
+func Delete(c *cli.Context) {
+	if !c.Args().Present() {
+		cli.ShowCommandHelp(c, c.Command.Name)
+		return
+	}
+
+	token := common.RequireAccessToken()
+	proj := common.RequireProject(token)
+
+	deployment, appErr := jsenvvars.Delete(token, proj.Name, c.Args())
+	if appErr != nil {
+		appErr.Handle()
+	}
+
+	showSpinnerForRelease(token, proj, deployment)
+
+	log.Infof(tr.T("env_deleted"), strings.Join(c.Args(), ", "))
+}
+
+func showSpinnerForRelease(token string, proj *project.Project, deployment *deployments.Deployment) {
 	spin := spinner.New()
 	tui.Printf("\n"+tr.T("launching")+" "+tui.Blu("%s"), deployment.Version, string(spin.Next()))
 
+	var appErr *apperror.Error
 	for deployment.State != deployments.DeploymentStateDeployed {
 		for i := 0; i < 5; i++ {
 			time.Sleep(100 * time.Millisecond)
@@ -64,5 +92,4 @@ func Add(c *cli.Context) {
 	}
 
 	tui.Println("\b \b")
-	log.Infof(tr.T("env_set"), output)
 }

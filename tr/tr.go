@@ -48,6 +48,8 @@ var strs = map[string]map[string]string{
 		"unprotect_desc":          "Disable protection for your PubStorm project",
 		"env_set_desc":            "Set one or more js environment variables",
 		"env_set_args":            "KEY1=VALUE1 [KEY2=VALUE2 ...]",
+		"env_rm_desc":             "Unset one or more js environment variables",
+		"env_rm_args":             "KEY1 [KEY2 ...]",
 
 		"update_available":       "A PubStorm update is available.",
 		"update_current_version": "Your version: %s",
@@ -250,6 +252,7 @@ var strs = map[string]map[string]string{
 		"env_set":         "Successfully added env vars\n%s",
 		"env_invalid_arg": "%s is invalid. Must be in the format FOO=bar.",
 		"env_key_empty":   "Key must not be empty.",
+		"env_deleted":     "Successfully deleted %s",
 	},
 }
 
