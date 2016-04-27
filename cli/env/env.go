@@ -93,3 +93,22 @@ func showSpinnerForRelease(token string, proj *project.Project, deployment *depl
 
 	tui.Println("\b \b")
 }
+
+func List(c *cli.Context) {
+	token := common.RequireAccessToken()
+	proj := common.RequireProject(token)
+
+	envvars, appErr := jsenvvars.List(token, proj.Name)
+	if appErr != nil {
+		appErr.Handle()
+	}
+
+	if len(*envvars) > 0 {
+		tui.Printf(tui.Undl(tui.Bold(tr.T("env_list_header")))+"\n", proj.Name)
+		for key, value := range *envvars {
+			tui.Println(tui.Bold(key) + ": " + value)
+		}
+	} else {
+		log.Infof(tr.T("no_env")+"\n", proj.Name)
+	}
+}

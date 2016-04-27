@@ -317,7 +317,9 @@ func main() {
 			Action: protect.Unprotect,
 		},
 		{
-			Name: "env",
+			Name:   "env",
+			Usage:  tr.T("env_list_desc"),
+			Action: env.List,
 			Subcommands: []cli.Command{
 				{
 					Name:      "set",

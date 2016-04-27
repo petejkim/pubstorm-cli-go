@@ -105,3 +105,40 @@ func Delete(token, projectName string, keys []string) (d *deployments.Deployment
 
 	return &j.Deployment, nil
 }
+
+func List(token, projectName string) (envvars *map[string]string, appErr *apperror.Error) {
+	req := goreq.Request{
+		Method:    "GET",
+		Uri:       config.Host + "/projects/" + projectName + "/jsenvvars",
+		Accept:    config.ReqAccept,
+		UserAgent: config.UserAgent,
+	}
+
+	req.AddHeader("Authorization", "Bearer "+token)
+
+	res, err := req.Do()
+	if err != nil {
+		return nil, apperror.New(ErrCodeRequestFailed, err, "", true)
+	}
+
+	if !util.ContainsInt([]int{http.StatusOK, http.StatusNotFound, http.StatusPreconditionFailed}, res.StatusCode) {
+		return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	switch res.StatusCode {
+	case http.StatusNotFound:
+		return nil, apperror.New(ErrCodeProjectNotFound, nil, "", true)
+	case http.StatusPreconditionFailed:
+		return nil, apperror.New(ErrCodeActiveDeploymentNotFound, nil, "", true)
+	}
+
+	var j struct {
+		JsEnvVars map[string]string `json:"js_env_vars"`
+	}
+
+	if err := res.Body.FromJsonTo(&j); err != nil {
+		return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	return &j.JsEnvVars, nil
+}

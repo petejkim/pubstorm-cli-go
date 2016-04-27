@@ -198,4 +198,76 @@ var _ = Describe("JsEnvVars", func() {
 			result:   &deployments.Deployment{ID: 10, State: "uploaded"},
 		}),
 	)
+
+	DescribeTable("List",
+		func(e expectation) {
+			server.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("GET", "/projects/foo-bar-express/jsenvvars"),
+					ghttp.VerifyHeader(http.Header{
+						"Authorization": {"Bearer t0k3n"},
+						"Accept":        {config.ReqAccept},
+						"User-Agent":    {config.UserAgent},
+					}),
+					ghttp.RespondWith(e.resCode, e.resBody),
+				),
+			)
+
+			envvars, appErr := jsenvvars.List("t0k3n", "foo-bar-express")
+			Expect(server.ReceivedRequests()).To(HaveLen(1))
+
+			if e.errIsNil {
+				Expect(appErr).To(BeNil())
+				Expect(envvars).To(Equal(e.result))
+			} else {
+				Expect(appErr).NotTo(BeNil())
+				Expect(appErr.Code).To(Equal(e.errCode))
+				Expect(strings.ToLower(appErr.Description)).To(ContainSubstring(e.errDesc))
+				Expect(appErr.IsFatal).To(Equal(e.errIsFatal))
+			}
+		},
+
+		Entry("unexpected response code", expectation{
+			resCode:    http.StatusInternalServerError,
+			resBody:    "",
+			errIsNil:   false,
+			errCode:    jsenvvars.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("malformed json", expectation{
+			resCode:    http.StatusOK,
+			resBody:    `{"foo": }`,
+			errIsNil:   false,
+			errCode:    jsenvvars.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("404 with not found", expectation{
+			resCode:    http.StatusNotFound,
+			resBody:    `{"error": "not_found", "error_description": "project could not be found"}`,
+			errIsNil:   false,
+			errCode:    jsenvvars.ErrCodeProjectNotFound,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("412 with precondition failed", expectation{
+			resCode:    http.StatusPreconditionFailed,
+			resBody:    `{"error": "not_found", "error_description": "current active deployment could not be found"}`,
+			errIsNil:   false,
+			errCode:    jsenvvars.ErrCodeActiveDeploymentNotFound,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("successful fetched", expectation{
+			resCode:  http.StatusOK,
+			resBody:  `{"js_env_vars": {"foo": "bar", "baz": "qux"}}`,
+			errIsNil: true,
+			result:   &map[string]string{"foo": "bar", "baz": "qux"},
+		}),
+	)
 })
