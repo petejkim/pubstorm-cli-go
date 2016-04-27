@@ -11,6 +11,7 @@ import (
 	"github.com/nitrous-io/rise-cli-go/config"
 )
 
+// TODO This should probably live in the client/projects package.
 type Project struct {
 	Name string `json:"name"`
 	Path string `json:"path"`
@@ -21,6 +22,13 @@ type Project struct {
 	// DefaultDomainEnabled).
 	EnableStats bool `json:"enable_stats"`
 	ForceHTTPS  bool `json:"force_https"`
+}
+
+// projConfig is used to marshal and unmarshal data that's written to the local
+// project configuration file.
+type projConfig struct {
+	Name string `json:"name"`
+	Path string `json:"path"`
 }
 
 var (
@@ -80,7 +88,10 @@ func (p *Project) Save() error {
 	}
 	defer f.Close()
 
-	return json.NewEncoder(f).Encode(p)
+	return json.NewEncoder(f).Encode(projConfig{
+		Name: p.Name,
+		Path: p.Path,
+	})
 }
 
 func Load() (*Project, error) {
@@ -90,12 +101,15 @@ func Load() (*Project, error) {
 	}
 	defer f.Close()
 
-	proj := Project{}
-	if err = json.NewDecoder(f).Decode(&proj); err != nil {
+	pcfg := projConfig{}
+	if err = json.NewDecoder(f).Decode(&pcfg); err != nil {
 		return nil, err
 	}
 
-	return &proj, nil
+	return &Project{
+		Name: pcfg.Name,
+		Path: pcfg.Path,
+	}, nil
 }
 
 func LoadDefault() (*Project, error) {

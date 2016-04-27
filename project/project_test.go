@@ -125,12 +125,13 @@ var _ = Describe("Project", func() {
 		})
 
 		Describe("Save()", func() {
-			It("persists settings in project json file in the current working directory", func() {
+			It("persists only name and path in project json file in the current working directory", func() {
 				proj := &project.Project{
-					Name:        "foo-bar-express",
-					Path:        "./build",
-					EnableStats: true,
-					ForceHTTPS:  false,
+					Name:                 "foo-bar-express",
+					Path:                 "./build",
+					DefaultDomainEnabled: true,
+					EnableStats:          true,
+					ForceHTTPS:           false,
 				}
 
 				err = proj.Save()
@@ -145,10 +146,10 @@ var _ = Describe("Project", func() {
 				Expect(err).To(BeNil())
 
 				Expect(j).NotTo(BeNil())
-				Expect(j["name"]).To(Equal("foo-bar-express"))
-				Expect(j["path"]).To(Equal("./build"))
-				Expect(j["enable_stats"]).To(BeTrue())
-				Expect(j["force_https"]).To(BeFalse())
+				Expect(j).To(Equal(map[string]interface{}{
+					"name": "foo-bar-express",
+					"path": "./build",
+				}))
 			})
 		})
 
@@ -168,7 +169,7 @@ var _ = Describe("Project", func() {
 						{
 							"name": "good-beer-company",
 							"path": "./output",
-							"enable_stats": false,
+							"enable_stats": true,
 							"force_https": true
 						}
 					`), 0600)
@@ -182,8 +183,15 @@ var _ = Describe("Project", func() {
 					Expect(proj).NotTo(BeNil())
 					Expect(proj.Name).To(Equal("good-beer-company"))
 					Expect(proj.Path).To(Equal("./output"))
+				})
+
+				It("ignores fields other than the project name and path", func() {
+					proj, err := project.Load()
+					Expect(err).To(BeNil())
+
+					Expect(proj).NotTo(BeNil())
 					Expect(proj.EnableStats).To(BeFalse())
-					Expect(proj.ForceHTTPS).To(BeTrue())
+					Expect(proj.ForceHTTPS).To(BeFalse())
 				})
 			})
 		})
