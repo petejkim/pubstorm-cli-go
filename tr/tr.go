@@ -14,7 +14,7 @@ var strs = map[string]map[string]string{
 		"publish_verbose":         "Show additional information",
 		"domains_desc":            "List all domains for a PubStorm project",
 		"domains_add_desc":        "Add a new domain to a PubStorm project",
-		"domains_add_args":        "[DOMAIN]\n\nDOMAIN: Domain to add. Specify \"default\" to enable the default .%s domain.",
+		"domains_add_args":        "[DOMAIN] [CRT_FILE_PATH] [KEY_FILE_PATH]\n\nDOMAIN: Domain to add. Specify \"default\" to enable the default .%s domain.",
 		"domains_rm_desc":         "Remove a domain from a PubStorm project",
 		"domains_rm_args":         "[DOMAIN]\n\nDOMAIN: Domain to remove. Specify \"default\" to disable the default .%s domain.",
 		"projects_desc":           "List your PubStorm projects",
@@ -26,6 +26,8 @@ var strs = map[string]map[string]string{
 		"collab_desc":             "Lists collaborators for the current project",
 		"collab_add_desc":         "Add a collaborator to the current project",
 		"collab_rm_desc":          "Remove a collaborator from the current project",
+		"cert_upload_desc":        "Upload ssl cert for a PubStorm project",
+		"cert_info_desc":          "Show certificate information for a Pubstorm project",
 
 		"update_available":       "A PubStorm update is available.",
 		"update_current_version": "Your version: %s",
@@ -161,6 +163,23 @@ var strs = map[string]map[string]string{
 		"project_locked": "This PubStorm project is locked",
 
 		"versions_list": "Completed deployments for \"%s\"",
+
+		"will_upload_cert":        "Uploading your ssl cert",
+		"cert_uploaded":           "Successfully uploaded ssl cert to project \"%s\" for domain \"%s\"",
+		"cert_file_not_found":     "\"%s\" file could not be found",
+		"cert_file_invalid":       "\"%s\" file is invalid",
+		"cert_not_allowed_domain": "You cannot upload ssl cert for domain \"%s\"",
+		"cert_too_large":          "The given cert file size is too large",
+		"cert_invalid":            "The given cert file is not valid",
+		"cert_not_match":          "The given cert file is not matched the domain \"%s\"",
+		"enter_cert_path":         "Enter Certficate File Path",
+		"enter_key_path":          "Enter Key File Path",
+		"cert_not_found":          "The cert for \"%s\" could not be found",
+		"cert_details":            "Certificate details for domain \"%s\"",
+		"cert_common_name":        "Common Name",
+		"cert_starts_at":          "Starts At",
+		"cert_expires_at":         "Expires At",
+		"want_upload_cert":        "Would you like to upload ssl cert for the domain",
 	},
 }
 

@@ -8,6 +8,7 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/franela/goreq"
 
+	"github.com/nitrous-io/rise-cli-go/cli/certs"
 	"github.com/nitrous-io/rise-cli-go/cli/collab"
 	"github.com/nitrous-io/rise-cli-go/cli/common"
 	"github.com/nitrous-io/rise-cli-go/cli/deploy"
@@ -237,6 +238,35 @@ func main() {
 			Name:   "versions",
 			Usage:  tr.T("versions_desc"),
 			Action: versions.Versions,
+		},
+		{
+			Name:      "certs.info",
+			Usage:     tr.T("cert_info_desc"),
+			Action:    certs.Get,
+			ArgsUsage: "DOMAIN",
+		},
+		{
+			Name:      "certs.upload",
+			Usage:     tr.T("cert_upload_desc"),
+			Action:    certs.Create,
+			ArgsUsage: "DOMAIN CERT_FILE_PATH KEY_FILE_PATH",
+		},
+		{
+			Name: "certs",
+			Subcommands: []cli.Command{
+				{
+					Name:      "info",
+					Usage:     tr.T("cert_info_desc"),
+					Action:    certs.Get,
+					ArgsUsage: "DOMAIN",
+				},
+				{
+					Name:      "upload",
+					Usage:     tr.T("cert_upload_desc"),
+					Action:    certs.Create,
+					ArgsUsage: "DOMAIN CERT_FILE_PATH KEY_FILE_PATH",
+				},
+			},
 		},
 	}
 
