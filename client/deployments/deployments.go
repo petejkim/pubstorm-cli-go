@@ -22,12 +22,13 @@ import (
 )
 
 const (
-	ErrCodeRequestFailed    = "request_failed"
-	ErrCodeUnexpectedError  = "unexpected_error"
-	ErrCodeValidationFailed = "validation_failed"
-	ErrCodeProjectNotFound  = "project_not_found"
-	ErrCodeNotFound         = "not_found"
-	ErrCodeProjectLocked    = "project_locked"
+	ErrCodeRequestFailed     = "request_failed"
+	ErrCodeUnexpectedError   = "unexpected_error"
+	ErrCodeValidationFailed  = "validation_failed"
+	ErrCodeProjectNotFound   = "project_not_found"
+	ErrCodeNotFound          = "not_found"
+	ErrCodeProjectLocked     = "project_locked"
+	ErrCodeRawBundleNotFound = "raw_bundle_not_found"
 
 	DeploymentStateDeployed     = "deployed"
 	DeploymentStateBuilding     = "pending_build"
@@ -126,6 +127,50 @@ func Create(token, name, bunPath string, quiet bool) (depl *Deployment, appErr *
 		return nil, apperror.New(ErrCodeNotFound, nil, "project could not be found", true)
 	case 423:
 		return nil, apperror.New(ErrCodeProjectLocked, nil, "project is locked", true)
+	}
+
+	return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
+}
+
+func CreateWithChecksum(token, name, checksum string) (depl *Deployment, appErr *apperror.Error) {
+	req := goreq.Request{
+		Method:      "POST",
+		Uri:         config.Host + "/projects/" + name + "/deployments",
+		ContentType: "application/x-www-form-urlencoded",
+		Accept:      config.ReqAccept,
+		UserAgent:   config.UserAgent,
+		Body: url.Values{
+			"bundle_checksum": {checksum},
+		}.Encode(),
+	}
+	req.AddHeader("Authorization", "Bearer "+token)
+
+	res, err := req.Do()
+	if err != nil {
+		return nil, apperror.New(ErrCodeRequestFailed, err, "", true)
+	}
+	defer res.Body.Close()
+
+	if !util.ContainsInt([]int{http.StatusAccepted, http.StatusNotFound, 422, 423}, res.StatusCode) {
+		return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	if res.StatusCode == http.StatusAccepted {
+		var j struct {
+			Deployment Deployment `json:"deployment"`
+		}
+
+		if err := res.Body.FromJsonTo(&j); err != nil {
+			return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
+		}
+
+		return &j.Deployment, nil
+	} else if res.StatusCode == http.StatusNotFound {
+		return nil, apperror.New(ErrCodeProjectNotFound, nil, "", true)
+	} else if res.StatusCode == 422 {
+		return nil, apperror.New(ErrCodeRawBundleNotFound, nil, "", true)
+	} else if res.StatusCode == 423 {
+		return nil, apperror.New(ErrCodeProjectLocked, nil, "", true)
 	}
 
 	return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)

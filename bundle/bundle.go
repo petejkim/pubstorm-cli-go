@@ -3,6 +3,8 @@ package bundle
 import (
 	"archive/tar"
 	"compress/gzip"
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
@@ -255,4 +257,19 @@ func (b *Bundle) Pack(tarballPath string, showError, showProgress bool) error {
 	}
 
 	return nil
+}
+
+func Sha256Sum(path string) (string, error) {
+	hasher := sha256.New()
+
+	f, err := os.Open(path)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+	if _, err := io.Copy(hasher, f); err != nil {
+		return "", err
+	}
+
+	return hex.EncodeToString(hasher.Sum(nil)), nil
 }

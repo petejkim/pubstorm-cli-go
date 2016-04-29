@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/nitrous-io/rise-cli-go/client/deployments"
-	"github.com/nitrous-io/rise-cli-go/client/projects"
 	"github.com/nitrous-io/rise-cli-go/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -125,7 +124,7 @@ var _ = Describe("Deployments", func() {
 			resCode:    http.StatusInternalServerError,
 			resBody:    "",
 			errIsNil:   false,
-			errCode:    projects.ErrCodeUnexpectedError,
+			errCode:    deployments.ErrCodeUnexpectedError,
 			errDesc:    "",
 			errIsFatal: true,
 		}),
@@ -134,7 +133,7 @@ var _ = Describe("Deployments", func() {
 			resCode:    http.StatusCreated,
 			resBody:    `{"foo": }`,
 			errIsNil:   false,
-			errCode:    projects.ErrCodeUnexpectedError,
+			errCode:    deployments.ErrCodeUnexpectedError,
 			errDesc:    "",
 			errIsFatal: true,
 		}),
@@ -143,7 +142,7 @@ var _ = Describe("Deployments", func() {
 			resCode:    http.StatusBadRequest,
 			resBody:    `{"error": "invalid_request", "error_description": "request body is too large"}`,
 			errIsNil:   false,
-			errCode:    projects.ErrCodeValidationFailed,
+			errCode:    deployments.ErrCodeValidationFailed,
 			errDesc:    "project size is too large",
 			errIsFatal: true,
 		}),
@@ -171,6 +170,93 @@ var _ = Describe("Deployments", func() {
 			resBody:  `{"deployment": {"id": 123, "state": "deployed", "deployed_at": ` + formattedTime + `}}`,
 			errIsNil: true,
 			result:   &deployments.Deployment{ID: 123, State: "deployed", DeployedAt: deployedTime},
+		}),
+	)
+
+	DescribeTable("CreateWithChecksum",
+		func(e expectation) {
+			checksum := "bundl3ch3ck5um"
+
+			server.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("POST", "/projects/foo-bar-express/deployments"),
+					ghttp.VerifyHeader(http.Header{
+						"Authorization": {"Bearer t0k3n"},
+						"Content-Type":  {"application/x-www-form-urlencoded"},
+						"Accept":        {config.ReqAccept},
+						"User-Agent":    {config.UserAgent},
+					}),
+					ghttp.VerifyForm(url.Values{
+						"bundle_checksum": {checksum},
+					}),
+					ghttp.RespondWith(e.resCode, e.resBody),
+				),
+			)
+
+			deployment, appErr := deployments.CreateWithChecksum("t0k3n", "foo-bar-express", checksum)
+			Expect(server.ReceivedRequests()).To(HaveLen(1))
+
+			if e.errIsNil {
+				Expect(appErr).To(BeNil())
+				Expect(deployment).To(Equal(e.result))
+			} else {
+				Expect(appErr).NotTo(BeNil())
+				Expect(appErr.Code).To(Equal(e.errCode))
+				Expect(strings.ToLower(appErr.Description)).To(ContainSubstring(e.errDesc))
+				Expect(appErr.IsFatal).To(Equal(e.errIsFatal))
+			}
+		},
+
+		Entry("unexpected response code", expectation{
+			resCode:    http.StatusInternalServerError,
+			resBody:    "",
+			errIsNil:   false,
+			errCode:    deployments.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("malformed json", expectation{
+			resCode:    http.StatusCreated,
+			resBody:    `{"foo": }`,
+			errIsNil:   false,
+			errCode:    deployments.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("404 with not found", expectation{
+			resCode:    http.StatusNotFound,
+			resBody:    `{"error": "not_found", "error_description": "project could not be found"}`,
+			errIsNil:   false,
+			errCode:    deployments.ErrCodeProjectNotFound,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("422 with not found", expectation{
+			resCode:    422,
+			resBody:    `{"error": "invalid_params", "errors": {"bundle_checksum": "the bundle could not be found"}}`,
+			errIsNil:   false,
+			errCode:    deployments.ErrCodeRawBundleNotFound,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("423 with locked", expectation{
+			resCode:    423,
+			resBody:    `{"error": "locked", "error_description": "project is locked"}`,
+			errIsNil:   false,
+			errCode:    deployments.ErrCodeProjectLocked,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("successful deployment", expectation{
+			resCode:  http.StatusAccepted,
+			resBody:  `{"deployment": {"id": 123, "state": "pending_deployed"}}`,
+			errIsNil: true,
+			result:   &deployments.Deployment{ID: 123, State: "pending_deployed"},
 		}),
 	)
 

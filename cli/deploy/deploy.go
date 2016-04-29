@@ -14,6 +14,8 @@ import (
 	"github.com/nitrous-io/rise-cli-go/cli/common"
 	"github.com/nitrous-io/rise-cli-go/client/deployments"
 	"github.com/nitrous-io/rise-cli-go/client/domains"
+	"github.com/nitrous-io/rise-cli-go/client/projects"
+	"github.com/nitrous-io/rise-cli-go/client/rawbundles"
 	"github.com/nitrous-io/rise-cli-go/config"
 	"github.com/nitrous-io/rise-cli-go/pkg/ignore"
 	"github.com/nitrous-io/rise-cli-go/pkg/spinner"
@@ -96,9 +98,10 @@ func Deploy(c *cli.Context) {
 		log.Fatalf(tr.T("bundle_size_exceeded"), humanize.Bytes(uint64(config.MaxBundleSize)))
 	}
 
-	tui.Printf("\n"+tr.T("uploading_bundle")+"\n", proj.Name)
+	checksum, err := bundle.Sha256Sum(bunPath)
+	util.ExitIfError(err)
 
-	deployment, appErr := deployments.Create(token, proj.Name, bunPath, false)
+	rawBundle, appErr := rawbundles.Get(token, proj.Name, checksum)
 	if appErr != nil {
 		if appErr.Code == deployments.ErrCodeNotFound {
 			log.Fatalf(tr.T("project_not_found"), proj.Name)
@@ -107,6 +110,26 @@ func Deploy(c *cli.Context) {
 			log.Fatalf(tr.T("project_is_locked"), proj.Name)
 		}
 		appErr.Handle()
+	}
+
+	var deployment *deployments.Deployment
+	if rawBundle == nil {
+		tui.Printf("\n"+tr.T("uploading_bundle")+"\n", proj.Name)
+		deployment, appErr = deployments.Create(token, proj.Name, bunPath, false)
+		if appErr != nil {
+			if appErr.Code == projects.ErrCodeNotFound {
+				log.Fatalf(tr.T("project_not_found"), proj.Name)
+			}
+			appErr.Handle()
+		}
+	} else {
+		deployment, appErr = deployments.CreateWithChecksum(token, proj.Name, checksum)
+		if appErr != nil {
+			if appErr.Code == projects.ErrCodeNotFound {
+				log.Fatalf(tr.T("project_not_found"), proj.Name)
+			}
+			appErr.Handle()
+		}
 	}
 
 	spin := spinner.New()
