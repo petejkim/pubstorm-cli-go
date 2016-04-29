@@ -121,7 +121,6 @@ func CheckForUpdates() {
 		Uri:       config.LatestVersionURL,
 		Accept:    config.ReqAccept,
 		UserAgent: config.UserAgent,
-		Timeout:   1 * time.Second,
 	}.Do()
 
 	if err != nil {
