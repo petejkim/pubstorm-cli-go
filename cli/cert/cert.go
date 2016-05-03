@@ -134,6 +134,8 @@ func Info(c *cli.Context) {
 
 	tui.Printf(tui.Undl(tui.Bold(tr.T("cert_details")+":"))+"\n", domainName)
 	tui.Println(tr.T("cert_common_name") + ": " + ct.CommonName)
+	tui.Println(tr.T("cert_issuer") + ": " + ct.Issuer)
+	tui.Println(tr.T("cert_subject") + ": " + ct.Subject)
 	tui.Println(tr.T("cert_starts_at") + ": " + ct.StartsAt.String())
 	tui.Println(tr.T("cert_expires_at") + ": " + ct.ExpiresAt.String())
 }

@@ -238,6 +238,8 @@ var _ = Describe("Certs", func() {
 					Expect(r.CommonName).To(Equal(ct.CommonName))
 					Expect(r.StartsAt.Unix()).To(Equal(ct.StartsAt.Unix()))
 					Expect(r.ExpiresAt.Unix()).To(Equal(ct.ExpiresAt.Unix()))
+					Expect(r.Issuer).To(Equal(ct.Issuer))
+					Expect(r.Subject).To(Equal(ct.Subject))
 				} else {
 					Expect(appErr).NotTo(BeNil())
 					Expect(appErr.Code).To(Equal(e.errCode))
@@ -284,20 +286,26 @@ var _ = Describe("Certs", func() {
 
 			Entry("successful fetch", expectation{
 				resCode: http.StatusOK,
-				resBody: fmt.Sprintf(`{
-									"cert": {
-										"id": 10,
-										"starts_at": %s,
-										"expires_at": %s,
-										"common_name": "*.foo-bar-express.com"
-									}
-							  }`, formattedStartsAt, formattedExpiresAt),
+				resBody: fmt.Sprintf(`
+					{
+						"cert": {
+							"id": 10,
+							"starts_at": %s,
+							"expires_at": %s,
+							"common_name": "*.foo-bar-express.com",
+							"issuer": "/C=SG/OU=NitrousCA/L=Singapore/ST=Singapore/CN=*.foo-bar-express.com",
+							"subject": "/C=SG/O=Nitrous/L=Singapore/ST=Singapore/CN=*.foo-bar-express.com"
+						}
+					}
+				`, formattedStartsAt, formattedExpiresAt),
 				errIsNil: true,
 				result: &certs.Cert{
 					ID:         10,
 					StartsAt:   startsAt,
 					ExpiresAt:  expiresAt,
 					CommonName: "*.foo-bar-express.com",
+					Issuer:     "/C=SG/OU=NitrousCA/L=Singapore/ST=Singapore/CN=*.foo-bar-express.com",
+					Subject:    "/C=SG/O=Nitrous/L=Singapore/ST=Singapore/CN=*.foo-bar-express.com",
 				},
 			}),
 		)

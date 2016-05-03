@@ -34,6 +34,8 @@ type Cert struct {
 	StartsAt   time.Time `json:"starts_at"`
 	ExpiresAt  time.Time `json:"expires_at"`
 	CommonName string    `json:"common_name"`
+	Issuer     string    `json:"issuer"`
+	Subject    string    `json:"subject"`
 }
 
 func Create(token, name, domainName, crtPath, keyPath string) (appErr *apperror.Error) {

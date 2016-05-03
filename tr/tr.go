@@ -179,6 +179,8 @@ var strs = map[string]map[string]string{
 		"cert_not_found":          "The cert for \"%s\" could not be found",
 		"cert_details":            "Certificate details for domain \"%s\"",
 		"cert_common_name":        "Common Name",
+		"cert_issuer":             "Issuer",
+		"cert_subject":            "Subject",
 		"cert_starts_at":          "Starts At",
 		"cert_expires_at":         "Expires At",
 	},
