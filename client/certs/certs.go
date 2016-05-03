@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/franela/goreq"
 	"github.com/nitrous-io/rise-cli-go/apperror"
@@ -27,6 +28,13 @@ const (
 	ErrInvalidCert          = "invalid_cert"
 	ErrInvalidCommonName    = "invalid_common_name"
 )
+
+type Cert struct {
+	ID         uint      `json:"id"`
+	StartsAt   time.Time `json:"starts_at"`
+	ExpiresAt  time.Time `json:"expires_at"`
+	CommonName string    `json:"common_name"`
+}
 
 func Create(token, name, domainName, crtPath, keyPath string) (appErr *apperror.Error) {
 	req := goreq.Request{
@@ -96,6 +104,51 @@ func Create(token, name, domainName, crtPath, keyPath string) (appErr *apperror.
 	}
 
 	return nil
+}
+
+func Get(token, name, domainName string) (c *Cert, appErr *apperror.Error) {
+	req := goreq.Request{
+		Method:    "GET",
+		Uri:       config.Host + "/projects/" + name + "/domains/" + domainName + "/cert",
+		Accept:    config.ReqAccept,
+		UserAgent: config.UserAgent,
+	}
+	req.AddHeader("Authorization", "Bearer "+token)
+
+	res, err := req.Do()
+	if err != nil {
+		return nil, apperror.New(ErrCodeRequestFailed, err, "", true)
+	}
+	defer res.Body.Close()
+
+	if !util.ContainsInt([]int{http.StatusOK, http.StatusNotFound}, res.StatusCode) {
+		return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	if res.StatusCode == http.StatusOK {
+		var j struct {
+			Cert *Cert `json:"cert"`
+		}
+
+		if err := res.Body.FromJsonTo(&j); err != nil {
+			return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
+		}
+
+		return j.Cert, nil
+	}
+
+	var j map[string]interface{}
+	if err := res.Body.FromJsonTo(&j); err != nil {
+		return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	switch j["error_description"] {
+	case "cert could not be found":
+		return nil, apperror.New(ErrCodeNotFound, nil, "cert could not be found", true)
+	case "project could not be found":
+		return nil, apperror.New(ErrCodeProjectNotFound, nil, "project could not be found", true)
+	}
+	return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
 }
 
 func writeFileToBody(path, paramName string, bodyWriter *multipart.Writer) error {

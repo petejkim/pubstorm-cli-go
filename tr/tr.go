@@ -26,6 +26,8 @@ var strs = map[string]map[string]string{
 		"collab_desc":             "Lists collaborators for the current project",
 		"collab_add_desc":         "Add a collaborator to the current project",
 		"collab_rm_desc":          "Remove a collaborator from the current project",
+		"cert_info_desc":          "Show certificate information for a Pubstorm project",
+		"cert_info_args":          "[DOMAIN]",
 		"cert_set_desc":           "Upload an SSL certificate and a private key for a PubStorm project",
 		"cert_set_args":           "[DOMAIN] [CRT_FILE] [KEY_FILE]",
 
@@ -172,8 +174,13 @@ var strs = map[string]map[string]string{
 		"cert_too_large":          "Certificate or private key file is too large",
 		"cert_invalid":            "Certificate or prvate key file is not valid",
 		"cert_invalid_domain":     "Certificate's common name does not match \"%s\"",
-		"enter_cert_path":         "Enter Path To Certificate",
-		"enter_key_path":          "Enter Path To Private Key",
+		"cert_enter_cert_path":    "Enter Path To Certificate",
+		"cert_enter_key_path":     "Enter Path To Private Key",
+		"cert_not_found":          "The cert for \"%s\" could not be found",
+		"cert_details":            "Certificate details for domain \"%s\"",
+		"cert_common_name":        "Common Name",
+		"cert_starts_at":          "Starts At",
+		"cert_expires_at":         "Expires At",
 	},
 }
 

@@ -240,6 +240,12 @@ func main() {
 			Action: versions.Versions,
 		},
 		{
+			Name:      "cert.info",
+			Usage:     tr.T("cert_info_desc"),
+			Action:    cert.Info,
+			ArgsUsage: tr.T("cert_info_args"),
+		},
+		{
 			Name:      "cert.set",
 			Usage:     tr.T("cert_set_desc"),
 			Action:    cert.Set,
@@ -248,6 +254,12 @@ func main() {
 		{
 			Name: "cert",
 			Subcommands: []cli.Command{
+				{
+					Name:      "info",
+					Usage:     tr.T("cert_info_desc"),
+					Action:    cert.Info,
+					ArgsUsage: tr.T("cert_info_args"),
+				},
 				{
 					Name:      "set",
 					Usage:     tr.T("cert_set_desc"),

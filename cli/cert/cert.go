@@ -23,7 +23,6 @@ func Set(c *cli.Context) {
 	var err error
 
 	if len(c.Args()) < 1 {
-
 		for {
 			domainName, err = readline.Read(tui.Bold(tr.T("cert_enter_domain_name")+": "), true, "")
 			util.ExitIfErrorOrEOF(err)
@@ -39,7 +38,7 @@ func Set(c *cli.Context) {
 
 	if len(c.Args()) < 2 {
 		for {
-			crtFilePath, err = readline.Read(tui.Bold(tr.T("enter_cert_path")+": "), true, "")
+			crtFilePath, err = readline.Read(tui.Bold(tr.T("cert_enter_cert_path")+": "), true, "")
 			util.ExitIfErrorOrEOF(err)
 
 			err := checkCertFile(crtFilePath)
@@ -59,7 +58,7 @@ func Set(c *cli.Context) {
 
 	if len(c.Args()) < 3 {
 		for {
-			keyFilePath, err = readline.Read(tui.Bold(tr.T("enter_key_path")+": "), true, "")
+			keyFilePath, err = readline.Read(tui.Bold(tr.T("cert_enter_key_path")+": "), true, "")
 			util.ExitIfErrorOrEOF(err)
 
 			err := checkCertFile(keyFilePath)
@@ -98,6 +97,45 @@ func Set(c *cli.Context) {
 	}
 
 	log.Infof(tr.T("cert_set"), domainName)
+}
+
+func Info(c *cli.Context) {
+	token := common.RequireAccessToken()
+	proj := common.RequireProject(token)
+
+	var domainName string
+
+	if len(c.Args()) < 1 {
+		var err error
+		for {
+			domainName, err = readline.Read(tui.Bold(tr.T("cert_enter_domain_name")+": "), true, "")
+			util.ExitIfErrorOrEOF(err)
+
+			if domainName != "" {
+				domainName = util.SanitizeDomain(domainName)
+				break
+			}
+		}
+	} else {
+		domainName = util.SanitizeDomain(c.Args().Get(0))
+	}
+
+	ct, appErr := certs.Get(token, proj.Name, domainName)
+	if appErr != nil {
+		switch appErr.Code {
+		case certs.ErrCodeProjectNotFound:
+			log.Fatalf(tr.T("project_not_found"), proj.Name)
+		case certs.ErrCodeNotFound:
+			log.Fatalf(tr.T("cert_not_found"), domainName)
+		}
+
+		appErr.Handle()
+	}
+
+	tui.Printf(tui.Undl(tui.Bold(tr.T("cert_details")+":"))+"\n", domainName)
+	tui.Println(tr.T("cert_common_name") + ": " + ct.CommonName)
+	tui.Println(tr.T("cert_starts_at") + ": " + ct.StartsAt.String())
+	tui.Println(tr.T("cert_expires_at") + ": " + ct.ExpiresAt.String())
 }
 
 func checkCertFile(filePath string) error {

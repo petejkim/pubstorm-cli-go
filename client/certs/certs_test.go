@@ -1,15 +1,16 @@
 package certs_test
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/nitrous-io/rise-cli-go/client/certs"
-	"github.com/nitrous-io/rise-cli-go/client/deployments"
 	"github.com/nitrous-io/rise-cli-go/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -46,7 +47,7 @@ var _ = Describe("Certs", func() {
 		errCode    string
 		errDesc    string
 		errIsFatal bool
-		result     *deployments.Deployment
+		result     interface{}
 	}
 
 	DescribeTable("Create",
@@ -202,4 +203,103 @@ var _ = Describe("Certs", func() {
 			errIsNil: true,
 		}),
 	)
+
+	Describe("Get", func() {
+		var (
+			startsAt              = time.Now().Add(-365 * 24 * time.Hour)
+			expiresAt             = time.Now().Add(+365 * 24 * time.Hour)
+			formattedStartsAt, _  = startsAt.MarshalJSON()
+			formattedExpiresAt, _ = expiresAt.MarshalJSON()
+		)
+
+		DescribeTable("Get",
+			func(e expectation) {
+				server.AppendHandlers(
+					ghttp.CombineHandlers(
+						ghttp.VerifyRequest("GET", "/projects/foo-bar-express/domains/foo-bar-express.com/cert"),
+						ghttp.VerifyHeader(http.Header{
+							"Authorization": {"Bearer t0k3n"},
+							"Accept":        {config.ReqAccept},
+							"User-Agent":    {config.UserAgent},
+						}),
+						ghttp.RespondWith(e.resCode, e.resBody),
+					),
+				)
+
+				ct, appErr := certs.Get("t0k3n", "foo-bar-express", "foo-bar-express.com")
+				Expect(server.ReceivedRequests()).To(HaveLen(1))
+
+				if e.errIsNil {
+					Expect(appErr).To(BeNil())
+					Expect(ct).NotTo(BeNil())
+					r, ok := e.result.(*certs.Cert)
+					Expect(ok).To(BeTrue())
+					Expect(r.ID).To(Equal(ct.ID))
+					Expect(r.CommonName).To(Equal(ct.CommonName))
+					Expect(r.StartsAt.Unix()).To(Equal(ct.StartsAt.Unix()))
+					Expect(r.ExpiresAt.Unix()).To(Equal(ct.ExpiresAt.Unix()))
+				} else {
+					Expect(appErr).NotTo(BeNil())
+					Expect(appErr.Code).To(Equal(e.errCode))
+					Expect(strings.ToLower(appErr.Description)).To(ContainSubstring(e.errDesc))
+					Expect(appErr.IsFatal).To(Equal(e.errIsFatal))
+				}
+			},
+
+			Entry("unexpected response code", expectation{
+				resCode:    http.StatusInternalServerError,
+				resBody:    "",
+				errIsNil:   false,
+				errCode:    certs.ErrCodeUnexpectedError,
+				errDesc:    "",
+				errIsFatal: true,
+			}),
+
+			Entry("malformed json", expectation{
+				resCode:    http.StatusOK,
+				resBody:    `{"foo": }`,
+				errIsNil:   false,
+				errCode:    certs.ErrCodeUnexpectedError,
+				errDesc:    "",
+				errIsFatal: true,
+			}),
+
+			Entry("404 with cert not found", expectation{
+				resCode:    http.StatusNotFound,
+				resBody:    `{"error": "not_found", "error_description": "cert could not be found"}`,
+				errIsNil:   false,
+				errCode:    certs.ErrCodeNotFound,
+				errDesc:    "cert could not be found",
+				errIsFatal: true,
+			}),
+
+			Entry("404 with project not found", expectation{
+				resCode:    http.StatusNotFound,
+				resBody:    `{"error": "not_found", "error_description": "project could not be found"}`,
+				errIsNil:   false,
+				errCode:    certs.ErrCodeProjectNotFound,
+				errDesc:    "project could not be found",
+				errIsFatal: true,
+			}),
+
+			Entry("successful fetch", expectation{
+				resCode: http.StatusOK,
+				resBody: fmt.Sprintf(`{
+									"cert": {
+										"id": 10,
+										"starts_at": %s,
+										"expires_at": %s,
+										"common_name": "*.foo-bar-express.com"
+									}
+							  }`, formattedStartsAt, formattedExpiresAt),
+				errIsNil: true,
+				result: &certs.Cert{
+					ID:         10,
+					StartsAt:   startsAt,
+					ExpiresAt:  expiresAt,
+					CommonName: "*.foo-bar-express.com",
+				},
+			}),
+		)
+	})
 })
