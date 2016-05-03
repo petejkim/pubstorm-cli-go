@@ -8,6 +8,7 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/franela/goreq"
 
+	"github.com/nitrous-io/rise-cli-go/cli/cert"
 	"github.com/nitrous-io/rise-cli-go/cli/collab"
 	"github.com/nitrous-io/rise-cli-go/cli/common"
 	"github.com/nitrous-io/rise-cli-go/cli/deploy"
@@ -237,6 +238,23 @@ func main() {
 			Name:   "versions",
 			Usage:  tr.T("versions_desc"),
 			Action: versions.Versions,
+		},
+		{
+			Name:      "cert.set",
+			Usage:     tr.T("cert_set_desc"),
+			Action:    cert.Set,
+			ArgsUsage: tr.T("cert_set_args"),
+		},
+		{
+			Name: "cert",
+			Subcommands: []cli.Command{
+				{
+					Name:      "set",
+					Usage:     tr.T("cert_set_desc"),
+					Action:    cert.Set,
+					ArgsUsage: tr.T("cert_set_args"),
+				},
+			},
 		},
 	}
 
