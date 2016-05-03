@@ -76,7 +76,7 @@ func Set(c *cli.Context) {
 		}
 	}
 
-	appErr := certs.Create(token, proj.Name, domainName, crtFilePath, keyFilePath)
+	ct, appErr := certs.Create(token, proj.Name, domainName, crtFilePath, keyFilePath)
 	if appErr != nil {
 		switch appErr.Code {
 		case certs.ErrCodeProjectNotFound:
@@ -96,7 +96,14 @@ func Set(c *cli.Context) {
 		appErr.Handle()
 	}
 
-	log.Infof(tr.T("cert_set"), domainName)
+	log.Infof(tr.T("cert_set"), tui.Undl("https://"+domainName+"/"))
+
+	tui.Printf("\n"+tui.Undl(tui.Bold(tr.T("cert_details")+":"))+"\n", domainName)
+	tui.Println(tr.T("cert_common_name") + ": " + ct.CommonName)
+	tui.Println(tr.T("cert_issuer") + ": " + ct.Issuer)
+	tui.Println(tr.T("cert_subject") + ": " + ct.Subject)
+	tui.Println(tr.T("cert_starts_at") + ": " + ct.StartsAt.String())
+	tui.Println(tr.T("cert_expires_at") + ": " + ct.ExpiresAt.String())
 }
 
 func Info(c *cli.Context) {

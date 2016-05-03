@@ -38,7 +38,7 @@ type Cert struct {
 	Subject    string    `json:"subject"`
 }
 
-func Create(token, name, domainName, crtPath, keyPath string) (appErr *apperror.Error) {
+func Create(token, name, domainName, crtPath, keyPath string) (c *Cert, appErr *apperror.Error) {
 	req := goreq.Request{
 		Method:    "POST",
 		Uri:       config.Host + "/projects/" + name + "/domains/" + domainName + "/cert",
@@ -51,15 +51,15 @@ func Create(token, name, domainName, crtPath, keyPath string) (appErr *apperror.
 	writer := multipart.NewWriter(body)
 
 	if err := writeFileToBody(crtPath, "cert", writer); err != nil {
-		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+		return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
 
 	if err := writeFileToBody(keyPath, "key", writer); err != nil {
-		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+		return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
 
 	if err := writer.Close(); err != nil {
-		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+		return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
 
 	req.AddHeader("Content-Type", writer.FormDataContentType())
@@ -72,40 +72,48 @@ func Create(token, name, domainName, crtPath, keyPath string) (appErr *apperror.
 
 	res, err := req.Do()
 	if err != nil {
-		return apperror.New(ErrCodeRequestFailed, err, "", true)
+		return nil, apperror.New(ErrCodeRequestFailed, err, "", true)
 	}
 	defer res.Body.Close()
 
 	if !util.ContainsInt([]int{http.StatusCreated, http.StatusBadRequest, http.StatusNotFound, http.StatusForbidden, 422}, res.StatusCode) {
-		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+		return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	if res.StatusCode == http.StatusCreated {
+		var j struct {
+			Cert *Cert `json:"cert"`
+		}
+
+		if err := res.Body.FromJsonTo(&j); err != nil {
+			return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
+		}
+
+		return j.Cert, nil
 	}
 
 	var j map[string]interface{}
 	if err := res.Body.FromJsonTo(&j); err != nil {
-		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+		return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
 
-	if res.StatusCode != http.StatusCreated {
-		switch j["error_description"] {
-		case "domain could not be found":
-			return apperror.New(ErrCodeNotFound, nil, "domain could not be found", true)
-		case "project could not be found":
-			return apperror.New(ErrCodeProjectNotFound, nil, "project could not be found", true)
-		case "not allowed to upload certs for default domain":
-			return apperror.New(ErrCodeNotAllowedDomain, nil, "not allowed to upload certs for default domain", true)
-		case "request body is too large":
-			return apperror.New(ErrCodeFileSizeTooLarge, nil, "cert or key file is too large", true)
-		case "both cert and key are required":
-			return apperror.New(ErrInvalidCert, nil, "certificate or private key is missing", true)
-		case "invalid cert or key":
-			return apperror.New(ErrInvalidCert, nil, "certificate or private key is not valid", true)
-		case "invalid common name (domain name mismatch)":
-			return apperror.New(ErrInvalidCommonName, nil, "certificate is not valid for the specified domain", true)
-		}
-		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	switch j["error_description"] {
+	case "domain could not be found":
+		return nil, apperror.New(ErrCodeNotFound, nil, "domain could not be found", true)
+	case "project could not be found":
+		return nil, apperror.New(ErrCodeProjectNotFound, nil, "project could not be found", true)
+	case "not allowed to upload certs for default domain":
+		return nil, apperror.New(ErrCodeNotAllowedDomain, nil, "not allowed to upload certs for default domain", true)
+	case "request body is too large":
+		return nil, apperror.New(ErrCodeFileSizeTooLarge, nil, "cert or key file is too large", true)
+	case "both cert and key are required":
+		return nil, apperror.New(ErrInvalidCert, nil, "certificate or private key is missing", true)
+	case "invalid cert or key":
+		return nil, apperror.New(ErrInvalidCert, nil, "certificate or private key is not valid", true)
+	case "invalid common name (domain name mismatch)":
+		return nil, apperror.New(ErrInvalidCommonName, nil, "certificate is not valid for the specified domain", true)
 	}
-
-	return nil
+	return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
 }
 
 func Get(token, name, domainName string) (c *Cert, appErr *apperror.Error) {

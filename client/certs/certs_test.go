@@ -27,6 +27,11 @@ var _ = Describe("Certs", func() {
 	var (
 		origHost string
 		server   *ghttp.Server
+
+		startsAt              = time.Now().Add(-365 * 24 * time.Hour)
+		expiresAt             = time.Now().Add(+365 * 24 * time.Hour)
+		formattedStartsAt, _  = startsAt.MarshalJSON()
+		formattedExpiresAt, _ = expiresAt.MarshalJSON()
 	)
 
 	BeforeEach(func() {
@@ -112,11 +117,20 @@ var _ = Describe("Certs", func() {
 				os.Remove(keyPath)
 			}()
 
-			appErr := certs.Create("t0k3n", "foo-bar-express", "foo-bar-express.com", crtPath, keyPath)
+			ct, appErr := certs.Create("t0k3n", "foo-bar-express", "foo-bar-express.com", crtPath, keyPath)
 			Expect(server.ReceivedRequests()).To(HaveLen(1))
 
 			if e.errIsNil {
 				Expect(appErr).To(BeNil())
+				Expect(ct).NotTo(BeNil())
+				r, ok := e.result.(*certs.Cert)
+				Expect(ok).To(BeTrue())
+				Expect(r.ID).To(Equal(ct.ID))
+				Expect(r.CommonName).To(Equal(ct.CommonName))
+				Expect(r.StartsAt.Unix()).To(Equal(ct.StartsAt.Unix()))
+				Expect(r.ExpiresAt.Unix()).To(Equal(ct.ExpiresAt.Unix()))
+				Expect(r.Issuer).To(Equal(ct.Issuer))
+				Expect(r.Subject).To(Equal(ct.Subject))
 			} else {
 				Expect(appErr).NotTo(BeNil())
 				Expect(appErr.Code).To(Equal(e.errCode))
@@ -198,20 +212,32 @@ var _ = Describe("Certs", func() {
 		}),
 
 		Entry("successful creation", expectation{
-			resCode:  http.StatusCreated,
-			resBody:  `{"cert": {"id": 10 }}`,
+			resCode: http.StatusCreated,
+			resBody: fmt.Sprintf(`
+				{
+					"cert": {
+						"id": 10,
+						"starts_at": %s,
+						"expires_at": %s,
+						"common_name": "*.foo-bar-express.com",
+						"issuer": "/C=SG/OU=NitrousCA/L=Singapore/ST=Singapore/CN=*.foo-bar-express.com",
+						"subject": "/C=SG/O=Nitrous/L=Singapore/ST=Singapore/CN=*.foo-bar-express.com"
+					}
+				}
+			`, formattedStartsAt, formattedExpiresAt),
 			errIsNil: true,
+			result: &certs.Cert{
+				ID:         10,
+				StartsAt:   startsAt,
+				ExpiresAt:  expiresAt,
+				CommonName: "*.foo-bar-express.com",
+				Issuer:     "/C=SG/OU=NitrousCA/L=Singapore/ST=Singapore/CN=*.foo-bar-express.com",
+				Subject:    "/C=SG/O=Nitrous/L=Singapore/ST=Singapore/CN=*.foo-bar-express.com",
+			},
 		}),
 	)
 
 	Describe("Get", func() {
-		var (
-			startsAt              = time.Now().Add(-365 * 24 * time.Hour)
-			expiresAt             = time.Now().Add(+365 * 24 * time.Hour)
-			formattedStartsAt, _  = startsAt.MarshalJSON()
-			formattedExpiresAt, _ = expiresAt.MarshalJSON()
-		)
-
 		DescribeTable("Get",
 			func(e expectation) {
 				server.AppendHandlers(

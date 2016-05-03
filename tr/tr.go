@@ -167,7 +167,7 @@ var strs = map[string]map[string]string{
 		"versions_list": "Completed deployments for \"%s\"",
 
 		"cert_enter_domain_name":  "Enter Domain Name",
-		"cert_set":                "Successfully set an SSL certificate for \"https://%s/\".",
+		"cert_set":                "Successfully set an SSL certificate for %s",
 		"cert_file_not_found":     "\"%s\" could not be found",
 		"cert_file_invalid":       "\"%s\" is invalid",
 		"cert_not_allowed_domain": "You cannot set an SSL certificate for the domain \"%s\"",
