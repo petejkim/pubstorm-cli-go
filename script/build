@@ -19,7 +19,7 @@ riseVersion=${RISE_VERSION:-"`cat VERSION`-`git rev-parse --short HEAD`"}
 # those are exposed in the client anyway
 case $RISE_CLI_ENV in
   "staging")
-    riseHost=${RISE_HOST:-"http://api.risestaging.com"}
+    riseHost=${RISE_HOST:-"https://api.risestaging.com"}
     riseDefaultDomain=${RISE_DEFAULT_DOMAIN:-"risestaging.cloud"}
     riseWebsiteHost=${RISE_WEBSITE_HOST:-"http://www.risestaging.com"}
     riseLatestVersionURL=${RISE_LATEST_VERSION_URL:-"https://pubstorm-updates-staging.s3-us-west-2.amazonaws.com/latest.json"}
