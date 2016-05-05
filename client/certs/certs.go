@@ -161,6 +161,44 @@ func Get(token, name, domainName string) (c *Cert, appErr *apperror.Error) {
 	return nil, apperror.New(ErrCodeUnexpectedError, err, "", true)
 }
 
+func Delete(token, name, domainName string) (appErr *apperror.Error) {
+	req := goreq.Request{
+		Method:    "DELETE",
+		Uri:       config.Host + "/projects/" + name + "/domains/" + domainName + "/cert",
+		Accept:    config.ReqAccept,
+		UserAgent: config.UserAgent,
+	}
+	req.AddHeader("Authorization", "Bearer "+token)
+
+	res, err := req.Do()
+	if err != nil {
+		return apperror.New(ErrCodeRequestFailed, err, "", true)
+	}
+	defer res.Body.Close()
+
+	if !util.ContainsInt([]int{http.StatusOK, http.StatusNotFound}, res.StatusCode) {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	var j map[string]interface{}
+	if err := res.Body.FromJsonTo(&j); err != nil {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	if res.StatusCode == http.StatusNotFound {
+		switch j["error_description"] {
+		case "cert could not be found":
+			return apperror.New(ErrCodeNotFound, nil, "cert could not be found", true)
+		case "project could not be found":
+			return apperror.New(ErrCodeProjectNotFound, nil, "project could not be found", true)
+		}
+
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	return nil
+}
+
 func writeFileToBody(path, paramName string, bodyWriter *multipart.Writer) error {
 	f, err := os.Open(path)
 	if err != nil {
