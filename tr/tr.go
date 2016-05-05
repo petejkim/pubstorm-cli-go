@@ -30,6 +30,8 @@ var strs = map[string]map[string]string{
 		"cert_info_args":          "[DOMAIN]",
 		"cert_set_desc":           "Upload an SSL certificate and a private key for a PubStorm project",
 		"cert_set_args":           "[DOMAIN] [CRT_FILE] [KEY_FILE]",
+		"cert_rm_desc":            "Remove an SSL certificate and a private key for a PubStorm project",
+		"cert_rm_args":            "[DOMAIN]",
 
 		"update_available":       "A PubStorm update is available.",
 		"update_current_version": "Your version: %s",
@@ -183,6 +185,7 @@ var strs = map[string]map[string]string{
 		"cert_subject":            "Subject",
 		"cert_starts_at":          "Starts At",
 		"cert_expires_at":         "Expires At",
+		"cert_removed":            "Successfully removed SSL certificate for %s",
 	},
 }
 

@@ -251,6 +251,12 @@ func main() {
 			ArgsUsage: tr.T("cert_set_args"),
 		},
 		{
+			Name:      "cert.rm",
+			Usage:     tr.T("cert_rm_desc"),
+			Action:    cert.Delete,
+			ArgsUsage: tr.T("cert_rm_args"),
+		},
+		{
 			Name: "cert",
 			Subcommands: []cli.Command{
 				{
@@ -264,6 +270,12 @@ func main() {
 					Usage:     tr.T("cert_set_desc"),
 					Action:    cert.Set,
 					ArgsUsage: tr.T("cert_set_args"),
+				},
+				{
+					Name:      "rm",
+					Usage:     tr.T("cert_rm_desc"),
+					Action:    cert.Delete,
+					ArgsUsage: tr.T("cert_rm_args"),
 				},
 			},
 		},

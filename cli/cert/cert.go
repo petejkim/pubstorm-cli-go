@@ -148,6 +148,42 @@ func Info(c *cli.Context) {
 	tui.Println(tr.T("cert_expires_at") + ": " + ct.ExpiresAt.String())
 }
 
+func Delete(c *cli.Context) {
+	token := common.RequireAccessToken()
+	proj := common.RequireProject(token)
+
+	var domainName string
+
+	if len(c.Args()) < 1 {
+		var err error
+		for {
+			domainName, err = readline.Read(tui.Bold(tr.T("cert_enter_domain_name")+": "), true, "")
+			util.ExitIfErrorOrEOF(err)
+
+			if domainName != "" {
+				domainName = util.SanitizeDomain(domainName)
+				break
+			}
+		}
+	} else {
+		domainName = util.SanitizeDomain(c.Args().Get(0))
+	}
+
+	appErr := certs.Delete(token, proj.Name, domainName)
+	if appErr != nil {
+		switch appErr.Code {
+		case certs.ErrCodeProjectNotFound:
+			log.Fatalf(tr.T("project_not_found"), proj.Name)
+		case certs.ErrCodeNotFound:
+			log.Fatalf(tr.T("cert_not_found"), domainName)
+		}
+
+		appErr.Handle()
+	}
+
+	log.Infof(tr.T("cert_removed"), domainName)
+}
+
 func checkCertFile(filePath string) error {
 	fi, err := os.Stat(filePath)
 	if err != nil {
