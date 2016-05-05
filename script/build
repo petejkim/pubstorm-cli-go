@@ -29,7 +29,7 @@ case $RISE_CLI_ENV in
   "production")
     riseHost=${RISE_HOST:-"https://api.pubstorm.com"}
     riseDefaultDomain=${RISE_DEFAULT_DOMAIN:-"pubstorm.site"}
-    riseWebsiteHost=${RISE_WEBSITE_HOST:-"http://www.pubstorm.com"}
+    riseWebsiteHost=${RISE_WEBSITE_HOST:-"https://www.pubstorm.com"}
     riseLatestVersionURL=${RISE_LATEST_VERSION_URL:-"https://pubstorm-updates.s3-us-west-2.amazonaws.com/latest.json"}
     riseClientID=${RISE_CLIENT_ID:-"70211de132f778378407fd94195bc2e6"}
     riseClientSecret=${RISE_CLIENT_SECRET:-"69f9a67ac8fd44b19b1fa3426cede97f410b7fe5335a79f0bbd0023ec64a2658c95e9511760121e7231d131e2950d485a76d3d32db3eab70745095f8fd901b79"}
