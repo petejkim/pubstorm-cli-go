@@ -13,6 +13,7 @@ import (
 	"github.com/nitrous-io/rise-cli-go/client/deployments"
 	"github.com/nitrous-io/rise-cli-go/client/domains"
 	"github.com/nitrous-io/rise-cli-go/config"
+	"github.com/nitrous-io/rise-cli-go/pkg/ignore"
 	"github.com/nitrous-io/rise-cli-go/pkg/spinner"
 	"github.com/nitrous-io/rise-cli-go/tr"
 	"github.com/nitrous-io/rise-cli-go/tui"
@@ -20,6 +21,8 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 )
+
+const StormIgnoreFile = ".stormignore"
 
 func Deploy(c *cli.Context) {
 	verbose := c.Bool("verbose")
@@ -30,10 +33,25 @@ func Deploy(c *cli.Context) {
 	absPath, err := filepath.Abs(proj.Path)
 	util.ExitIfError(err)
 
+	ignoreFiles := []string{config.ProjectJSON, ".git", ".svn", ".hg", "CVS", ".DS_Store", ".AppleDouble", ".LSOverride", ".Spotlight-V100", ".Trashes", "Thumbs.db"}
+	_, err = os.Stat(StormIgnoreFile)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			util.ExitIfError(err)
+		}
+	} else {
+		b, err := ioutil.ReadFile(StormIgnoreFile)
+		util.ExitIfError(err)
+
+		for _, ignoreFile := range ignore.Parse(string(b)) {
+			ignoreFiles = append(ignoreFiles, ignoreFile)
+		}
+	}
+
 	tui.Printf(tr.T("scanning_path")+"\n", absPath)
 
 	bun := bundle.New(proj.Path)
-	count, size, err := bun.Assemble([]string{config.ProjectJSON, "Thumbs.db", "desktop.ini"}, verbose)
+	count, size, err := bun.Assemble(ignoreFiles, verbose)
 
 	log.Infof(tr.T("bundling_file_count_size"), humanize.Comma(int64(count)), humanize.Bytes(uint64(size)))
 
