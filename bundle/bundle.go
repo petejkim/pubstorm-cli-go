@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/nitrous-io/rise-cli-go/pkg/pathmatch"
 	"github.com/nitrous-io/rise-cli-go/progressbar"
@@ -211,8 +212,14 @@ func (b *Bundle) Pack(tarballPath string, showError, showProgress bool) error {
 			return err
 		}
 
-		hdr, err := tar.FileInfoHeader(fi, path)
-		hdr.Name = path
+		unixPath := path
+
+		if filepath.Separator != '/' {
+			unixPath = strings.Replace(path, string(filepath.Separator), "/", -1)
+		}
+
+		hdr, err := tar.FileInfoHeader(fi, unixPath)
+		hdr.Name = unixPath
 		if err != nil {
 			logErr(fmt.Sprintf(tr.T("stat_failed"), absPath))
 			return err
