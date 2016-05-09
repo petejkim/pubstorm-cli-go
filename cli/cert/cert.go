@@ -3,10 +3,13 @@ package cert
 import (
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 
 	"github.com/codegangsta/cli"
 	"github.com/nitrous-io/rise-cli-go/cli/common"
 	"github.com/nitrous-io/rise-cli-go/client/certs"
+	"github.com/nitrous-io/rise-cli-go/client/domains"
 	"github.com/nitrous-io/rise-cli-go/pkg/readline"
 	"github.com/nitrous-io/rise-cli-go/tr"
 	"github.com/nitrous-io/rise-cli-go/tui"
@@ -145,6 +148,67 @@ func Info(c *cli.Context) {
 	tui.Println(tr.T("cert_subject") + ": " + ct.Subject)
 	tui.Println(tr.T("cert_starts_at") + ": " + ct.StartsAt.String())
 	tui.Println(tr.T("cert_expires_at") + ": " + ct.ExpiresAt.String())
+}
+
+func ForceHTTPS(c *cli.Context) {
+	token := common.RequireAccessToken()
+	proj := common.RequireProject(token)
+
+	var (
+		domainName string
+		forceHTTPS bool
+	)
+
+	if len(c.Args()) < 1 {
+		var err error
+		for {
+			domainName, err = readline.Read(tui.Bold(tr.T("cert_enter_domain_name")+": "), true, "")
+			util.ExitIfErrorOrEOF(err)
+
+			if domainName != "" {
+				domainName = util.SanitizeDomain(domainName)
+				break
+			}
+		}
+	} else {
+		domainName = util.SanitizeDomain(c.Args().Get(0))
+	}
+
+	if len(c.Args()) < 2 {
+		forceHTTPSStr, err := readline.Read(tui.Bold(tr.T("cert_enter_force_https")+" [y/N]: "), true, "n")
+		util.ExitIfErrorOrEOF(err)
+
+		forceHTTPS = strings.ToUpper(forceHTTPSStr) == "Y"
+	} else {
+		var err error
+		forceHTTPS, err = strconv.ParseBool(c.Args().Get(1))
+		util.ExitIfErrorOrEOF(err)
+	}
+
+	if !proj.DefaultDomainEnabled && domainName == proj.DefaultDomain() {
+		log.Fatalf(tr.T("cert_cannot_force_https_disabled_domain"))
+		return
+	}
+
+	appErr := domains.Update(token, proj.Name, domainName, forceHTTPS)
+	if appErr != nil {
+		switch appErr.Code {
+		case domains.ErrCodeProjectNotFound:
+			log.Fatalf(tr.T("project_not_found"), proj.Name)
+		case domains.ErrCodeNotFound:
+			log.Fatalf(tr.T("domain_not_found"), domainName)
+		case domains.ErrCodeSSLCertNotFound:
+			log.Fatalf(tr.T("cert_not_found"), domainName)
+		}
+
+		appErr.Handle()
+	}
+
+	if forceHTTPS {
+		tui.Printf(tui.Undl(tui.Bold(tr.T("cert_force_https_enabled")+"\n")), domainName)
+	} else {
+		tui.Printf(tui.Undl(tui.Bold(tr.T("cert_force_https_disabled")+"\n")), domainName)
+	}
 }
 
 func checkCertFile(filePath string) error {
