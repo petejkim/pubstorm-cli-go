@@ -238,7 +238,7 @@ var _ = Describe("Domains", func() {
 		}),
 
 		Entry("malformed json", expectation{
-			resCode:    http.StatusCreated,
+			resCode:    http.StatusOK,
 			resBody:    `{"foo": }`,
 			errIsNil:   false,
 			errCode:    domains.ErrCodeUnexpectedError,
@@ -267,6 +267,89 @@ var _ = Describe("Domains", func() {
 		Entry("successfully deleted", expectation{
 			resCode:  http.StatusOK,
 			resBody:  `{"deleted": true}`,
+			errIsNil: true,
+		}),
+	)
+
+	DescribeTable("Update",
+		func(e expectation) {
+			server.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("PUT", "/projects/foo-bar-express/domains/foo-bar-express.com"),
+					ghttp.VerifyHeader(http.Header{
+						"Authorization": {"Bearer t0k3n"},
+						"Accept":        {config.ReqAccept},
+						"User-Agent":    {config.UserAgent},
+						"Content-Type":  {"application/x-www-form-urlencoded"},
+					}),
+					ghttp.VerifyForm(url.Values{
+						"force_https": {"true"},
+					}),
+					ghttp.RespondWith(e.resCode, e.resBody),
+				),
+			)
+
+			appErr := domains.Update("t0k3n", "foo-bar-express", "foo-bar-express.com", true)
+			Expect(server.ReceivedRequests()).To(HaveLen(1))
+
+			if e.errIsNil {
+				Expect(appErr).To(BeNil())
+			} else {
+				Expect(appErr).NotTo(BeNil())
+				Expect(appErr.Code).To(Equal(e.errCode))
+				Expect(strings.ToLower(appErr.Description)).To(ContainSubstring(e.errDesc))
+				Expect(appErr.IsFatal).To(Equal(e.errIsFatal))
+			}
+		},
+
+		Entry("unexpected response code", expectation{
+			resCode:    http.StatusInternalServerError,
+			resBody:    "",
+			errIsNil:   false,
+			errCode:    domains.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("malformed json", expectation{
+			resCode:    http.StatusOK,
+			resBody:    `{"foo": }`,
+			errIsNil:   false,
+			errCode:    domains.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("403 with forbidden", expectation{
+			resCode:    http.StatusForbidden,
+			resBody:    `{"error": "forbidden", "error_description": "ssl cert could not be found for the domain"}`,
+			errIsNil:   false,
+			errCode:    domains.ErrCodeSSLCertNotFound,
+			errDesc:    "ssl cert could not be found for the domain",
+			errIsFatal: true,
+		}),
+
+		Entry("404 with project not found", expectation{
+			resCode:    http.StatusNotFound,
+			resBody:    `{"error": "not_found", "error_description": "project could not be found"}`,
+			errIsNil:   false,
+			errCode:    domains.ErrCodeProjectNotFound,
+			errDesc:    "project could not be found",
+			errIsFatal: true,
+		}),
+
+		Entry("404 with domain not found", expectation{
+			resCode:    http.StatusNotFound,
+			resBody:    `{"error": "not_found", "error_description": "domain could not be found"}`,
+			errIsNil:   false,
+			errCode:    domains.ErrCodeNotFound,
+			errDesc:    "domain could not be found",
+			errIsFatal: true,
+		}),
+
+		Entry("successfully deleted", expectation{
+			resCode:  http.StatusOK,
+			resBody:  `{"updated": true}`,
 			errIsNil: true,
 		}),
 	)

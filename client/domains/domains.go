@@ -1,6 +1,7 @@
 package domains
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 
@@ -13,9 +14,11 @@ import (
 const (
 	ErrCodeRequestFailed    = "request_failed"
 	ErrCodeUnexpectedError  = "unexpected_error"
+	ErrCodeProjectNotFound  = "project_not_found"
 	ErrCodeNotFound         = "not_found"
 	ErrCodeValidationFailed = "validation_failed"
 	ErrCodeLimitReached     = "limit_reached"
+	ErrCodeSSLCertNotFound  = "ssl_cert_not_found"
 )
 
 func Index(token, projectName string) (domainNames []string, appErr *apperror.Error) {
@@ -136,6 +139,50 @@ func Delete(token, projectName, name string) (appErr *apperror.Error) {
 
 	if res.StatusCode == http.StatusNotFound {
 		return apperror.New(ErrCodeNotFound, nil, j["error_description"].(string), true)
+	}
+
+	return nil
+}
+
+func Update(token, projectName, name string, forceHTTPS bool) (appErr *apperror.Error) {
+	req := goreq.Request{
+		Method:      "PUT",
+		Uri:         config.Host + "/projects/" + projectName + "/domains/" + name,
+		ContentType: "application/x-www-form-urlencoded",
+		Accept:      config.ReqAccept,
+		UserAgent:   config.UserAgent,
+
+		Body: url.Values{
+			"force_https": {fmt.Sprintf("%v", forceHTTPS)},
+		}.Encode(),
+	}
+
+	req.AddHeader("Authorization", "Bearer "+token)
+	res, err := req.Do()
+
+	if err != nil {
+		return apperror.New(ErrCodeRequestFailed, err, "", true)
+	}
+
+	if !util.ContainsInt([]int{http.StatusOK, http.StatusForbidden, http.StatusNotFound}, res.StatusCode) {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	var j map[string]interface{}
+	if err := res.Body.FromJsonTo(&j); err != nil {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	if res.StatusCode != http.StatusOK {
+		switch j["error_description"] {
+		case "ssl cert could not be found for the domain":
+			return apperror.New(ErrCodeSSLCertNotFound, err, "ssl cert could not be found for the domain", true)
+		case "project could not be found":
+			return apperror.New(ErrCodeProjectNotFound, err, "project could not be found", true)
+		case "domain could not be found":
+			return apperror.New(ErrCodeNotFound, err, "domain could not be found", true)
+		}
+		return apperror.New(ErrCodeUnexpectedError, nil, "", true)
 	}
 
 	return nil
