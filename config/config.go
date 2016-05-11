@@ -57,6 +57,7 @@ func init() {
 
 	if BuildEnv != "production" {
 		DotRisePath += "-" + BuildEnv
+		ProjectJSON = "pubstorm-" + BuildEnv + ".json"
 	}
 
 	if err := os.MkdirAll(DotRisePath, 0700); err != nil {
