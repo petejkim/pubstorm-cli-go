@@ -67,7 +67,6 @@ func main() {
 	goreq.SetConnectTimeout(10 * time.Second)
 
 	app := cli.NewApp()
-	app.Name = config.AppName
 	app.Version = config.Version
 	app.Usage = tr.T("rise_cli_desc")
 
