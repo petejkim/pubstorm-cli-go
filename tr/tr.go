@@ -176,7 +176,7 @@ var strs = map[string]map[string]string{
 		"cert_invalid_domain":     "Certificate's common name does not match \"%s\"",
 		"cert_enter_cert_path":    "Enter Path To Certificate",
 		"cert_enter_key_path":     "Enter Path To Private Key",
-		"cert_not_found":          "The cert for \"%s\" could not be found",
+		"cert_not_found":          "No certificate for \"%s\"",
 		"cert_details":            "Certificate details for domain \"%s\"",
 		"cert_common_name":        "Common Name",
 		"cert_issuer":             "Issuer",

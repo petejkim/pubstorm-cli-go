@@ -133,7 +133,8 @@ func Info(c *cli.Context) {
 		case certs.ErrCodeProjectNotFound:
 			log.Fatalf(tr.T("project_not_found"), proj.Name)
 		case certs.ErrCodeNotFound:
-			log.Fatalf(tr.T("cert_not_found"), domainName)
+			log.Infof(tr.T("cert_not_found"), domainName)
+			return
 		}
 
 		appErr.Handle()
