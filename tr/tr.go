@@ -134,7 +134,7 @@ var strs = map[string]map[string]string{
 
 		"will_invalidate_session":     "Changing password will log you out from all other active sessions.",
 		"enter_existing_password":     "Enter Existing Password",
-		"password_changed":            "Your password is updated.",
+		"password_changed":            "Your password has been changed.",
 		"reenter_email":               "Please re-enter your email address to login with your new password.",
 		"existing_password_incorrect": "The existing password you've entered is incorrect.",
 		"new_password_same":           "You cannot reuse your previous password.",
