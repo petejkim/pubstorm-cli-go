@@ -237,82 +237,81 @@ var _ = Describe("Certs", func() {
 		}),
 	)
 
-	Describe("Get", func() {
-		DescribeTable("Get",
-			func(e expectation) {
-				server.AppendHandlers(
-					ghttp.CombineHandlers(
-						ghttp.VerifyRequest("GET", "/projects/foo-bar-express/domains/foo-bar-express.com/cert"),
-						ghttp.VerifyHeader(http.Header{
-							"Authorization": {"Bearer t0k3n"},
-							"Accept":        {config.ReqAccept},
-							"User-Agent":    {config.UserAgent},
-						}),
-						ghttp.RespondWith(e.resCode, e.resBody),
-					),
-				)
+	DescribeTable("Get",
+		func(e expectation) {
+			server.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("GET", "/projects/foo-bar-express/domains/foo-bar-express.com/cert"),
+					ghttp.VerifyHeader(http.Header{
+						"Authorization": {"Bearer t0k3n"},
+						"Accept":        {config.ReqAccept},
+						"User-Agent":    {config.UserAgent},
+					}),
+					ghttp.RespondWith(e.resCode, e.resBody),
+				),
+			)
 
-				ct, appErr := certs.Get("t0k3n", "foo-bar-express", "foo-bar-express.com")
-				Expect(server.ReceivedRequests()).To(HaveLen(1))
+			ct, appErr := certs.Get("t0k3n", "foo-bar-express", "foo-bar-express.com")
+			Expect(server.ReceivedRequests()).To(HaveLen(1))
 
-				if e.errIsNil {
-					Expect(appErr).To(BeNil())
-					Expect(ct).NotTo(BeNil())
-					r, ok := e.result.(*certs.Cert)
-					Expect(ok).To(BeTrue())
-					Expect(r.ID).To(Equal(ct.ID))
-					Expect(r.CommonName).To(Equal(ct.CommonName))
-					Expect(r.StartsAt.Unix()).To(Equal(ct.StartsAt.Unix()))
-					Expect(r.ExpiresAt.Unix()).To(Equal(ct.ExpiresAt.Unix()))
-					Expect(r.Issuer).To(Equal(ct.Issuer))
-					Expect(r.Subject).To(Equal(ct.Subject))
-				} else {
-					Expect(appErr).NotTo(BeNil())
-					Expect(appErr.Code).To(Equal(e.errCode))
-					Expect(strings.ToLower(appErr.Description)).To(ContainSubstring(e.errDesc))
-					Expect(appErr.IsFatal).To(Equal(e.errIsFatal))
-				}
-			},
+			if e.errIsNil {
+				Expect(appErr).To(BeNil())
+				Expect(ct).NotTo(BeNil())
+				r, ok := e.result.(*certs.Cert)
+				Expect(ok).To(BeTrue())
+				Expect(r.ID).To(Equal(ct.ID))
+				Expect(r.CommonName).To(Equal(ct.CommonName))
+				Expect(r.StartsAt.Unix()).To(Equal(ct.StartsAt.Unix()))
+				Expect(r.ExpiresAt.Unix()).To(Equal(ct.ExpiresAt.Unix()))
+				Expect(r.Issuer).To(Equal(ct.Issuer))
+				Expect(r.Subject).To(Equal(ct.Subject))
+			} else {
+				Expect(appErr).NotTo(BeNil())
+				Expect(appErr.Code).To(Equal(e.errCode))
+				Expect(strings.ToLower(appErr.Description)).To(ContainSubstring(e.errDesc))
+				Expect(appErr.IsFatal).To(Equal(e.errIsFatal))
+			}
+		},
 
-			Entry("unexpected response code", expectation{
-				resCode:    http.StatusInternalServerError,
-				resBody:    "",
-				errIsNil:   false,
-				errCode:    certs.ErrCodeUnexpectedError,
-				errDesc:    "",
-				errIsFatal: true,
-			}),
+		Entry("unexpected response code", expectation{
+			resCode:    http.StatusInternalServerError,
+			resBody:    "",
+			errIsNil:   false,
+			errCode:    certs.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
 
-			Entry("malformed json", expectation{
-				resCode:    http.StatusOK,
-				resBody:    `{"foo": }`,
-				errIsNil:   false,
-				errCode:    certs.ErrCodeUnexpectedError,
-				errDesc:    "",
-				errIsFatal: true,
-			}),
+		Entry("malformed json", expectation{
+			resCode:    http.StatusOK,
+			resBody:    `{"foo": }`,
+			errIsNil:   false,
+			errCode:    certs.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
 
-			Entry("404 with cert not found", expectation{
-				resCode:    http.StatusNotFound,
-				resBody:    `{"error": "not_found", "error_description": "cert could not be found"}`,
-				errIsNil:   false,
-				errCode:    certs.ErrCodeNotFound,
-				errDesc:    "cert could not be found",
-				errIsFatal: true,
-			}),
+		Entry("404 with cert not found", expectation{
+			resCode:    http.StatusNotFound,
+			resBody:    `{"error": "not_found", "error_description": "cert could not be found"}`,
+			errIsNil:   false,
+			errCode:    certs.ErrCodeNotFound,
+			errDesc:    "cert could not be found",
+			errIsFatal: true,
+		}),
 
-			Entry("404 with project not found", expectation{
-				resCode:    http.StatusNotFound,
-				resBody:    `{"error": "not_found", "error_description": "project could not be found"}`,
-				errIsNil:   false,
-				errCode:    certs.ErrCodeProjectNotFound,
-				errDesc:    "project could not be found",
-				errIsFatal: true,
-			}),
+		Entry("404 with project not found", expectation{
+			resCode:    http.StatusNotFound,
+			resBody:    `{"error": "not_found", "error_description": "project could not be found"}`,
+			errIsNil:   false,
+			errCode:    certs.ErrCodeProjectNotFound,
+			errDesc:    "project could not be found",
+			errIsFatal: true,
+		}),
 
-			Entry("successful fetch", expectation{
-				resCode: http.StatusOK,
-				resBody: fmt.Sprintf(`
+		Entry("successful fetch", expectation{
+			resCode: http.StatusOK,
+			resBody: fmt.Sprintf(`
 					{
 						"cert": {
 							"id": 10,
@@ -324,16 +323,85 @@ var _ = Describe("Certs", func() {
 						}
 					}
 				`, formattedStartsAt, formattedExpiresAt),
-				errIsNil: true,
-				result: &certs.Cert{
-					ID:         10,
-					StartsAt:   startsAt,
-					ExpiresAt:  expiresAt,
-					CommonName: "*.foo-bar-express.com",
-					Issuer:     "/C=SG/OU=NitrousCA/L=Singapore/ST=Singapore/CN=*.foo-bar-express.com",
-					Subject:    "/C=SG/O=Nitrous/L=Singapore/ST=Singapore/CN=*.foo-bar-express.com",
-				},
-			}),
-		)
-	})
+			errIsNil: true,
+			result: &certs.Cert{
+				ID:         10,
+				StartsAt:   startsAt,
+				ExpiresAt:  expiresAt,
+				CommonName: "*.foo-bar-express.com",
+				Issuer:     "/C=SG/OU=NitrousCA/L=Singapore/ST=Singapore/CN=*.foo-bar-express.com",
+				Subject:    "/C=SG/O=Nitrous/L=Singapore/ST=Singapore/CN=*.foo-bar-express.com",
+			},
+		}),
+	)
+
+	DescribeTable("Delete",
+		func(e expectation) {
+			server.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("DELETE", "/projects/foo-bar-express/domains/foo-bar-express.com/cert"),
+					ghttp.VerifyHeader(http.Header{
+						"Authorization": {"Bearer t0k3n"},
+						"Accept":        {config.ReqAccept},
+						"User-Agent":    {config.UserAgent},
+					}),
+					ghttp.RespondWith(e.resCode, e.resBody),
+				),
+			)
+
+			appErr := certs.Delete("t0k3n", "foo-bar-express", "foo-bar-express.com")
+			Expect(server.ReceivedRequests()).To(HaveLen(1))
+
+			if e.errIsNil {
+				Expect(appErr).To(BeNil())
+			} else {
+				Expect(appErr).NotTo(BeNil())
+				Expect(appErr.Code).To(Equal(e.errCode))
+				Expect(strings.ToLower(appErr.Description)).To(ContainSubstring(e.errDesc))
+				Expect(appErr.IsFatal).To(Equal(e.errIsFatal))
+			}
+		},
+
+		Entry("unexpected response code", expectation{
+			resCode:    http.StatusInternalServerError,
+			resBody:    "",
+			errIsNil:   false,
+			errCode:    certs.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("malformed json", expectation{
+			resCode:    http.StatusOK,
+			resBody:    `{"foo": }`,
+			errIsNil:   false,
+			errCode:    certs.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("404 with cert not found", expectation{
+			resCode:    http.StatusNotFound,
+			resBody:    `{"error": "not_found", "error_description": "cert could not be found"}`,
+			errIsNil:   false,
+			errCode:    certs.ErrCodeNotFound,
+			errDesc:    "cert could not be found",
+			errIsFatal: true,
+		}),
+
+		Entry("404 with project not found", expectation{
+			resCode:    http.StatusNotFound,
+			resBody:    `{"error": "not_found", "error_description": "project could not be found"}`,
+			errIsNil:   false,
+			errCode:    certs.ErrCodeProjectNotFound,
+			errDesc:    "project could not be found",
+			errIsFatal: true,
+		}),
+
+		Entry("successful fetch", expectation{
+			resCode:  http.StatusOK,
+			resBody:  `{"deleted": true}`,
+			errIsNil: true,
+		}),
+	)
 })
