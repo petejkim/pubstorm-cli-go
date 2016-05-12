@@ -17,11 +17,7 @@ type Project struct {
 	Path string `json:"path"`
 
 	DefaultDomainEnabled bool `json:"default_domain_enabled"`
-
-	// TODO These 2 flags should be read from the API server (like
-	// DefaultDomainEnabled).
-	EnableStats bool `json:"enable_stats"`
-	ForceHTTPS  bool `json:"force_https"`
+	ForceHTTPS           bool `json:"force_https"`
 }
 
 // projConfig is used to marshal and unmarshal data that's written to the local

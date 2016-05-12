@@ -32,6 +32,8 @@ var strs = map[string]map[string]string{
 		"ssl_set_args":            "[DOMAIN] [CRT_FILE] [KEY_FILE]",
 		"ssl_rm_desc":             "Remove an SSL certificate and a private key for a PubStorm project",
 		"ssl_rm_args":             "[DOMAIN]",
+		"ssl_force_desc":          "Enable or disable forced SSL/HTTPS",
+		"ssl_force_args":          "[on/off]",
 
 		"update_available":       "A PubStorm update is available.",
 		"update_current_version": "Your version: %s",
@@ -178,7 +180,7 @@ var strs = map[string]map[string]string{
 		"cert_invalid_domain":     "Certificate's common name does not match \"%s\"",
 		"cert_enter_cert_path":    "Enter Path To Certificate",
 		"cert_enter_key_path":     "Enter Path To Private Key",
-		"cert_not_found":          "No certificate for \"%s\"",
+		"cert_not_found":          "The cert for \"%s\" could not be found",
 		"cert_details":            "Certificate details for domain \"%s\"",
 		"cert_common_name":        "Common Name",
 		"cert_issuer":             "Issuer",
@@ -186,6 +188,9 @@ var strs = map[string]map[string]string{
 		"cert_starts_at":          "Starts At",
 		"cert_expires_at":         "Expires At",
 		"cert_removed":            "Successfully removed SSL certificate for %s",
+
+		"cert_force_https_enabled":  "Forced SSL/HTTPS is enabled.",
+		"cert_force_https_disabled": "Forced SSL/HTTPS is disabled.",
 	},
 }
 

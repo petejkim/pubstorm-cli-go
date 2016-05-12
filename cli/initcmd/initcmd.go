@@ -64,9 +64,6 @@ func Init(c *cli.Context) {
 		break
 	}
 
-	proj.EnableStats = true
-	proj.ForceHTTPS = false
-
 	for {
 		proj.Name, err = readline.Read(tui.Bold(tr.T("enter_project_name")+": "), true, "")
 		util.ExitIfErrorOrEOF(err)

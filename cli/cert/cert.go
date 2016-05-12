@@ -3,10 +3,12 @@ package cert
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/codegangsta/cli"
 	"github.com/nitrous-io/rise-cli-go/cli/common"
 	"github.com/nitrous-io/rise-cli-go/client/certs"
+	"github.com/nitrous-io/rise-cli-go/client/projects"
 	"github.com/nitrous-io/rise-cli-go/pkg/readline"
 	"github.com/nitrous-io/rise-cli-go/tr"
 	"github.com/nitrous-io/rise-cli-go/tui"
@@ -182,6 +184,29 @@ func Delete(c *cli.Context) {
 	}
 
 	log.Infof(tr.T("cert_removed"), domainName)
+}
+
+func Force(c *cli.Context) {
+	token := common.RequireAccessToken()
+	proj := common.RequireProject(token)
+
+	arg := c.Args().Get(0)
+	forceHTTPS, err := strconv.ParseBool(arg)
+	if err != nil {
+		forceHTTPS = !(arg == "off" || arg == "disable" || arg == "disabled" || arg == "no")
+	}
+	proj.ForceHTTPS = forceHTTPS
+
+	updatedProj, appErr := projects.Update(token, proj)
+	if appErr != nil {
+		appErr.Handle()
+	}
+
+	if updatedProj.ForceHTTPS {
+		log.Info(tr.T("cert_force_https_enabled"))
+	} else {
+		log.Info(tr.T("cert_force_https_disabled"))
+	}
 }
 
 func checkCertFile(filePath string) error {

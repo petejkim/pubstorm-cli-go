@@ -300,6 +300,9 @@ var _ = Describe("Projects", func() {
 						"default_domain_enabled": {
 							strconv.FormatBool(e.proj.DefaultDomainEnabled),
 						},
+						"force_https": {
+							strconv.FormatBool(e.proj.ForceHTTPS),
+						},
 					}),
 					ghttp.RespondWith(e.resCode, e.resBody),
 				),
@@ -342,25 +345,41 @@ var _ = Describe("Projects", func() {
 		Entry("successful update", expectation{
 			proj:     &project.Project{Name: "foo-bar-express"},
 			resCode:  http.StatusOK,
-			resBody:  `{"project": { "name": "foo-bar-express", "default_domain_enabled": true }}`,
+			resBody:  `{"project": { "name": "foo-bar-express", "default_domain_enabled": true, "force_https": false }}`,
 			errIsNil: true,
 			result:   &project.Project{Name: "foo-bar-express", DefaultDomainEnabled: true},
 		}),
 
 		Entry("successful update to set default domain enabled to true", expectation{
-			proj:     &project.Project{Name: "foo-bar-express", DefaultDomainEnabled: true},
+			proj:     &project.Project{Name: "foo-bar-express", DefaultDomainEnabled: false},
 			resCode:  http.StatusOK,
-			resBody:  `{"project": { "name": "foo-bar-express", "default_domain_enabled": true }}`,
+			resBody:  `{"project": { "name": "foo-bar-express", "default_domain_enabled": true, "force_https": false }}`,
 			errIsNil: true,
 			result:   &project.Project{Name: "foo-bar-express", DefaultDomainEnabled: true},
 		}),
 
 		Entry("successful update to set default domain enabled to false", expectation{
-			proj:     &project.Project{Name: "foo-bar-express", DefaultDomainEnabled: false},
+			proj:     &project.Project{Name: "foo-bar-express", DefaultDomainEnabled: true},
 			resCode:  http.StatusOK,
-			resBody:  `{"project": { "name": "foo-bar-express", "default_domain_enabled": false }}`,
+			resBody:  `{"project": { "name": "foo-bar-express", "default_domain_enabled": false, "force_https": false }}`,
 			errIsNil: true,
 			result:   &project.Project{Name: "foo-bar-express", DefaultDomainEnabled: false},
+		}),
+
+		Entry("successful update to set force https to true", expectation{
+			proj:     &project.Project{Name: "foo-bar-express", ForceHTTPS: false},
+			resCode:  http.StatusOK,
+			resBody:  `{"project": { "name": "foo-bar-express", "default_domain_enabled": false, "force_https": true }}`,
+			errIsNil: true,
+			result:   &project.Project{Name: "foo-bar-express", ForceHTTPS: true},
+		}),
+
+		Entry("successful update to set force https to false", expectation{
+			proj:     &project.Project{Name: "foo-bar-express", ForceHTTPS: true},
+			resCode:  http.StatusOK,
+			resBody:  `{"project": { "name": "foo-bar-express", "default_domain_enabled": false, "force_https": false }}`,
+			errIsNil: true,
+			result:   &project.Project{Name: "foo-bar-express", ForceHTTPS: false},
 		}),
 	)
 

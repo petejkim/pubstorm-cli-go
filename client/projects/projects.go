@@ -133,6 +133,7 @@ func Update(token string, proj *project.Project) (*project.Project, *apperror.Er
 
 		Body: url.Values{
 			"default_domain_enabled": {strconv.FormatBool(proj.DefaultDomainEnabled)},
+			"force_https":            {strconv.FormatBool(proj.ForceHTTPS)},
 		}.Encode(),
 	}
 	req.AddHeader("Authorization", "Bearer "+token)
