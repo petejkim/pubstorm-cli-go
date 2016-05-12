@@ -8,7 +8,6 @@ import (
 	"github.com/codegangsta/cli"
 	"github.com/franela/goreq"
 
-	"github.com/nitrous-io/rise-cli-go/cli/cert"
 	"github.com/nitrous-io/rise-cli-go/cli/collab"
 	"github.com/nitrous-io/rise-cli-go/cli/common"
 	"github.com/nitrous-io/rise-cli-go/cli/deploy"
@@ -20,6 +19,7 @@ import (
 	"github.com/nitrous-io/rise-cli-go/cli/projects"
 	"github.com/nitrous-io/rise-cli-go/cli/rollback"
 	"github.com/nitrous-io/rise-cli-go/cli/signup"
+	"github.com/nitrous-io/rise-cli-go/cli/ssl"
 	"github.com/nitrous-io/rise-cli-go/cli/versions"
 	"github.com/nitrous-io/rise-cli-go/config"
 	"github.com/nitrous-io/rise-cli-go/pkg/readline"
@@ -241,20 +241,26 @@ func main() {
 		{
 			Name:      "ssl.info",
 			Usage:     tr.T("ssl_info_desc"),
-			Action:    cert.Info,
+			Action:    ssl.Info,
 			ArgsUsage: tr.T("ssl_info_args"),
 		},
 		{
 			Name:      "ssl.set",
 			Usage:     tr.T("ssl_set_desc"),
-			Action:    cert.Set,
+			Action:    ssl.Set,
 			ArgsUsage: tr.T("ssl_set_args"),
 		},
 		{
 			Name:      "ssl.rm",
 			Usage:     tr.T("ssl_rm_desc"),
-			Action:    cert.Delete,
+			Action:    ssl.Delete,
 			ArgsUsage: tr.T("ssl_rm_args"),
+		},
+		{
+			Name:      "ssl.force",
+			Usage:     tr.T("ssl_force_desc"),
+			Action:    ssl.Force,
+			ArgsUsage: tr.T("ssl_force_args"),
 		},
 		{
 			Name: "ssl",
@@ -262,20 +268,26 @@ func main() {
 				{
 					Name:      "info",
 					Usage:     tr.T("ssl_info_desc"),
-					Action:    cert.Info,
+					Action:    ssl.Info,
 					ArgsUsage: tr.T("ssl_info_args"),
 				},
 				{
 					Name:      "set",
 					Usage:     tr.T("ssl_set_desc"),
-					Action:    cert.Set,
+					Action:    ssl.Set,
 					ArgsUsage: tr.T("ssl_set_args"),
 				},
 				{
 					Name:      "rm",
 					Usage:     tr.T("ssl_rm_desc"),
-					Action:    cert.Delete,
+					Action:    ssl.Delete,
 					ArgsUsage: tr.T("ssl_rm_args"),
+				},
+				{
+					Name:      "force",
+					Usage:     tr.T("ssl_force_desc"),
+					Action:    ssl.Force,
+					ArgsUsage: tr.T("ssl_force_args"),
 				},
 			},
 		},

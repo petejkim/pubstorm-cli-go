@@ -1,12 +1,14 @@
-package cert
+package ssl
 
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/codegangsta/cli"
 	"github.com/nitrous-io/rise-cli-go/cli/common"
 	"github.com/nitrous-io/rise-cli-go/client/certs"
+	"github.com/nitrous-io/rise-cli-go/client/projects"
 	"github.com/nitrous-io/rise-cli-go/pkg/readline"
 	"github.com/nitrous-io/rise-cli-go/tr"
 	"github.com/nitrous-io/rise-cli-go/tui"
@@ -24,7 +26,7 @@ func Set(c *cli.Context) {
 
 	if len(c.Args()) < 1 {
 		for {
-			domainName, err = readline.Read(tui.Bold(tr.T("cert_enter_domain_name")+": "), true, "")
+			domainName, err = readline.Read(tui.Bold(tr.T("ssl_enter_domain_name")+": "), true, "")
 			util.ExitIfErrorOrEOF(err)
 
 			if domainName != "" {
@@ -38,7 +40,7 @@ func Set(c *cli.Context) {
 
 	if len(c.Args()) < 2 {
 		for {
-			crtFilePath, err = readline.Read(tui.Bold(tr.T("cert_enter_cert_path")+": "), true, "")
+			crtFilePath, err = readline.Read(tui.Bold(tr.T("ssl_enter_cert_path")+": "), true, "")
 			util.ExitIfErrorOrEOF(err)
 
 			err := checkCertFile(crtFilePath)
@@ -58,7 +60,7 @@ func Set(c *cli.Context) {
 
 	if len(c.Args()) < 3 {
 		for {
-			keyFilePath, err = readline.Read(tui.Bold(tr.T("cert_enter_key_path")+": "), true, "")
+			keyFilePath, err = readline.Read(tui.Bold(tr.T("ssl_enter_key_path")+": "), true, "")
 			util.ExitIfErrorOrEOF(err)
 
 			err := checkCertFile(keyFilePath)
@@ -84,26 +86,26 @@ func Set(c *cli.Context) {
 		case certs.ErrCodeNotFound:
 			log.Fatalf(tr.T("domain_not_found"), domainName)
 		case certs.ErrCodeNotAllowedDomain:
-			log.Fatalf(tr.T("cert_not_allowed_domain"), domainName)
+			log.Fatalf(tr.T("ssl_not_allowed_domain"), domainName)
 		case certs.ErrCodeFileSizeTooLarge:
-			log.Fatalln(tr.T("cert_too_large"))
+			log.Fatalln(tr.T("ssl_too_large"))
 		case certs.ErrInvalidCert:
-			log.Fatalln(tr.T("cert_invalid"))
+			log.Fatalln(tr.T("ssl_invalid"))
 		case certs.ErrInvalidCommonName:
-			log.Fatalf(tr.T("cert_invalid_domain"), domainName)
+			log.Fatalf(tr.T("ssl_invalid_domain"), domainName)
 		}
 
 		appErr.Handle()
 	}
 
-	log.Infof(tr.T("cert_set"), tui.Undl("https://"+domainName+"/"))
+	log.Infof(tr.T("ssl_cert_set"), tui.Undl("https://"+domainName+"/"))
 
-	tui.Printf("\n"+tui.Undl(tui.Bold(tr.T("cert_details")+":"))+"\n", domainName)
-	tui.Println(tr.T("cert_common_name") + ": " + ct.CommonName)
-	tui.Println(tr.T("cert_issuer") + ": " + ct.Issuer)
-	tui.Println(tr.T("cert_subject") + ": " + ct.Subject)
-	tui.Println(tr.T("cert_starts_at") + ": " + ct.StartsAt.String())
-	tui.Println(tr.T("cert_expires_at") + ": " + ct.ExpiresAt.String())
+	tui.Printf("\n"+tui.Undl(tui.Bold(tr.T("ssl_cert_details")+":"))+"\n", domainName)
+	tui.Println(tr.T("ssl_cert_common_name") + ": " + ct.CommonName)
+	tui.Println(tr.T("ssl_cert_issuer") + ": " + ct.Issuer)
+	tui.Println(tr.T("ssl_cert_subject") + ": " + ct.Subject)
+	tui.Println(tr.T("ssl_cert_starts_at") + ": " + ct.StartsAt.String())
+	tui.Println(tr.T("ssl_cert_expires_at") + ": " + ct.ExpiresAt.String())
 }
 
 func Info(c *cli.Context) {
@@ -115,7 +117,7 @@ func Info(c *cli.Context) {
 	if len(c.Args()) < 1 {
 		var err error
 		for {
-			domainName, err = readline.Read(tui.Bold(tr.T("cert_enter_domain_name")+": "), true, "")
+			domainName, err = readline.Read(tui.Bold(tr.T("ssl_enter_domain_name")+": "), true, "")
 			util.ExitIfErrorOrEOF(err)
 
 			if domainName != "" {
@@ -133,19 +135,19 @@ func Info(c *cli.Context) {
 		case certs.ErrCodeProjectNotFound:
 			log.Fatalf(tr.T("project_not_found"), proj.Name)
 		case certs.ErrCodeNotFound:
-			log.Infof(tr.T("cert_not_found"), domainName)
+			log.Infof(tr.T("ssl_cert_not_found"), domainName)
 			return
 		}
 
 		appErr.Handle()
 	}
 
-	tui.Printf(tui.Undl(tui.Bold(tr.T("cert_details")+":"))+"\n", domainName)
-	tui.Println(tr.T("cert_common_name") + ": " + ct.CommonName)
-	tui.Println(tr.T("cert_issuer") + ": " + ct.Issuer)
-	tui.Println(tr.T("cert_subject") + ": " + ct.Subject)
-	tui.Println(tr.T("cert_starts_at") + ": " + ct.StartsAt.String())
-	tui.Println(tr.T("cert_expires_at") + ": " + ct.ExpiresAt.String())
+	tui.Printf(tui.Undl(tui.Bold(tr.T("ssl_cert_details")+":"))+"\n", domainName)
+	tui.Println(tr.T("ssl_cert_common_name") + ": " + ct.CommonName)
+	tui.Println(tr.T("ssl_cert_issuer") + ": " + ct.Issuer)
+	tui.Println(tr.T("ssl_cert_subject") + ": " + ct.Subject)
+	tui.Println(tr.T("ssl_cert_starts_at") + ": " + ct.StartsAt.String())
+	tui.Println(tr.T("ssl_cert_expires_at") + ": " + ct.ExpiresAt.String())
 }
 
 func Delete(c *cli.Context) {
@@ -157,7 +159,7 @@ func Delete(c *cli.Context) {
 	if len(c.Args()) < 1 {
 		var err error
 		for {
-			domainName, err = readline.Read(tui.Bold(tr.T("cert_enter_domain_name")+": "), true, "")
+			domainName, err = readline.Read(tui.Bold(tr.T("ssl_enter_domain_name")+": "), true, "")
 			util.ExitIfErrorOrEOF(err)
 
 			if domainName != "" {
@@ -175,26 +177,49 @@ func Delete(c *cli.Context) {
 		case certs.ErrCodeProjectNotFound:
 			log.Fatalf(tr.T("project_not_found"), proj.Name)
 		case certs.ErrCodeNotFound:
-			log.Fatalf(tr.T("cert_not_found"), domainName)
+			log.Fatalf(tr.T("ssl_cert_not_found"), domainName)
 		}
 
 		appErr.Handle()
 	}
 
-	log.Infof(tr.T("cert_removed"), domainName)
+	log.Infof(tr.T("ssl_cert_removed"), domainName)
+}
+
+func Force(c *cli.Context) {
+	token := common.RequireAccessToken()
+	proj := common.RequireProject(token)
+
+	arg := c.Args().Get(0)
+	forceHTTPS, err := strconv.ParseBool(arg)
+	if err != nil {
+		forceHTTPS = !(arg == "off" || arg == "disable" || arg == "disabled" || arg == "no")
+	}
+	proj.ForceHTTPS = forceHTTPS
+
+	updatedProj, appErr := projects.Update(token, proj)
+	if appErr != nil {
+		appErr.Handle()
+	}
+
+	if updatedProj.ForceHTTPS {
+		log.Info(tr.T("ssl_force_https_on"))
+	} else {
+		log.Info(tr.T("ssl_force_https_off"))
+	}
 }
 
 func checkCertFile(filePath string) error {
 	fi, err := os.Stat(filePath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return fmt.Errorf(tr.T("cert_file_not_found"), filePath)
+			return fmt.Errorf(tr.T("ssl_file_not_found"), filePath)
 		}
 		log.Fatal(err)
 	}
 
 	if fi.Size() < 10 {
-		return fmt.Errorf(tr.T("cert_file_invalid"), filePath)
+		return fmt.Errorf(tr.T("ssl_file_invalid"), filePath)
 	}
 
 	return nil

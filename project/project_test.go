@@ -130,7 +130,6 @@ var _ = Describe("Project", func() {
 					Name:                 "foo-bar-express",
 					Path:                 "./build",
 					DefaultDomainEnabled: true,
-					EnableStats:          true,
 					ForceHTTPS:           false,
 				}
 
@@ -190,7 +189,6 @@ var _ = Describe("Project", func() {
 					Expect(err).To(BeNil())
 
 					Expect(proj).NotTo(BeNil())
-					Expect(proj.EnableStats).To(BeFalse())
 					Expect(proj.ForceHTTPS).To(BeFalse())
 				})
 			})
