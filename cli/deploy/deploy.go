@@ -69,8 +69,11 @@ func Deploy(c *cli.Context) {
 
 	deployment, appErr := deployments.Create(token, proj.Name, bunPath, false)
 	if appErr != nil {
-		if appErr.Code == projects.ErrCodeNotFound {
+		if appErr.Code == deployments.ErrCodeNotFound {
 			log.Fatalf(tr.T("project_not_found"), proj.Name)
+		}
+		if appErr.Code == deployments.ErrCodeProjectLocked {
+			log.Fatalf(tr.T("project_is_locked"), proj.Name)
 		}
 		appErr.Handle()
 	}

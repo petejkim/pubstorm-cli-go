@@ -194,6 +194,15 @@ var _ = Describe("Domains", func() {
 			errIsFatal: true,
 		}),
 
+		Entry("423 with locked", expectation{
+			resCode:    423,
+			resBody:    `{"error": "locked", "error_description": "project is locked"}`,
+			errIsNil:   false,
+			errCode:    domains.ErrCodeProjectLocked,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
 		Entry("successful creation", expectation{
 			resCode:  http.StatusCreated,
 			resBody:  `{"domain": { "name": "www.foo-bar-express.com" }}`,
@@ -255,12 +264,12 @@ var _ = Describe("Domains", func() {
 			errIsFatal: true,
 		}),
 
-		Entry("404 with domain not found", expectation{
-			resCode:    http.StatusNotFound,
-			resBody:    `{"error": "not_found", "error_description": "domain could not be found"}`,
+		Entry("423 with locked", expectation{
+			resCode:    423,
+			resBody:    `{"error": "locked", "error_description": "project is locked"}`,
 			errIsNil:   false,
-			errCode:    domains.ErrCodeNotFound,
-			errDesc:    "domain could not be found",
+			errCode:    domains.ErrCodeProjectLocked,
+			errDesc:    "",
 			errIsFatal: true,
 		}),
 
