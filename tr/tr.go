@@ -43,6 +43,8 @@ var strs = map[string]map[string]string{
 		"cert_rm_args":            "[DOMAIN]",
 		"reinit_desc":             "Re-initialize a PubStorm project",
 		"reinit_args":             "[PROJECT NAME]",
+		"protect_desc":            "Protect your PubStorm project by HTTP basic authentication",
+		"protect_args":            "[USERNAME] [PASSWORD]",
 
 		"update_available":       "A PubStorm update is available.",
 		"update_current_version": "Your version: %s",
@@ -234,6 +236,10 @@ var strs = map[string]map[string]string{
 		"optimized_project_invalid_response": "Please response with \"y\" or \"n\"",
 
 		"emtpy_project": "Project folder is empty.",
+
+		"enter_basic_auth_username": "Basic Auth Username",
+		"enter_basic_auth_password": "Basic Auth Password",
+		"protect_success":           "Successfully protected project \"%s\".",
 	},
 }
 

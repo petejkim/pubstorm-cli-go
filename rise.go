@@ -18,6 +18,7 @@ import (
 	"github.com/nitrous-io/rise-cli-go/cli/logout"
 	"github.com/nitrous-io/rise-cli-go/cli/password"
 	"github.com/nitrous-io/rise-cli-go/cli/projects"
+	"github.com/nitrous-io/rise-cli-go/cli/protect"
 	"github.com/nitrous-io/rise-cli-go/cli/rollback"
 	"github.com/nitrous-io/rise-cli-go/cli/signup"
 	"github.com/nitrous-io/rise-cli-go/cli/ssl"
@@ -302,6 +303,12 @@ func main() {
 			Usage:     tr.T("reinit_desc"),
 			Action:    initcmd.ReInit,
 			ArgsUsage: tr.T("reinit_args"),
+		},
+		{
+			Name:      "protect",
+			Usage:     tr.T("protect_desc"),
+			Action:    protect.Protect,
+			ArgsUsage: tr.T("protect_args"),
 		},
 	}
 
