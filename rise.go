@@ -310,6 +310,11 @@ func main() {
 			Action:    protect.Protect,
 			ArgsUsage: tr.T("protect_args"),
 		},
+		{
+			Name:   "unprotect",
+			Usage:  tr.T("unprotect_desc"),
+			Action: protect.Unprotect,
+		},
 	}
 
 	app.Run(os.Args)

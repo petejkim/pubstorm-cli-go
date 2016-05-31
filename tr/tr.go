@@ -45,6 +45,7 @@ var strs = map[string]map[string]string{
 		"reinit_args":             "[PROJECT NAME]",
 		"protect_desc":            "Protect your PubStorm project by HTTP basic authentication",
 		"protect_args":            "[USERNAME] [PASSWORD]",
+		"unprotect_desc":          "Disable protection for your PubStorm project",
 
 		"update_available":       "A PubStorm update is available.",
 		"update_current_version": "Your version: %s",
@@ -240,6 +241,7 @@ var strs = map[string]map[string]string{
 		"enter_basic_auth_username": "Basic Auth Username",
 		"enter_basic_auth_password": "Basic Auth Password",
 		"protect_success":           "Successfully protected project \"%s\".",
+		"unprotect_success":         "Successfully disabled protection for project \"%s\".",
 	},
 }
 

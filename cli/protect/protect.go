@@ -42,3 +42,15 @@ func Protect(c *cli.Context) {
 
 	log.Infof(tr.T("protect_success"), proj.Name)
 }
+
+func Unprotect(c *cli.Context) {
+	token := common.RequireAccessToken()
+	proj := common.RequireProject(token)
+
+	appErr := projects.Unprotect(token, proj.Name)
+	if appErr != nil {
+		appErr.Handle()
+	}
+
+	log.Infof(tr.T("unprotect_success"), proj.Name)
+}
