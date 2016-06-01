@@ -12,7 +12,6 @@ import (
 	"github.com/nitrous-io/rise-cli-go/cli/common"
 	"github.com/nitrous-io/rise-cli-go/client/deployments"
 	"github.com/nitrous-io/rise-cli-go/client/domains"
-	"github.com/nitrous-io/rise-cli-go/client/projects"
 	"github.com/nitrous-io/rise-cli-go/config"
 	"github.com/nitrous-io/rise-cli-go/pkg/spinner"
 	"github.com/nitrous-io/rise-cli-go/tr"
