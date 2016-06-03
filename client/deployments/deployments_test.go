@@ -234,10 +234,18 @@ var _ = Describe("Deployments", func() {
 		}),
 
 		Entry("successfully fetched", expectation{
-			resCode:  http.StatusOK,
-			resBody:  `{"deployment": {"id": 123, "state": "deployed", "deployed_at": ` + formattedTime + `}}`,
+			resCode: http.StatusOK,
+			resBody: `
+				{
+					"deployment": {
+						"id": 123,
+					  "state": "deployed",
+						"deployed_at": ` + formattedTime + `,
+						"error_message": "index.html:Unexpected Tag\napp.json:undefined is undefined"
+					}
+				}`,
 			errIsNil: true,
-			result:   &deployments.Deployment{ID: 123, State: "deployed", DeployedAt: deployedTime},
+			result:   &deployments.Deployment{ID: 123, State: "deployed", DeployedAt: deployedTime, ErrorMessage: "index.html:Unexpected Tag\napp.json:undefined is undefined"},
 		}),
 	)
 

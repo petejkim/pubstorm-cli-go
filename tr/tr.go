@@ -105,6 +105,7 @@ var strs = map[string]map[string]string{
 		"packing_bundle":            "Packing bundle \"%s\"...",
 		"bundle_size_exceeded":      "Your bundle size cannot exceed %s!",
 		"uploading_bundle":          "Uploading bundle \"%s\" to PubStorm Cloud...",
+		"optimizing":                "Optimizing...",
 		"launching":                 "Launching v%d...",
 		"published":                 "Successfully published \"%s\" on PubStorm Cloud.",
 		"published_no_domain":       "Successfully published \"%s\" on PubStorm Cloud, but no domain name is configured. To add a domain name, run `storm domains add`.",
