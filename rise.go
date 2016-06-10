@@ -291,6 +291,12 @@ func main() {
 				},
 			},
 		},
+		{
+			Name:      "reinit",
+			Usage:     tr.T("reinit_desc"),
+			Action:    initcmd.ReInit,
+			ArgsUsage: tr.T("reinit_args"),
+		},
 	}
 
 	app.Run(os.Args)
