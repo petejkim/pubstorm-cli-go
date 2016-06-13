@@ -18,6 +18,7 @@ type Project struct {
 
 	DefaultDomainEnabled bool `json:"default_domain_enabled"`
 	ForceHTTPS           bool `json:"force_https"`
+	SkipBuild            bool `json:"skip_build"`
 }
 
 // projConfig is used to marshal and unmarshal data that's written to the local

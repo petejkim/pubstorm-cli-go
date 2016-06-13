@@ -10,6 +10,7 @@ import (
 
 	"github.com/nitrous-io/rise-cli-go/cli/collab"
 	"github.com/nitrous-io/rise-cli-go/cli/common"
+	"github.com/nitrous-io/rise-cli-go/cli/configuration"
 	"github.com/nitrous-io/rise-cli-go/cli/deploy"
 	"github.com/nitrous-io/rise-cli-go/cli/domains"
 	"github.com/nitrous-io/rise-cli-go/cli/initcmd"
@@ -127,6 +128,11 @@ func main() {
 			Name:   "init",
 			Usage:  tr.T("init_desc"),
 			Action: initcmd.Init,
+		},
+		{
+			Name:   "config",
+			Usage:  tr.T("config_desc"),
+			Action: configuration.Update,
 		},
 		{
 			Name:    "publish",

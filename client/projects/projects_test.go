@@ -303,6 +303,9 @@ var _ = Describe("Projects", func() {
 						"force_https": {
 							strconv.FormatBool(e.proj.ForceHTTPS),
 						},
+						"skip_build": {
+							strconv.FormatBool(e.proj.SkipBuild),
+						},
 					}),
 					ghttp.RespondWith(e.resCode, e.resBody),
 				),
@@ -380,6 +383,22 @@ var _ = Describe("Projects", func() {
 			resBody:  `{"project": { "name": "foo-bar-express", "default_domain_enabled": false, "force_https": false }}`,
 			errIsNil: true,
 			result:   &project.Project{Name: "foo-bar-express", ForceHTTPS: false},
+		}),
+
+		Entry("successful update to set skip build to true", expectation{
+			proj:     &project.Project{Name: "foo-bar-express", ForceHTTPS: false},
+			resCode:  http.StatusOK,
+			resBody:  `{"project": { "name": "foo-bar-express", "default_domain_enabled": false, "force_https": true, "skip_build": true }}`,
+			errIsNil: true,
+			result:   &project.Project{Name: "foo-bar-express", ForceHTTPS: true, SkipBuild: true},
+		}),
+
+		Entry("successful update to set skip build to false", expectation{
+			proj:     &project.Project{Name: "foo-bar-express", ForceHTTPS: true},
+			resCode:  http.StatusOK,
+			resBody:  `{"project": { "name": "foo-bar-express", "default_domain_enabled": false, "force_https": false, "skip_build": false }}`,
+			errIsNil: true,
+			result:   &project.Project{Name: "foo-bar-express", ForceHTTPS: false, SkipBuild: false},
 		}),
 	)
 
