@@ -232,6 +232,8 @@ var strs = map[string]map[string]string{
 		"project_disabled_optimizer":         "Project will not be optimized from next deployment.",
 		"optimized_project":                  "Deploy optimized project? [Y/n]",
 		"optimized_project_invalid_response": "Please response with \"y\" or \"n\"",
+
+		"emtpy_project": "Project folder is empty.",
 	},
 }
 
