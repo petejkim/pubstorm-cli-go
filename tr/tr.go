@@ -10,6 +10,7 @@ var strs = map[string]map[string]string{
 		"password_reset_desc":     "Reset your PubStorm password",
 		"password_reset_continue": "Specify this flag if you already have a password reset token",
 		"init_desc":               "Initialize a PubStorm project",
+		"config_desc":             "Configure a PubStorm project",
 		"publish_desc":            "Publish a PubStorm project",
 		"publish_verbose":         "Show additional information",
 		"domains_desc":            "List all domains for a PubStorm project",
@@ -105,6 +106,7 @@ var strs = map[string]map[string]string{
 		"packing_bundle":            "Packing bundle \"%s\"...",
 		"bundle_size_exceeded":      "Your bundle size cannot exceed %s!",
 		"uploading_bundle":          "Uploading bundle \"%s\" to PubStorm Cloud...",
+		"optimizing":                "Optimizing...",
 		"launching":                 "Launching v%d...",
 		"published":                 "Successfully published \"%s\" on PubStorm Cloud.",
 		"published_no_domain":       "Successfully published \"%s\" on PubStorm Cloud, but no domain name is configured. To add a domain name, run `storm domains add`.",
@@ -223,6 +225,13 @@ var strs = map[string]map[string]string{
 		"re_init_project":         "Would you like to initialize using an existing project in current directory",
 		"project_re_initialized":  "Successfully re-initialized project \"%s\".",
 		"re_init_project_aborted": "Re-initialization aborted",
+
+		"configure_project":                  "Configure your project: %s",
+		"configuration_updated":              "Successfully updated %s project's configuration.",
+		"project_enabled_optimizer":          "Project will be optmized from next deployment.",
+		"project_disabled_optimizer":         "Project will not be optimized from next deployment.",
+		"optimized_project":                  "Deploy optimized project? [Y/n]",
+		"optimized_project_invalid_response": "Please response with \"y\" or \"n\"",
 	},
 }
 

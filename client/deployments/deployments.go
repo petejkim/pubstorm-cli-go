@@ -29,15 +29,18 @@ const (
 	ErrCodeNotFound         = "not_found"
 	ErrCodeProjectLocked    = "project_locked"
 
-	DeploymentStateDeployed = "deployed"
+	DeploymentStateDeployed  = "deployed"
+	DeploymentStateBuilding  = "pending_build"
+	DeploymentStateDeploying = "pending_deploy"
 )
 
 type Deployment struct {
-	ID         uint      `json:"id"`
-	State      string    `json:"state"`
-	Active     bool      `json:"active,omitempty"`
-	DeployedAt time.Time `json:"deployed_at,omitempty"`
-	Version    int64     `json:"version"`
+	ID           uint      `json:"id"`
+	State        string    `json:"state"`
+	Active       bool      `json:"active,omitempty"`
+	DeployedAt   time.Time `json:"deployed_at,omitempty"`
+	Version      int64     `json:"version"`
+	ErrorMessage string    `json:"error_message,omitempty"`
 }
 
 func Create(token, name, bunPath string, quiet bool) (depl *Deployment, appErr *apperror.Error) {

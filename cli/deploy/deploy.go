@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/codegangsta/cli"
@@ -96,9 +97,29 @@ func Deploy(c *cli.Context) {
 	}
 
 	spin := spinner.New()
-	tui.Printf("\n"+tr.T("launching")+" "+tui.Blu("%s"), deployment.Version, string(spin.Next()))
-
+	currentState := ""
+	optimized := false
 	for deployment.State != deployments.DeploymentStateDeployed {
+		if currentState != deployment.State {
+			if deployment.State == deployments.DeploymentStateBuilding {
+				tui.Printf("\n"+tr.T("optimizing")+tui.Blu("%s"), string(spin.Next()))
+				optimized = true
+			} else if deployment.State == deployments.DeploymentStateDeploying {
+				if optimized {
+					tui.Println("\b \b") // "Eat up" spinner characters from previous optimizing log.
+
+					if deployment.ErrorMessage != "" {
+						for _, errorMessage := range strings.Split(deployment.ErrorMessage, "\n") {
+							tui.Println(tui.Ylo("[Warn] " + errorMessage))
+						}
+					}
+				}
+
+				tui.Printf("\n"+tr.T("launching")+" "+tui.Blu("%s"), deployment.Version, string(spin.Next()))
+			}
+			currentState = deployment.State
+		}
+
 		for i := 0; i < 5; i++ {
 			time.Sleep(100 * time.Millisecond)
 			tui.Printf(tui.Blu("\b%s"), string(spin.Next()))
