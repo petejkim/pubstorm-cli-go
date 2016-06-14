@@ -102,10 +102,7 @@ func Deploy(c *cli.Context) {
 	util.ExitIfError(err)
 
 	rawBundle, appErr := rawbundles.Get(token, proj.Name, checksum)
-	if appErr != nil {
-		if appErr.Code == deployments.ErrCodeNotFound {
-			log.Fatalf(tr.T("project_not_found"), proj.Name)
-		}
+	if appErr != nil && appErr.Code != rawbundles.ErrCodeNotFound {
 		if appErr.Code == deployments.ErrCodeProjectLocked {
 			log.Fatalf(tr.T("project_is_locked"), proj.Name)
 		}
