@@ -191,3 +191,71 @@ func Delete(token, name string) *apperror.Error {
 
 	return nil
 }
+
+func Protect(token, name, username, password string) *apperror.Error {
+	req := goreq.Request{
+		Method:      "POST",
+		Uri:         config.Host + "/projects/" + name + "/auth",
+		ContentType: "application/x-www-form-urlencoded",
+		Accept:      config.ReqAccept,
+		UserAgent:   config.UserAgent,
+
+		Body: url.Values{
+			"basic_auth_username": {username},
+			"basic_auth_password": {password},
+		}.Encode(),
+	}
+
+	req.AddHeader("Authorization", "Bearer "+token)
+	res, err := req.Do()
+	if err != nil {
+		return apperror.New(ErrCodeRequestFailed, err, "", true)
+	}
+	defer res.Body.Close()
+
+	if !util.ContainsInt([]int{http.StatusOK, http.StatusNotFound}, res.StatusCode) {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	if res.StatusCode == http.StatusNotFound {
+		return apperror.New(ErrCodeNotFound, nil, fmt.Sprintf(tr.T("project_not_found"), name), true)
+	}
+
+	var j map[string]interface{}
+	if err := res.Body.FromJsonTo(&j); err != nil {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	return nil
+}
+
+func Unprotect(token, name string) *apperror.Error {
+	req := goreq.Request{
+		Method:    "DELETE",
+		Uri:       config.Host + "/projects/" + name + "/auth",
+		Accept:    config.ReqAccept,
+		UserAgent: config.UserAgent,
+	}
+
+	req.AddHeader("Authorization", "Bearer "+token)
+	res, err := req.Do()
+	if err != nil {
+		return apperror.New(ErrCodeRequestFailed, err, "", true)
+	}
+	defer res.Body.Close()
+
+	if !util.ContainsInt([]int{http.StatusOK, http.StatusNotFound}, res.StatusCode) {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	if res.StatusCode == http.StatusNotFound {
+		return apperror.New(ErrCodeNotFound, nil, fmt.Sprintf(tr.T("project_not_found"), name), true)
+	}
+
+	var j map[string]interface{}
+	if err := res.Body.FromJsonTo(&j); err != nil {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	return nil
+}

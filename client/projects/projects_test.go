@@ -462,4 +462,130 @@ var _ = Describe("Projects", func() {
 			errIsNil: true,
 		}),
 	)
+
+	DescribeTable("Protect",
+		func(e expectation) {
+			server.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("POST", "/projects/foo-bar-express/auth"),
+					ghttp.VerifyHeader(http.Header{
+						"Authorization": {"Bearer t0k3n"},
+						"Accept":        {config.ReqAccept},
+						"User-Agent":    {config.UserAgent},
+					}),
+					ghttp.VerifyForm(url.Values{
+						"basic_auth_username": {"basic-user"},
+						"basic_auth_password": {"basic-pass"},
+					}),
+					ghttp.RespondWith(e.resCode, e.resBody),
+				),
+			)
+
+			appErr := projects.Protect("t0k3n", "foo-bar-express", "basic-user", "basic-pass")
+			Expect(server.ReceivedRequests()).To(HaveLen(1))
+
+			if e.errIsNil {
+				Expect(appErr).To(BeNil())
+			} else {
+				Expect(appErr).NotTo(BeNil())
+				Expect(appErr.Code).To(Equal(e.errCode))
+				Expect(strings.ToLower(appErr.Description)).To(ContainSubstring(strings.ToLower(e.errDesc)))
+				Expect(appErr.IsFatal).To(Equal(e.errIsFatal))
+			}
+		},
+
+		Entry("unexpected response code", expectation{
+			resCode:    http.StatusInternalServerError,
+			resBody:    "",
+			errIsNil:   false,
+			errCode:    projects.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("malformed json", expectation{
+			resCode:    http.StatusOK,
+			resBody:    `{"foo": }`,
+			errIsNil:   false,
+			errCode:    projects.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("404 with not found error", expectation{
+			resCode:    http.StatusNotFound,
+			resBody:    `{"error": "not_found", "errors_description": "project could not be found"}`,
+			errIsNil:   false,
+			errCode:    projects.ErrCodeNotFound,
+			errDesc:    `Could not find a project "foo-bar-express" that belongs to you.`,
+			errIsFatal: true,
+		}),
+
+		Entry("successful protection", expectation{
+			resCode:  http.StatusOK,
+			resBody:  `{"protected": true}`,
+			errIsNil: true,
+		}),
+	)
+
+	DescribeTable("Delete",
+		func(e expectation) {
+			server.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("DELETE", "/projects/foo-bar-express/auth"),
+					ghttp.VerifyHeader(http.Header{
+						"Authorization": {"Bearer t0k3n"},
+						"Accept":        {config.ReqAccept},
+						"User-Agent":    {config.UserAgent},
+					}),
+					ghttp.RespondWith(e.resCode, e.resBody),
+				),
+			)
+
+			appErr := projects.Unprotect("t0k3n", "foo-bar-express")
+			Expect(server.ReceivedRequests()).To(HaveLen(1))
+
+			if e.errIsNil {
+				Expect(appErr).To(BeNil())
+			} else {
+				Expect(appErr).NotTo(BeNil())
+				Expect(appErr.Code).To(Equal(e.errCode))
+				Expect(strings.ToLower(appErr.Description)).To(ContainSubstring(strings.ToLower(e.errDesc)))
+				Expect(appErr.IsFatal).To(Equal(e.errIsFatal))
+			}
+		},
+
+		Entry("unexpected response code", expectation{
+			resCode:    http.StatusInternalServerError,
+			resBody:    "",
+			errIsNil:   false,
+			errCode:    projects.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("malformed json", expectation{
+			resCode:    http.StatusOK,
+			resBody:    `{"foo": }`,
+			errIsNil:   false,
+			errCode:    projects.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("404 with not found error", expectation{
+			resCode:    http.StatusNotFound,
+			resBody:    `{"error": "not_found", "errors_description": "project could not be found"}`,
+			errIsNil:   false,
+			errCode:    projects.ErrCodeNotFound,
+			errDesc:    `Could not find a project "foo-bar-express" that belongs to you.`,
+			errIsFatal: true,
+		}),
+
+		Entry("successful deletion", expectation{
+			resCode:  http.StatusOK,
+			resBody:  `{"unprotected": true}`,
+			errIsNil: true,
+		}),
+	)
 })
