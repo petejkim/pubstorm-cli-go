@@ -54,6 +54,11 @@ func Deploy(c *cli.Context) {
 	bun := bundle.New(proj.Path)
 	count, size, err := bun.Assemble(ignoreFiles, verbose)
 
+	if size == 0 || count == 0 {
+		log.Infof(tr.T("emtpy_project"))
+		return
+	}
+
 	log.Infof(tr.T("bundling_file_count_size"), humanize.Comma(int64(count)), humanize.Bytes(uint64(size)))
 
 	if size > config.MaxProjectSize {
