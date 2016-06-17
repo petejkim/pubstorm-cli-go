@@ -250,6 +250,7 @@ var strs = map[string]map[string]string{
 		"protect_success":           "Successfully protected project \"%s\".",
 		"unprotect_success":         "Successfully disabled protection for project \"%s\".",
 
+		"env_updating":    "Updating env vars for project \"%s\"...",
 		"env_set":         "Successfully added env vars\n%s",
 		"env_invalid_arg": "%s is invalid. Must be in the format FOO=bar.",
 		"env_key_empty":   "Key must not be empty.",

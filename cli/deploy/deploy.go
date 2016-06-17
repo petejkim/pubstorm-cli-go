@@ -10,6 +10,7 @@ import (
 
 	"github.com/codegangsta/cli"
 	humanize "github.com/dustin/go-humanize"
+	"github.com/nitrous-io/rise-cli-go/apperror"
 	"github.com/nitrous-io/rise-cli-go/bundle"
 	"github.com/nitrous-io/rise-cli-go/cli/common"
 	"github.com/nitrous-io/rise-cli-go/client/deployments"
@@ -129,9 +130,29 @@ func Deploy(c *cli.Context) {
 		}
 	}
 
+	ShowDeploymentProcess(token, proj.Name, deployment)
+
+	domainNames, appErr := domains.Index(token, proj.Name)
+	if appErr != nil {
+		appErr.Handle()
+	}
+
+	if len(domainNames) > 0 {
+		log.Infof(tr.T("published"), proj.Name)
+		for _, domainName := range domainNames {
+			tui.Println("=> " + tui.Undl(domainName))
+		}
+	} else {
+		log.Warnf(tr.T("published_no_domain"), proj.Name)
+	}
+}
+
+func ShowDeploymentProcess(token string, projName string, deployment *deployments.Deployment) {
 	spin := spinner.New()
 	currentState := ""
 	optimized := false
+	var appErr *apperror.Error
+
 	for deployment.State != deployments.DeploymentStateDeployed {
 		if currentState != deployment.State {
 			switch deployment.State {
@@ -153,7 +174,7 @@ func Deploy(c *cli.Context) {
 			case deployments.DeploymentStateDeployFailed:
 				tui.Println("\b \b") // "Eat up" spinner characters from previous optimizing log.
 
-				log.Fatal(fmt.Sprintf(tr.T("deployment_failure"), proj.Name, deployment.ErrorMessage))
+				log.Fatal(fmt.Sprintf(tr.T("deployment_failure"), projName, deployment.ErrorMessage))
 			}
 
 			currentState = deployment.State
@@ -164,25 +185,11 @@ func Deploy(c *cli.Context) {
 			tui.Printf(tui.Blu("\b%s"), string(spin.Next()))
 		}
 
-		deployment, appErr = deployments.Get(token, proj.Name, deployment.ID)
+		deployment, appErr = deployments.Get(token, projName, deployment.ID)
 		if appErr != nil {
 			appErr.Handle()
 		}
 	}
 
-	tui.Println("\b \b") // "Eat up" spinner characters.
-
-	domainNames, appErr := domains.Index(token, proj.Name)
-	if appErr != nil {
-		appErr.Handle()
-	}
-
-	if len(domainNames) > 0 {
-		log.Infof(tr.T("published"), proj.Name)
-		for _, domainName := range domainNames {
-			tui.Println("=> " + tui.Undl(domainName))
-		}
-	} else {
-		log.Warnf(tr.T("published_no_domain"), proj.Name)
-	}
+	tui.Println("\b \b")
 }
