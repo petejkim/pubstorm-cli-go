@@ -1,6 +1,7 @@
 package deploy
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -106,10 +107,11 @@ func Deploy(c *cli.Context) {
 	optimized := false
 	for deployment.State != deployments.DeploymentStateDeployed {
 		if currentState != deployment.State {
-			if deployment.State == deployments.DeploymentStateBuilding {
+			switch deployment.State {
+			case deployments.DeploymentStateBuilding:
 				tui.Printf("\n"+tr.T("optimizing")+tui.Blu("%s"), string(spin.Next()))
 				optimized = true
-			} else if deployment.State == deployments.DeploymentStateDeploying {
+			case deployments.DeploymentStateDeploying:
 				if optimized {
 					tui.Println("\b \b") // "Eat up" spinner characters from previous optimizing log.
 
@@ -121,7 +123,12 @@ func Deploy(c *cli.Context) {
 				}
 
 				tui.Printf("\n"+tr.T("launching")+" "+tui.Blu("%s"), deployment.Version, string(spin.Next()))
+			case deployments.DeploymentStateDeployFailed:
+				tui.Println("\b \b") // "Eat up" spinner characters from previous optimizing log.
+
+				log.Fatal(fmt.Sprintf(tr.T("deployment_failure"), proj.Name, deployment.ErrorMessage))
 			}
+
 			currentState = deployment.State
 		}
 

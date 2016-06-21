@@ -29,9 +29,10 @@ const (
 	ErrCodeNotFound         = "not_found"
 	ErrCodeProjectLocked    = "project_locked"
 
-	DeploymentStateDeployed  = "deployed"
-	DeploymentStateBuilding  = "pending_build"
-	DeploymentStateDeploying = "pending_deploy"
+	DeploymentStateDeployed     = "deployed"
+	DeploymentStateBuilding     = "pending_build"
+	DeploymentStateDeploying    = "pending_deploy"
+	DeploymentStateDeployFailed = "deploy_failed"
 )
 
 type Deployment struct {

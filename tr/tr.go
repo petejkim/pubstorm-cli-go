@@ -113,6 +113,7 @@ var strs = map[string]map[string]string{
 		"launching":                 "Launching v%d...",
 		"published":                 "Successfully published \"%s\" on PubStorm Cloud.",
 		"published_no_domain":       "Successfully published \"%s\" on PubStorm Cloud, but no domain name is configured. To add a domain name, run `storm domains add`.",
+		"deployment_failure":        "Could not publish \"%s\" due to \"%s\".",
 
 		"ignore_file_reason":    "Ignoring \"%s\", %s...",
 		"symlink_error":         "could not follow symlink",
