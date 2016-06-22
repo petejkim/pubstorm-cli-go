@@ -1,6 +1,7 @@
 package deploy
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -23,7 +24,10 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-const StormIgnoreFile = ".stormignore"
+const (
+	StormIgnoreFile   = ".stormignore"
+	MaxIdealFileCount = 3000
+)
 
 func Deploy(c *cli.Context) {
 	verbose := c.Bool("verbose")
@@ -60,6 +64,10 @@ func Deploy(c *cli.Context) {
 	}
 
 	log.Infof(tr.T("bundling_file_count_size"), humanize.Comma(int64(count)), humanize.Bytes(uint64(size)))
+
+	if count > MaxIdealFileCount {
+		log.Warn(tr.T("bundle_has_many_files"))
+	}
 
 	if size > config.MaxProjectSize {
 		log.Fatalf(tr.T("project_size_exceeded"), humanize.Bytes(uint64(config.MaxProjectSize)))
@@ -106,10 +114,11 @@ func Deploy(c *cli.Context) {
 	optimized := false
 	for deployment.State != deployments.DeploymentStateDeployed {
 		if currentState != deployment.State {
-			if deployment.State == deployments.DeploymentStateBuilding {
+			switch deployment.State {
+			case deployments.DeploymentStateBuilding:
 				tui.Printf("\n"+tr.T("optimizing")+tui.Blu("%s"), string(spin.Next()))
 				optimized = true
-			} else if deployment.State == deployments.DeploymentStateDeploying {
+			case deployments.DeploymentStateDeploying:
 				if optimized {
 					tui.Println("\b \b") // "Eat up" spinner characters from previous optimizing log.
 
@@ -121,7 +130,12 @@ func Deploy(c *cli.Context) {
 				}
 
 				tui.Printf("\n"+tr.T("launching")+" "+tui.Blu("%s"), deployment.Version, string(spin.Next()))
+			case deployments.DeploymentStateDeployFailed:
+				tui.Println("\b \b") // "Eat up" spinner characters from previous optimizing log.
+
+				log.Fatal(fmt.Sprintf(tr.T("deployment_failure"), proj.Name, deployment.ErrorMessage))
 			}
+
 			currentState = deployment.State
 		}
 
