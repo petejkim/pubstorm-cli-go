@@ -114,6 +114,7 @@ var strs = map[string]map[string]string{
 		"published":                 "Successfully published \"%s\" on PubStorm Cloud.",
 		"published_no_domain":       "Successfully published \"%s\" on PubStorm Cloud, but no domain name is configured. To add a domain name, run `storm domains add`.",
 		"deployment_failure":        "Could not publish \"%s\" due to \"%s\".",
+		"bundle_has_many_files":     "You can create a .stormignore file to specify which files to ignore when publishing your project",
 
 		"ignore_file_reason":    "Ignoring \"%s\", %s...",
 		"symlink_error":         "could not follow symlink",

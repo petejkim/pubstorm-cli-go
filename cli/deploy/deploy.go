@@ -24,7 +24,10 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-const StormIgnoreFile = ".stormignore"
+const (
+	StormIgnoreFile   = ".stormignore"
+	MaxIdealFileCount = 3000
+)
 
 func Deploy(c *cli.Context) {
 	verbose := c.Bool("verbose")
@@ -61,6 +64,10 @@ func Deploy(c *cli.Context) {
 	}
 
 	log.Infof(tr.T("bundling_file_count_size"), humanize.Comma(int64(count)), humanize.Bytes(uint64(size)))
+
+	if count > MaxIdealFileCount {
+		log.Warn(tr.T("bundle_has_many_files"))
+	}
 
 	if size > config.MaxProjectSize {
 		log.Fatalf(tr.T("project_size_exceeded"), humanize.Bytes(uint64(config.MaxProjectSize)))
