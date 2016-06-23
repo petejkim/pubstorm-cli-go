@@ -125,7 +125,7 @@ func handleInterrupt(fd uintptr, state *State) {
 	signal.Notify(sigchan, os.Interrupt)
 
 	go func() {
-		_ = <-sigchan
+		<-sigchan
 		RestoreTerminal(fd, state)
 		os.Exit(0)
 	}()
