@@ -4,12 +4,15 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/codegangsta/cli"
 	"github.com/nitrous-io/rise-cli-go/cli/common"
 	"github.com/nitrous-io/rise-cli-go/client/certs"
 	"github.com/nitrous-io/rise-cli-go/client/projects"
+	"github.com/nitrous-io/rise-cli-go/config"
 	"github.com/nitrous-io/rise-cli-go/pkg/readline"
+	"github.com/nitrous-io/rise-cli-go/pkg/spinner"
 	"github.com/nitrous-io/rise-cli-go/tr"
 	"github.com/nitrous-io/rise-cli-go/tui"
 	"github.com/nitrous-io/rise-cli-go/util"
@@ -207,6 +210,69 @@ func Force(c *cli.Context) {
 	} else {
 		log.Info(tr.T("ssl_force_https_off"))
 	}
+}
+
+func Enable(c *cli.Context) {
+	token := common.RequireAccessToken()
+	proj := common.RequireProject(token)
+
+	domainName := util.SanitizeDomain(c.Args().First())
+	interactive := domainName == ""
+
+	if interactive {
+		var err error
+		for {
+			domainName, err = readline.Read(tui.Bold(tr.T("ssl_enter_domain_name")+": "), true, "")
+			util.ExitIfErrorOrEOF(err)
+
+			if domainName != "" {
+				domainName = util.SanitizeDomain(domainName)
+				break
+			}
+		}
+	}
+
+	spin := spinner.New()
+	done := make(chan struct{})
+	go func() {
+		tui.Printf(tr.T("ssl_enable_progress")+" "+tui.Blu("%s"), tui.Undl(domainName), string(spin.Next()))
+
+		ticker := time.NewTicker(100 * time.Millisecond)
+		for {
+			select {
+			case <-ticker.C:
+				tui.Printf(tui.Blu("\b%s"), string(spin.Next()))
+			case <-done:
+				ticker.Stop()
+				tui.Println("\b \b") // "Eat up" spinner characters.
+				done <- struct{}{}
+				return
+			}
+		}
+	}()
+
+	appErr := certs.Enable(token, proj.Name, domainName)
+	done <- struct{}{} // Stop spinner.
+	<-done
+	if appErr != nil {
+		switch appErr.Code {
+		case certs.ErrCodeProjectNotFound:
+			log.Fatalf(tr.T("project_not_found"), proj.Name)
+		case certs.ErrCodeAcmeServerError:
+			subDn, apex := util.SplitDomain(domainName)
+			log.Errorf(tr.T("ssl_enable_error"), tui.Undl(domainName))
+			log.Infof(tr.T("ssl_enable_dns"), apex)
+			log.Infof("  * %s: %s ---> %s", tui.Bold("CNAME (Alias)"), tui.Undl(subDn), tui.Undl(proj.DefaultDomain()))
+			if subDn == "www" {
+				log.Infof("\n  * %s: %s ---> %s", tui.Bold("A (Host)"), tui.Undl("@"), tui.Undl(config.RedirectorIP))
+			}
+			return
+		}
+
+		appErr.Handle()
+	}
+
+	log.Infof(tr.T("ssl_enable_success"), tui.Undl("https://"+domainName+"/"))
 }
 
 func checkCertFile(filePath string) error {

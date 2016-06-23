@@ -271,6 +271,12 @@ func main() {
 			ArgsUsage: tr.T("ssl_force_args"),
 		},
 		{
+			Name:      "ssl.enable",
+			Usage:     tr.T("ssl_enable_desc"),
+			Action:    ssl.Enable,
+			ArgsUsage: tr.T("ssl_enable_args"),
+		},
+		{
 			Name: "ssl",
 			Subcommands: []cli.Command{
 				{
@@ -296,6 +302,12 @@ func main() {
 					Usage:     tr.T("ssl_force_desc"),
 					Action:    ssl.Force,
 					ArgsUsage: tr.T("ssl_force_args"),
+				},
+				{
+					Name:      "enable",
+					Usage:     tr.T("ssl_enable_desc"),
+					Action:    ssl.Enable,
+					ArgsUsage: tr.T("ssl_enable_args"),
 				},
 			},
 		},

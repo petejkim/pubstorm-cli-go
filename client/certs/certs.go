@@ -23,10 +23,11 @@ const (
 	ErrCodeNotFound         = "not_found"
 	ErrCodeProjectNotFound  = "project_not_found"
 	ErrCodeFileSizeTooLarge = "file_size_too_large"
+	ErrCodeNotAllowedDomain = "domain_not_allowed"
+	ErrCodeAcmeServerError  = "acme_server_error"
 
-	ErrCodeNotAllowedDomain = "domain_not_allwed"
-	ErrInvalidCert          = "invalid_cert"
-	ErrInvalidCommonName    = "invalid_common_name"
+	ErrInvalidCert       = "invalid_cert"
+	ErrInvalidCommonName = "invalid_common_name"
 )
 
 type Cert struct {
@@ -194,6 +195,60 @@ func Delete(token, name, domainName string) (appErr *apperror.Error) {
 		}
 
 		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	return nil
+}
+
+func Enable(token, name, domainName string) *apperror.Error {
+	req := goreq.Request{
+		Method:    "POST",
+		Uri:       config.Host + "/projects/" + name + "/domains/" + domainName + "/cert/letsencrypt",
+		Accept:    config.ReqAccept,
+		UserAgent: config.UserAgent,
+	}
+	req.AddHeader("Authorization", "Bearer "+token)
+
+	res, err := req.Do()
+	if err != nil {
+		return apperror.New(ErrCodeRequestFailed, err, "", true)
+	}
+	defer res.Body.Close()
+
+	if !util.ContainsInt([]int{
+		http.StatusOK,
+		http.StatusNotFound,
+		http.StatusForbidden,
+		http.StatusServiceUnavailable}, res.StatusCode) {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	var j map[string]interface{}
+	if err := res.Body.FromJsonTo(&j); err != nil {
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	if res.StatusCode == http.StatusNotFound {
+		switch j["error_description"] {
+		case "project could not be found":
+			return apperror.New(ErrCodeProjectNotFound, nil, "project could not be found", true)
+		case "domain could not be found":
+			return apperror.New(ErrCodeNotFound, nil, "domain could not be found", true)
+		}
+
+		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	if res.StatusCode == http.StatusForbidden {
+		return apperror.New(ErrCodeNotAllowedDomain, nil, "the default domain already supports HTTPS", true)
+	}
+
+	if res.StatusCode == http.StatusServiceUnavailable {
+		switch j["error_description"] {
+		case "domain could not be verified":
+			return apperror.New(ErrCodeAcmeServerError, nil, "domain could not be verified - have you changed its DNS configuration yet?", true)
+		}
+		return apperror.New(ErrCodeAcmeServerError, nil, "error communicating with Let's Encrypt", true)
 	}
 
 	return nil

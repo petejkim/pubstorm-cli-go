@@ -404,4 +404,92 @@ var _ = Describe("Certs", func() {
 			errIsNil: true,
 		}),
 	)
+
+	DescribeTable("Enable",
+		func(e expectation) {
+			server.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("POST", "/projects/foo-bar-express/domains/foo-bar-express.com/cert/letsencrypt"),
+					ghttp.VerifyHeader(http.Header{
+						"Authorization": {"Bearer t0k3n"},
+						"Accept":        {config.ReqAccept},
+						"User-Agent":    {config.UserAgent},
+					}),
+					ghttp.RespondWith(e.resCode, e.resBody),
+				),
+			)
+
+			appErr := certs.Enable("t0k3n", "foo-bar-express", "foo-bar-express.com")
+			Expect(server.ReceivedRequests()).To(HaveLen(1))
+
+			if e.errIsNil {
+				Expect(appErr).To(BeNil())
+			} else {
+				Expect(appErr).NotTo(BeNil())
+				Expect(appErr.Code).To(Equal(e.errCode))
+				Expect(appErr.Description).To(ContainSubstring(e.errDesc))
+				Expect(appErr.IsFatal).To(Equal(e.errIsFatal))
+			}
+		},
+
+		Entry("unexpected response code", expectation{
+			resCode:    http.StatusInternalServerError,
+			resBody:    "",
+			errIsNil:   false,
+			errCode:    certs.ErrCodeUnexpectedError,
+			errDesc:    "",
+			errIsFatal: true,
+		}),
+
+		Entry("404 with project not found", expectation{
+			resCode:    http.StatusNotFound,
+			resBody:    `{"error": "not_found", "error_description": "project could not be found"}`,
+			errIsNil:   false,
+			errCode:    certs.ErrCodeProjectNotFound,
+			errDesc:    "project could not be found",
+			errIsFatal: true,
+		}),
+
+		Entry("404 with domain not found", expectation{
+			resCode:    http.StatusNotFound,
+			resBody:    `{"error": "not_found", "error_description": "domain could not be found"}`,
+			errIsNil:   false,
+			errCode:    certs.ErrCodeNotFound,
+			errDesc:    "domain could not be found",
+			errIsFatal: true,
+		}),
+
+		Entry("403 with default domain is already secure", expectation{
+			resCode:    http.StatusForbidden,
+			resBody:    `{"error": "forbidden", "error_description": "the default domain is already secure"}`,
+			errIsNil:   false,
+			errCode:    certs.ErrCodeNotAllowedDomain,
+			errDesc:    "the default domain already supports HTTPS",
+			errIsFatal: true,
+		}),
+
+		Entry("503 with domain could not be verified", expectation{
+			resCode:    http.StatusServiceUnavailable,
+			resBody:    `{"error": "service_unavailable", "error_description": "domain could not be verified"}`,
+			errIsNil:   false,
+			errCode:    certs.ErrCodeAcmeServerError,
+			errDesc:    "domain could not be verified - have you changed its DNS configuration yet?",
+			errIsFatal: true,
+		}),
+
+		Entry("503 with service unavailable", expectation{
+			resCode:    http.StatusServiceUnavailable,
+			resBody:    `{"error": "service_unavailable"}`,
+			errIsNil:   false,
+			errCode:    certs.ErrCodeAcmeServerError,
+			errDesc:    "error communicating with Let's Encrypt",
+			errIsFatal: true,
+		}),
+
+		Entry("successful enable", expectation{
+			resCode:  http.StatusOK,
+			resBody:  `{ "cert": {} }`,
+			errIsNil: true,
+		}),
+	)
 })
