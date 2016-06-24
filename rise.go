@@ -13,6 +13,7 @@ import (
 	"github.com/nitrous-io/rise-cli-go/cli/configuration"
 	"github.com/nitrous-io/rise-cli-go/cli/deploy"
 	"github.com/nitrous-io/rise-cli-go/cli/domains"
+	"github.com/nitrous-io/rise-cli-go/cli/env"
 	"github.com/nitrous-io/rise-cli-go/cli/initcmd"
 	"github.com/nitrous-io/rise-cli-go/cli/login"
 	"github.com/nitrous-io/rise-cli-go/cli/logout"
@@ -314,6 +315,37 @@ func main() {
 			Name:   "unprotect",
 			Usage:  tr.T("unprotect_desc"),
 			Action: protect.Unprotect,
+		},
+		{
+			Name:   "env",
+			Usage:  tr.T("env_list_desc"),
+			Action: env.List,
+			Subcommands: []cli.Command{
+				{
+					Name:      "set",
+					Usage:     tr.T("env_set_desc"),
+					Action:    env.Add,
+					ArgsUsage: tr.T("env_set_args"),
+				},
+				{
+					Name:      "rm",
+					Usage:     tr.T("env_rm_desc"),
+					Action:    env.Delete,
+					ArgsUsage: tr.T("env_rm_args"),
+				},
+			},
+		},
+		{
+			Name:      "env.set",
+			Usage:     tr.T("env_set_desc"),
+			Action:    env.Add,
+			ArgsUsage: tr.T("env_set_args"),
+		},
+		{
+			Name:      "env.rm",
+			Usage:     tr.T("env_rm_desc"),
+			Action:    env.Delete,
+			ArgsUsage: tr.T("env_rm_args"),
 		},
 	}
 
