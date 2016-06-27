@@ -24,6 +24,7 @@ const (
 	ErrCodeProjectNotFound  = "project_not_found"
 	ErrCodeFileSizeTooLarge = "file_size_too_large"
 	ErrCodeNotAllowedDomain = "domain_not_allowed"
+	ErrCodeCertExists       = "cert_already_exists"
 	ErrCodeAcmeServerError  = "acme_server_error"
 
 	ErrInvalidCert       = "invalid_cert"
@@ -219,6 +220,7 @@ func Enable(token, name, domainName string) *apperror.Error {
 		http.StatusOK,
 		http.StatusNotFound,
 		http.StatusForbidden,
+		http.StatusConflict,
 		http.StatusServiceUnavailable}, res.StatusCode) {
 		return apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
@@ -241,6 +243,10 @@ func Enable(token, name, domainName string) *apperror.Error {
 
 	if res.StatusCode == http.StatusForbidden {
 		return apperror.New(ErrCodeNotAllowedDomain, nil, "the default domain already supports HTTPS", true)
+	}
+
+	if res.StatusCode == http.StatusConflict {
+		return apperror.New(ErrCodeCertExists, nil, "a Let's Encrypt certificate has already been setup for this domain", true)
 	}
 
 	if res.StatusCode == http.StatusServiceUnavailable {

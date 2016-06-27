@@ -468,6 +468,15 @@ var _ = Describe("Certs", func() {
 			errIsFatal: true,
 		}),
 
+		Entry("409 with certificate has already been setup", expectation{
+			resCode:    http.StatusConflict,
+			resBody:    `{"error": "already_exists", "error_description": "a certificate from Let's Encrypt has already been setup"}`,
+			errIsNil:   false,
+			errCode:    certs.ErrCodeCertExists,
+			errDesc:    "a Let's Encrypt certificate has already been setup for this domain",
+			errIsFatal: true,
+		}),
+
 		Entry("503 with domain could not be verified", expectation{
 			resCode:    http.StatusServiceUnavailable,
 			resBody:    `{"error": "service_unavailable", "error_description": "domain could not be verified"}`,
