@@ -212,7 +212,7 @@ func Force(c *cli.Context) {
 	}
 }
 
-func Enable(c *cli.Context) {
+func Letsencrypt(c *cli.Context) {
 	token := common.RequireAccessToken()
 	proj := common.RequireProject(token)
 
@@ -235,7 +235,7 @@ func Enable(c *cli.Context) {
 	spin := spinner.New()
 	done := make(chan struct{})
 	go func() {
-		tui.Printf(tr.T("ssl_enable_progress")+" "+tui.Blu("%s"), tui.Undl(domainName), string(spin.Next()))
+		tui.Printf(tr.T("ssl_letsencrypt_progress")+" "+tui.Blu("%s"), tui.Undl(domainName), string(spin.Next()))
 
 		ticker := time.NewTicker(100 * time.Millisecond)
 		for {
@@ -260,8 +260,8 @@ func Enable(c *cli.Context) {
 			log.Fatalf(tr.T("project_not_found"), proj.Name)
 		case certs.ErrCodeAcmeServerError:
 			subDn, apex := util.SplitDomain(domainName)
-			log.Errorf(tr.T("ssl_enable_error"), tui.Undl(domainName))
-			log.Infof(tr.T("ssl_enable_dns"), apex)
+			log.Errorf(tr.T("ssl_letsencrypt_error"), tui.Undl(domainName))
+			log.Infof(tr.T("ssl_letsencrypt_dns"), apex)
 			log.Infof("  * %s: %s ---> %s", tui.Bold("CNAME (Alias)"), tui.Undl(subDn), tui.Undl(proj.DefaultDomain()))
 			if subDn == "www" {
 				log.Infof("\n  * %s: %s ---> %s", tui.Bold("A (Host)"), tui.Undl("@"), tui.Undl(config.RedirectorIP))
@@ -272,7 +272,7 @@ func Enable(c *cli.Context) {
 		appErr.Handle()
 	}
 
-	log.Infof(tr.T("ssl_enable_success"), tui.Undl("https://"+domainName+"/"))
+	log.Infof(tr.T("ssl_letsencrypt_success"), tui.Undl("https://"+domainName+"/"))
 }
 
 func checkCertFile(filePath string) error {
