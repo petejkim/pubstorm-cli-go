@@ -243,9 +243,9 @@ var strs = map[string]map[string]string{
 		"re_init_project_aborted": "Re-initialization aborted",
 
 		"configure_project":                  "Configure your project: %s",
-		"configuration_updated":              "Successfully updated %s project's configuration.",
-		"project_enabled_optimizer":          "Project will be optmized from next deployment.",
-		"project_disabled_optimizer":         "Project will not be optimized from next deployment.",
+		"configuration_updated":              "Successfully updated \"%s\" project configuration.",
+		"project_enabled_optimizer":          "Project will be optimized from the next deployment onwards.",
+		"project_disabled_optimizer":         "Project will no longer be optimized from the next deployment onwards.",
 		"optimized_project":                  "Deploy optimized project? [Y/n]",
 		"optimized_project_invalid_response": "Please response with \"y\" or \"n\"",
 
