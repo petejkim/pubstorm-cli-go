@@ -20,7 +20,8 @@ var (
 	LatestVersionURL = "https://s3-us-west-2.amazonaws.com/rise-development-usw2/versions/latest.json"
 
 	RedirectorIP = "52.38.113.95" // don't ever change this
-	DNSHelpURL   = "https://help.pubstorm.com/custom-domains"
+
+	DNSHelpURL = "https://help.pubstorm.com/getting-started/custom-domains/"
 
 	// these do not have to be secured
 	ClientID     = "73c24fbc2eb24bbf1d3fc3749fc8ac35"
