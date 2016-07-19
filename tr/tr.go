@@ -53,6 +53,9 @@ var strs = map[string]map[string]string{
 		"env_rm_desc":             "Unset one or more js environment variables",
 		"env_rm_args":             "KEY1 [KEY2 ...]",
 		"env_list_desc":           "List js environment variables for a PubStorm project",
+		"repo_link_desc":          "Link the current project to a GitHub repository so that pushes to the repository will publish your project",
+		"repo_unlink_desc":        "Unlink the current project from its GitHub repository",
+		"repo_info_desc":          "Displays the linked GitHub repository information and setup instructions",
 
 		"update_available":       "A PubStorm update is available.",
 		"update_current_version": "Your version: %s",
@@ -152,9 +155,8 @@ var strs = map[string]map[string]string{
 		"default_domain_removed":         "Successfully disabled default domain \"%s\" for project \"%s\".",
 		"default_domain_already_removed": "Default domain \"%s\" is already disabled for project \"%s\", nothing to do.",
 
-		"project_not_found":     "Could not find a project \"%s\" that belongs to you.",
-		"project_is_locked":     "The project \"%s\" is locked by another user or process, please try again.",
-		"project_limit_reached": "You have hit the 10 free project limit. Please email hello@pubstorm.com to upgrade your account.",
+		"project_not_found": "Could not find a project \"%s\" that belongs to you.",
+		"project_is_locked": "The project \"%s\" is locked by another user or process, please try again.",
 
 		"projects_list_header":        "Your Projects",
 		"shared_projects_list_header": "Projects Shared With You",
@@ -264,6 +266,21 @@ var strs = map[string]map[string]string{
 		"env_deleted":     "Successfully deleted %s",
 		"env_list_header": "Your JS Environment Variables for \"%s\"",
 		"no_env":          "You do not have any js environment variables for \"%s\"",
+
+		"link_repo_explanation":         "Linking a GitHub repository to a project will allow you to automatically publish it when you push to the repository.",
+		"link_repo_caveat":              "This only works for public GitHub repositories. Also, please check in the pubstorm.json file to your repository.",
+		"enter_repo_to_link":            "Enter GitHub repository URL",
+		"enter_branch":                  "Enter branch [master]",
+		"link_repo_success":             "Successfully linked project to \"%s@%s\"",
+		"link_repo_instructions_header": "Setup Instructions:",
+		"link_repo_instructions_line_1": "1. In your GitHub account, go to the %s repository. Click on the %s tab.",
+		"link_repo_instructions_line_2": "2. Click on %s in the left navigation, then click the %s button.",
+		"link_repo_instructions_line_3": "3. Enter %s as the %s. Ensure that the %s is %s.",
+		"link_repo_instructions_line_4": "4. Enter %s in the %s field. This will ensure that only GitHub can trigger the publishing of your project.",
+		"link_repo_instructions_line_5": "5. Choose %s (only push events are currently supported). Click the %s button when done.",
+		"project_not_linked":            "Project \"%s\" is not linked to any GitHub repository.",
+		"unlink_repo_success":           "Unlinked project \"%s\" from its GitHub repository.",
+		"linked_repo_info_repo":         "Project \"%s\" is linked to \"%s@%s\"",
 	},
 }
 

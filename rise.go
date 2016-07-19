@@ -20,6 +20,7 @@ import (
 	"github.com/nitrous-io/rise-cli-go/cli/password"
 	"github.com/nitrous-io/rise-cli-go/cli/projects"
 	"github.com/nitrous-io/rise-cli-go/cli/protect"
+	"github.com/nitrous-io/rise-cli-go/cli/repo"
 	"github.com/nitrous-io/rise-cli-go/cli/rollback"
 	"github.com/nitrous-io/rise-cli-go/cli/signup"
 	"github.com/nitrous-io/rise-cli-go/cli/ssl"
@@ -358,6 +359,41 @@ func main() {
 			Usage:     tr.T("env_rm_desc"),
 			Action:    env.Delete,
 			ArgsUsage: tr.T("env_rm_args"),
+		},
+		{
+			Name:   "repo.link",
+			Usage:  tr.T("repo_link_desc"),
+			Action: repo.Link,
+		},
+		{
+			Name:   "repo.unlink",
+			Usage:  tr.T("repo_unlink_desc"),
+			Action: repo.Unlink,
+		},
+		{
+			Name:   "repo.info",
+			Usage:  tr.T("repo_info_desc"),
+			Action: repo.Info,
+		},
+		{
+			Name: "repo",
+			Subcommands: []cli.Command{
+				{
+					Name:   "link",
+					Usage:  tr.T("repo_link_desc"),
+					Action: repo.Link,
+				},
+				{
+					Name:   "unlink",
+					Usage:  tr.T("repo_unlink_desc"),
+					Action: repo.Unlink,
+				},
+				{
+					Name:   "info",
+					Usage:  tr.T("repo_info_desc"),
+					Action: repo.Info,
+				},
+			},
 		},
 	}
 
