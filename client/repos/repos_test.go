@@ -46,6 +46,57 @@ var _ = Describe("Repos", func() {
 		expectedRepo *repos.Repo
 	}
 
+	Describe("Link", func() {
+		BeforeEach(func() {
+			server.AppendHandlers(
+				ghttp.CombineHandlers(
+					ghttp.VerifyRequest("POST", "/projects/foo-bar-express/repos"),
+					ghttp.VerifyHeader(http.Header{
+						"Authorization": {"Bearer t0k3n"},
+						"Content-Type":  {"application/x-www-form-urlencoded"},
+						"Accept":        {config.ReqAccept},
+						"User-Agent":    {config.UserAgent},
+					}),
+					ghttp.VerifyForm(url.Values{
+						"uri":    {"https://github.com/github/developer.github.com.git"},
+						"branch": {"gh-pages"},
+						"secret": {"p@55w0rd"},
+					}),
+					ghttp.RespondWith(http.StatusCreated, `{ "repo": {
+						"project_id": 1,
+						"uri": "https://github.com/github/developer.github.com.git",
+						"branch": "gh-pages",
+						"webhook_url": "https://api.pubstorm.com/hooks/github/deadbeeffece5",
+						"webhook_secret": "p@55w0rd"
+					} }`),
+				),
+			)
+		})
+
+		Context("when repo is unreachable", func() {
+			BeforeEach(func() {
+				repos.CheckReachability = func(repoURL string) bool { return false }
+			})
+
+			Context("when repo URL is valid", func() {
+				It("does not return an error", func() {
+					_, appErr := repos.Link("t0k3n", "foo-bar-express", "https://github.com/github/developer.github.com.git", "gh-pages", "p@55w0rd")
+					Expect(appErr).To(BeNil())
+				})
+			})
+
+			Context("when repo URL is invalid", func() {
+				It("returns an error", func() {
+					_, appErr := repos.Link("t0k3n", "foo-bar-express", "https://github.com/github", "gh-pages", "p@55w0rd")
+					Expect(appErr).NotTo(BeNil())
+					Expect(appErr.Code).To(Equal(repos.ErrCodeRepoInvalidURL))
+					Expect(appErr.Description).To(Equal("repository URL is in an invalid format"))
+					Expect(appErr.IsFatal).To(Equal(true))
+				})
+			})
+		})
+	})
+
 	DescribeTable("Link",
 		func(e expectation) {
 			server.AppendHandlers(
@@ -65,6 +116,9 @@ var _ = Describe("Repos", func() {
 					ghttp.RespondWith(e.resCode, e.resBody),
 				),
 			)
+
+			// Don't run git ls-remote in tests.
+			repos.CheckReachability = func(repoURL string) bool { return true }
 
 			repo, appErr := repos.Link("t0k3n", "foo-bar-express", "https://github.com/github/developer.github.com.git", "gh-pages", "p@55w0rd")
 			Expect(server.ReceivedRequests()).To(HaveLen(1))

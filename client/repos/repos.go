@@ -1,8 +1,13 @@
 package repos
 
 import (
+	"errors"
+	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os/exec"
+	"strings"
+	"time"
 
 	"github.com/franela/goreq"
 	"github.com/nitrous-io/rise-cli-go/apperror"
@@ -17,6 +22,7 @@ const (
 	ErrCodeAlreadyLinked    = "already_linked"
 	ErrCodeNotLinked        = "not_linked"
 	ErrCodeProjectNotFound  = "project_not_found"
+	ErrCodeRepoInvalidURL   = "repo_invalid_url"
 )
 
 type Repo struct {
@@ -26,7 +32,54 @@ type Repo struct {
 	WebhookSecret string `json:"webhook_secret"`
 }
 
+// checkReachability tests whether the given Git repository URL is publicly
+// reachable via `git ls-remote`. It only returns definite positives (i.e. if it
+// returns false, it _does not_ mean that the repository is unreachable, only
+// that we don't know for sure).
+var CheckReachability = func(repoURL string) bool {
+	path, err := exec.LookPath("git")
+	if err != nil {
+		return false
+	}
+
+	cmd := exec.Command(path, "ls-remote", repoURL)
+	cmd.Env = append(cmd.Env, "GIT_ASKPASS=true") // Avoid auth prompt.
+	cmd.Stdout = ioutil.Discard
+	cmd.Stderr = ioutil.Discard
+
+	if err := cmd.Start(); err != nil {
+		return false
+	}
+
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- cmd.Wait()
+	}()
+
+	select {
+	case <-time.After(3 * time.Second):
+		cmd.Process.Kill()
+		return false
+	case err := <-errCh:
+		return (err == nil)
+	}
+}
+
 func Link(token, projectName, repoURL, branch, secret string) (*Repo, *apperror.Error) {
+	// Test whether repo URL is publicly reachable.
+	reachable := CheckReachability(repoURL)
+	if !reachable {
+		// Validate the URL format instead.
+		valid := validateRepoURL(repoURL)
+		if !valid {
+			err := errors.New("repository URL is in an invalid format")
+			return nil, apperror.New(ErrCodeRepoInvalidURL, err, err.Error(), true)
+		}
+
+		// If repo is not reachable, but looks like a valid URL, we allow it
+		// (e.g. user doesn't have git installed, or is offline).
+	}
+
 	req := goreq.Request{
 		Method:      "POST",
 		Uri:         config.Host + "/projects/" + projectName + "/repos",
@@ -174,4 +227,21 @@ func Info(token, projectName string) (*Repo, *apperror.Error) {
 	}
 
 	return j.Repo, nil
+}
+
+// validateRepoURL loosely validates that a URL is that of a GitHub repo.
+func validateRepoURL(repoURL string) bool {
+	allowedPrefixes := []string{"https://github.com/", "git://github.com/", "git@github.com:"}
+
+	for _, prefix := range allowedPrefixes {
+		if strings.HasPrefix(repoURL, prefix) {
+			path := strings.TrimPrefix(repoURL, prefix)
+			parts := strings.Split(path, "/")
+			if len(parts) == 2 {
+				return true
+			}
+		}
+	}
+
+	return false
 }

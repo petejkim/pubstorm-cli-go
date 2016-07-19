@@ -49,8 +49,6 @@ func Link(c *cli.Context) {
 		branch = defaultBranch
 	}
 
-	// TODO Validate repo@branch is publicly accessible.
-
 	// Generate a random secret to use for the webhook.
 	// TODO We should allow users to regenerate the secret (e.g. when they want to
 	// cycle it).
