@@ -99,6 +99,15 @@ var _ = Describe("Projects", func() {
 			errIsFatal: true,
 		}),
 
+		Entry("403 with project limit reached", expectation{
+			resCode:    http.StatusForbidden,
+			resBody:    `{"error": "invalid_params", "error_description": "maximum number of projects reached"}`,
+			errIsNil:   false,
+			errCode:    projects.ErrCodeLimitReached,
+			errDesc:    "maximum number of projects reached",
+			errIsFatal: true,
+		}),
+
 		Entry("422 with name is taken error", expectation{
 			resCode:    422,
 			resBody:    `{"error": "invalid_params", "errors": {"name": "is taken"}}`,

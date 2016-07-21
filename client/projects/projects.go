@@ -19,6 +19,7 @@ const (
 	ErrCodeUnexpectedError  = "unexpected_error"
 	ErrCodeValidationFailed = "validation_failed"
 	ErrCodeNotFound         = "not_found"
+	ErrCodeLimitReached     = "project_limit_reached"
 )
 
 func Create(token, name string) *apperror.Error {
@@ -40,13 +41,17 @@ func Create(token, name string) *apperror.Error {
 	}
 	defer res.Body.Close()
 
-	if !util.ContainsInt([]int{http.StatusCreated, 422}, res.StatusCode) {
+	if !util.ContainsInt([]int{http.StatusCreated, http.StatusForbidden, 422}, res.StatusCode) {
 		return apperror.New(ErrCodeUnexpectedError, err, "", true)
 	}
 
 	var j map[string]interface{}
 	if err := res.Body.FromJsonTo(&j); err != nil {
 		return apperror.New(ErrCodeUnexpectedError, err, "", true)
+	}
+
+	if res.StatusCode == http.StatusForbidden {
+		return apperror.New(ErrCodeLimitReached, nil, tr.T("project_limit_reached"), true)
 	}
 
 	if res.StatusCode == 422 {
