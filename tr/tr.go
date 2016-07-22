@@ -154,7 +154,7 @@ var strs = map[string]map[string]string{
 
 		"project_not_found":     "Could not find a project \"%s\" that belongs to you.",
 		"project_is_locked":     "The project \"%s\" is locked by another user or process, please try again.",
-		"project_limit_reached": "Maximum number of projects reached.",
+		"project_limit_reached": "You have hit the 10 free project limit. Please email hello@pubstorm.com to upgrade your account.",
 
 		"projects_list_header":        "Your Projects",
 		"shared_projects_list_header": "Projects Shared With You",
