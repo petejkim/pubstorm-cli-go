@@ -52,6 +52,7 @@ var _ = Describe("Bundle", func() {
 				"public/app/controllers/posts/posts_controller.rb",
 				"public/app/models/.gitkeep",
 				"public/app/models/post.rb",
+				"public/app/models/post(1.0_'beta').rb",
 				"public/app/models/#post.rb",
 				"public/app/views/home/home.erb",
 				"public/app/views/home/home.erb~",
@@ -61,6 +62,9 @@ var _ = Describe("Bundle", func() {
 				"public/log/production.log",
 				"public/public/index.html",
 				"public/tmp/appendonly.txt",
+				"public/tmp/\"$10dollar\"/nomoney.rb",
+				"public/tmp/10dollar/nömoney.rb",
+				"public/tmp/wèîrd_föłdér/śüper.txt",
 				"public/vendor/assets/javascripts/jquery/jquery-2.0.js",
 				"public/vendor/assets/javascripts/underscore.js",
 				"public/README.rdoc",
@@ -105,14 +109,15 @@ var _ = Describe("Bundle", func() {
 				"app/controllers/home/home_controller.rb",
 				"app/controllers/posts/posts_controller.rb",
 				"app/models/post.rb",
+				"app/models/post(1.0_'beta').rb",
 				"app/views/home/home.erb",
 				"config/environments/production.rb",
 				"public/index.html",
 				"README.rdoc",
 			}
 
-			Expect(count).To(Equal(10))
-			Expect(size).To(Equal(int64(30)))
+			Expect(count).To(Equal(11))
+			Expect(size).To(Equal(int64(33)))
 
 			Expect(b.FileList()).To(ConsistOf(expectedFiles))
 		})

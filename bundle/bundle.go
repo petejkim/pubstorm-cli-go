@@ -10,6 +10,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/nitrous-io/rise-cli-go/pkg/pathmatch"
@@ -21,6 +22,9 @@ import (
 )
 
 var (
+	// From http://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html#object-keys
+	FilenamePatternRe = regexp.MustCompile("[^0-9A-Za-z,!_'()\\.\\*\\-]+")
+
 	ErrFileChanged = errors.New("file changed while processing")
 )
 
@@ -138,6 +142,11 @@ func shouldInclude(path, basePath string, ignoreList []string, fi os.FileInfo, s
 
 	if base[len(base)-1] == '~' {
 		logWarn(tr.T("name_has_tilde_suffix"))
+		return skip()
+	}
+
+	if FilenamePatternRe.MatchString(base) {
+		logWarn(tr.T("name_has_non_safe_character"))
 		return skip()
 	}
 
