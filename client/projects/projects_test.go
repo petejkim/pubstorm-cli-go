@@ -104,7 +104,7 @@ var _ = Describe("Projects", func() {
 			resBody:    `{"error": "invalid_params", "error_description": "maximum number of projects reached"}`,
 			errIsNil:   false,
 			errCode:    projects.ErrCodeLimitReached,
-			errDesc:    "maximum number of projects reached",
+			errDesc:    "you have hit the 10 free project limit. please email hello@pubstorm.com to upgrade your account.",
 			errIsFatal: true,
 		}),
 
