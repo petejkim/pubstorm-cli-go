@@ -23,7 +23,7 @@ import (
 
 var (
 	// From http://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html#object-keys
-	FilenamePatternRe = regexp.MustCompile("[^0-9A-Za-z,!_'()\\.\\*\\-]+")
+	FilenamePatternRe = regexp.MustCompile("[^0-9A-Za-z,!_'()\\.\\*\\-@]+")
 
 	ErrFileChanged = errors.New("file changed while processing")
 )
