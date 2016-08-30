@@ -100,7 +100,7 @@ var strs = map[string]map[string]string{
 		"login_expired":   "Your previous session has expired. Please login again by running `storm login`.",
 		"no_rise_project": "Could not find a PubStorm project in current working directory. To initialize a new PubStorm project here, run `storm init`.",
 
-		"something_wrong": "Something went wrong. Please try again.",
+		"something_wrong": "Something went wrong. Please try again and contact support@pubstorm.com if it persists",
 
 		"existing_rise_project": "A PubStorm project already exists in the current working directory; aborting.",
 
@@ -283,6 +283,8 @@ var strs = map[string]map[string]string{
 		"project_not_linked":            "Project \"%s\" is not linked to any GitHub repository.",
 		"unlink_repo_success":           "Unlinked project \"%s\" from its GitHub repository.",
 		"linked_repo_info_repo":         "Project \"%s\" is linked to \"%s@%s\"",
+
+		"unexpected_error": "An unexpected error occurred. Please try again and contact support@pubstorm.com if it persists",
 	},
 }
 

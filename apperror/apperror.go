@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/nitrous-io/rise-cli-go/tr"
 )
 
 type Error struct {
@@ -44,6 +45,11 @@ func (e *Error) Print() {
 
 func (e *Error) Handle() {
 	if e.IsFatal {
+		// If description is empty, try to get from existing messages
+		if e.Description == "" && tr.T(e.Code) != "" {
+			e.Description = tr.T(e.Code)
+		}
+
 		log.Fatal(e.Error())
 	} else {
 		e.Print()
